@@ -1,0 +1,82 @@
+/* tokens.css: la identidad de Mosaico Telar, en un solo lugar.
+
+   De dónde sale cada decisión (para que nadie la cambie sin saber por qué):
+   - Nunito es la tipografía de Kinesis y de Wisfox. Se conserva como la voz común.
+   - El verde bosque #1B7F56 es el color de marca de Kinesis (docs/IDENTIDAD_DE_MARCA.md).
+   - El coral #E8746A es el acento de Wisfox y el color del zorro. Como texto no pasa el
+     contraste, por eso tiene una versión oscura (--c-wisfox-fuerte) para botones y letras.
+   - El índigo #3B3A7A es el de IA ValerIA y el de la marca del colectivo.
+   - El ámbar queda reservado para avisos y para el PIAR, como en Kinesis. Nunca rojo:
+     un PIAR no es un error.
+
+   Cada espacio (Kinesis, Wisfox, ValerIA) cambia cuatro variables --e-* y todos los
+   componentes se repintan solos. Así hay un único conjunto de componentes. */
+
+:root {
+  --papel: #FAF6EF;
+  --superficie: #FFFFFF;
+  --hundido: #F2EBDD;
+  --tinta: #23202E;
+  --tinta-suave: #54505F;
+  --linea: #E2DACB;
+
+  --c-kinesis: #1B7F56;       --c-kinesis-fuerte: #1B7F56;   --c-kinesis-texto: #166A47;   --c-kinesis-suave: #E1F1E9;
+  --c-wisfox: #E8746A;        --c-wisfox-fuerte: #A93D33;    --c-wisfox-texto: #A93D33;    --c-wisfox-suave: #FBE6E3;
+  --c-valeria: #3B3A7A;       --c-valeria-fuerte: #3B3A7A;   --c-valeria-texto: #3B3A7A;   --c-valeria-suave: #E8E8F6;
+
+  --aviso: #E8A13C;  --aviso-texto: #7A4E0E;  --aviso-suave: #FBEFD8;
+  --ok-texto: #1D4A35;  --ok-suave: #E0F0E7;
+  --sobre-fuerte: #FFFFFF;      /* texto sobre un relleno --e-fuerte */
+
+  --panel: #23202E;  --sobre-panel: #F1ECE2;  --sobre-panel-suave: #C9C2D6;
+  --foco: #C98A2B;
+  --hilo: #E4DAC6;  --hilo-sombra: #CFC3AB;   /* los hilos neutros del telar */
+
+  --radio: 18px;
+  --radio-chico: 12px;
+  --sombra: 0 6px 22px rgba(35, 32, 46, .09);
+  --fuente: "Nunito", system-ui, "Segoe UI", Roboto, sans-serif;
+
+  /* Espacio activo. Por defecto, la marca del colectivo. */
+  --e-vivo: var(--c-valeria);
+  --e-fuerte: var(--c-valeria-fuerte);
+  --e-texto: var(--c-valeria-texto);
+  --e-suave: var(--c-valeria-suave);
+}
+
+[data-espacio="kinesis"] { --e-vivo: var(--c-kinesis); --e-fuerte: var(--c-kinesis-fuerte); --e-texto: var(--c-kinesis-texto); --e-suave: var(--c-kinesis-suave); }
+[data-espacio="wisfox"]  { --e-vivo: var(--c-wisfox);  --e-fuerte: var(--c-wisfox-fuerte);  --e-texto: var(--c-wisfox-texto);  --e-suave: var(--c-wisfox-suave); }
+[data-espacio="valeria"] { --e-vivo: var(--c-valeria); --e-fuerte: var(--c-valeria-fuerte); --e-texto: var(--c-valeria-texto); --e-suave: var(--c-valeria-suave); }
+
+/* Tema oscuro: por preferencia del sistema, salvo que la persona fuerce el claro. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-tema="claro"]) {
+    --papel: #17151F;  --superficie: #211E2B;  --hundido: #1D1A26;
+    --tinta: #F1ECE2;  --tinta-suave: #B9B3C6;  --linea: #342F42;
+    --c-kinesis: #6FD08C;  --c-kinesis-fuerte: #6FD08C;  --c-kinesis-texto: #6FD08C;  --c-kinesis-suave: #15301F;
+    --c-wisfox: #FF9A8F;   --c-wisfox-fuerte: #FF9A8F;   --c-wisfox-texto: #FFA69C;   --c-wisfox-suave: #3C221C;
+    --c-valeria: #B7B6F0;  --c-valeria-fuerte: #B7B6F0;  --c-valeria-texto: #B7B6F0;  --c-valeria-suave: #2A2850;
+    --aviso-texto: #E8B968;  --aviso-suave: #3A2D16;
+    --ok-texto: #A8DCC1;  --ok-suave: #1B3228;
+    --sobre-fuerte: #14121B;
+    --panel: #0F0D15;
+    --hilo: #3A3548;  --hilo-sombra: #2C2838;
+    --sombra: 0 6px 22px rgba(0, 0, 0, .35);
+  }
+}
+:root[data-tema="oscuro"] {
+  --papel: #17151F;  --superficie: #211E2B;  --hundido: #1D1A26;
+  --tinta: #F1ECE2;  --tinta-suave: #B9B3C6;  --linea: #342F42;
+  --c-kinesis: #6FD08C;  --c-kinesis-fuerte: #6FD08C;  --c-kinesis-texto: #6FD08C;  --c-kinesis-suave: #15301F;
+  --c-wisfox: #FF9A8F;   --c-wisfox-fuerte: #FF9A8F;   --c-wisfox-texto: #FFA69C;   --c-wisfox-suave: #3C221C;
+  --c-valeria: #B7B6F0;  --c-valeria-fuerte: #B7B6F0;  --c-valeria-texto: #B7B6F0;  --c-valeria-suave: #2A2850;
+  --aviso-texto: #E8B968;  --aviso-suave: #3A2D16;
+  --ok-texto: #A8DCC1;  --ok-suave: #1B3228;
+  --sobre-fuerte: #14121B;
+  --panel: #0F0D15;
+  --hilo: #3A3548;  --hilo-sombra: #2C2838;
+  --sombra: 0 6px 22px rgba(0, 0, 0, .35);
+}
+
+/* Texto grande: sube la base al 112,5 %, como en Kinesis. Todo está en rem. */
+html[data-texto="grande"] { font-size: 112.5%; }

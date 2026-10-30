@@ -1,0 +1,188 @@
+# -*- coding: utf-8 -*-
+"""
+auditar.py: prueba Mosaico Telar en un navegador real.
+
+    python herramientas/auditar.py            # todo
+    python herramientas/auditar.py --enlaces  # además, comprueba que los enlaces externos respondan
+
+Por qué existe: los fallos de una página como esta (desbordes en el celular, texto que no se
+lee en el tema oscuro, un botón que no hace nada) no se ven leyendo el código. Se ven midiendo.
+Esto deja ese método como herramienta, para repetirlo antes de cada publicación.
+
+Qué hace
+--------
+1. Revisa que cada archivo que referencia index.html exista.
+2. Sirve la carpeta por http y abre herramientas/arnes.html en Chrome sin pantalla. El arnés
+   recorre las 11 pantallas en 390 y 1280 px de ancho, en tema claro y oscuro, y mide:
+   desborde horizontal, errores de ejecución, un único h1, controles sin nombre, controles de
+   menos de 24 px y contraste del texto (4,5 a 1, o 3 a 1 en texto grande).
+3. Ejecuta el recorrido completo como lo haría una persona: ajustar en Kinesis, aprobar en
+   Orientación, verlo en Familia, recibirlo en Wisfox, hacer el quiz y el juego, y hablar con
+   ValerIA.
+4. Imprime un informe. Sale con código 1 si algo falla.
+
+Necesita Chrome o Edge instalado. No instala nada y no envía datos a ningún sitio.
+"""
+
+import html
+import json
+import os
+import re
+import socket
+import subprocess
+import sys
+import tempfile
+import threading
+import urllib.request
+from functools import partial
+from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
+
+RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+NAVEGADORES = [
+    r'C:\Program Files\Google\Chrome\Application\chrome.exe',
+    r'C:\Program Files (x86)\Google\Chrome\Application\chrome.exe',
+    r'C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe',
+    '/usr/bin/google-chrome',
+    '/usr/bin/chromium',
+    '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+]
+
+
+def encontrar_navegador():
+    for ruta in NAVEGADORES:
+        if os.path.exists(ruta):
+            return ruta
+    return None
+
+
+def revisar_referencias():
+    """Cada src y href local de index.html, y cada url() de las hojas de estilo, debe existir."""
+    fallos = []
+    with open(os.path.join(RAIZ, 'index.html'), encoding='utf-8') as f:
+        texto = f.read()
+    refs = re.findall(r'(?:src|href)="([^"#?:]+)"', texto)
+    for css in re.findall(r'href="(css/[^"]+)"', texto):
+        with open(os.path.join(RAIZ, css), encoding='utf-8') as f:
+            base = os.path.dirname(css)
+            refs += [os.path.normpath(os.path.join(base, u)).replace('\\', '/')
+                     for u in re.findall(r'url\("?([^")]+)"?\)', f.read())]
+    for ref in sorted(set(refs)):
+        if not os.path.exists(os.path.join(RAIZ, ref)):
+            fallos.append('falta el archivo ' + ref)
+    return fallos
+
+
+def puerto_libre():
+    with socket.socket() as s:
+        s.bind(('127.0.0.1', 0))
+        return s.getsockname()[1]
+
+
+class Silencioso(SimpleHTTPRequestHandler):
+    def log_message(self, *args):  # sin ruido en la consola
+        pass
+
+
+def servir():
+    puerto = puerto_libre()
+    servidor = ThreadingHTTPServer(('127.0.0.1', puerto), partial(Silencioso, directory=RAIZ))
+    threading.Thread(target=servidor.serve_forever, daemon=True).start()
+    return servidor, puerto
+
+
+def correr_arnes(navegador, puerto):
+    perfil = tempfile.mkdtemp(prefix='mt_audit_')  # perfil limpio: sin extensiones ni caché
+    url = f'http://127.0.0.1:{puerto}/herramientas/arnes.html'
+    cmd = [navegador, '--headless=new', '--disable-gpu', '--hide-scrollbars', f'--user-data-dir={perfil}',
+           '--virtual-time-budget=180000', '--dump-dom', url]
+    r = subprocess.run(cmd, capture_output=True, text=True, encoding='utf-8', errors='replace', timeout=240)
+    m = re.search(r'<pre id="resultado"[^>]*>(.*?)</pre>', r.stdout, re.S)
+    if not m or not m.group(1).strip():
+        raise RuntimeError('El arnés no devolvió resultados.\n' + r.stderr[-500:])
+    return json.loads(html.unescape(m.group(1)))
+
+
+def comprobar_enlaces():
+    """Cada enlace externo que aparece en el código debe responder. Ignora la ruta /issues/new."""
+    urls = set()
+    for carpeta, _, archivos in os.walk(RAIZ):
+        if '.git' in carpeta:
+            continue
+        for a in archivos:
+            if a.endswith(('.js', '.html', '.md')):
+                with open(os.path.join(carpeta, a), encoding='utf-8') as f:
+                    urls |= set(re.findall(r"https://[^\s'\")<>]+", f.read()))
+    fallos = []
+    for u in sorted(urls):
+        u = u.rstrip('.,;')
+        if u.endswith('/issues/new') or 'fonts.googleapis' in u:
+            continue
+        try:
+            req = urllib.request.Request(u, headers={'User-Agent': 'Mozilla/5.0 (auditar.py)'})
+            urllib.request.urlopen(req, timeout=15)
+        except Exception as e:
+            fallos.append(f'{u} -> {e}')
+    return fallos, len(urls)
+
+
+def main():
+    # La consola de Windows usa una página de códigos que rompe las tildes.
+    if hasattr(sys.stdout, 'reconfigure'):
+        sys.stdout.reconfigure(encoding='utf-8')
+    problemas = 0
+    print('Mosaico Telar: auditoría\n')
+
+    refs = revisar_referencias()
+    print('1. Archivos referenciados:', 'todos existen' if not refs else '')
+    for r in refs:
+        print('   FALLA', r)
+    problemas += len(refs)
+
+    navegador = encontrar_navegador()
+    if not navegador:
+        print('\nNo encontré Chrome ni Edge: no puedo medir en un navegador.')
+        return 1
+
+    servidor, puerto = servir()
+    try:
+        datos = correr_arnes(navegador, puerto)
+    finally:
+        servidor.shutdown()
+
+    if datos.get('fatal'):
+        print('\nEl arnés tuvo un error (se muestran los resultados parciales):\n', datos['fatal'])
+        problemas += 1
+
+    casos = datos['casos']
+    malos = [c for c in casos if c['fallos']]
+    medidos = sum(c['contraste']['medidos'] for c in casos)
+    omitidos = sum(c['contraste']['omitidos'] for c in casos)
+    print(f'\n2. Pantallas: {len(casos)} casos (11 pantallas x 2 anchos x 2 temas), {len(malos)} con fallos.')
+    print(f'   Contraste: {medidos} textos medidos; {omitidos} sobre degradado omitidos (se revisan a ojo).')
+    for c in malos:
+        print(f"   FALLA {c['ruta']} {c['ancho']}px tema {c['tema']}")
+        for f in c['fallos']:
+            print('      -', f)
+    problemas += len(malos)
+
+    flujo = datos['flujo']
+    malos_f = [x for x in flujo if not x['ok']]
+    print(f'\n3. Recorrido completo: {len(flujo) - len(malos_f)} de {len(flujo)} comprobaciones bien.')
+    for x in malos_f:
+        print('   FALLA', x['nombre'], '|', x['detalle'])
+    problemas += len(malos_f)
+
+    if '--enlaces' in sys.argv:
+        fallos, total = comprobar_enlaces()
+        print(f'\n4. Enlaces externos: {total - len(fallos)} de {total} responden.')
+        for f in fallos:
+            print('   FALLA', f)
+        problemas += len(fallos)
+
+    print('\nResultado:', 'todo bien.' if not problemas else f'{problemas} problema(s).')
+    return 1 if problemas else 0
+
+
+if __name__ == '__main__':
+    sys.exit(main())

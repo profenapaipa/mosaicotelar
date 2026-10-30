@@ -1,0 +1,104 @@
+/* layout.css: el marco que comparten los tres espacios y la página de inicio.
+   Toma de Kinesis la "hoja" de tarjetas montada sobre un encabezado en degradado, las
+   pestañas en píldora y la barra flotante para el celular. */
+
+/* Un color por enlace de navegación, sin tocar los colores del espacio activo. */
+.e-kinesis { --l-vivo: var(--c-kinesis); --l-texto: var(--c-kinesis-texto); --l-suave: var(--c-kinesis-suave); }
+.e-wisfox  { --l-vivo: var(--c-wisfox);  --l-texto: var(--c-wisfox-texto);  --l-suave: var(--c-wisfox-suave); }
+.e-valeria { --l-vivo: var(--c-valeria); --l-texto: var(--c-valeria-texto); --l-suave: var(--c-valeria-suave); }
+.e-marca   { --l-vivo: var(--c-valeria); --l-texto: var(--c-valeria-texto); --l-suave: var(--c-valeria-suave); }
+
+/* Barra superior */
+.barra {
+  position: sticky; top: 0; z-index: 30;
+  display: flex; align-items: center; gap: .75rem 1.5rem; flex-wrap: wrap;
+  padding: .6rem 1.5rem;
+  background: color-mix(in srgb, var(--papel) 92%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--linea);
+}
+.marca { display: flex; align-items: center; gap: .6rem; text-decoration: none; color: var(--tinta); font: 900 1.3rem var(--fuente); margin-right: auto; }
+.marca svg { width: 34px; height: 34px; flex: none; }
+.nav-principal { display: flex; gap: .25rem; }
+.nav-principal a, .nav-movil a {
+  display: flex; align-items: center; gap: .45rem; text-decoration: none;
+  color: var(--tinta-suave); font-weight: 800; border-radius: 999px;
+}
+.nav-principal a { padding: .4rem .85rem; font-size: .95rem; }
+.nav-principal a svg, .nav-movil a svg { width: 22px; height: 22px; flex: none; }
+.nav-principal a:hover, .nav-movil a:hover { background: var(--l-suave); color: var(--l-texto); }
+.nav-principal a[aria-current="page"], .nav-movil a[aria-current="page"] { background: var(--l-suave); color: var(--l-texto); }
+.barra-acciones { display: flex; gap: .5rem; align-items: center; position: relative; }
+
+/* Menú de apariencia */
+.menu-apariencia {
+  position: absolute; right: 0; top: calc(100% + .5rem); z-index: 40; width: 17rem;
+  background: var(--superficie); border: 1px solid var(--linea); border-radius: var(--radio);
+  box-shadow: var(--sombra); padding: 1rem 1.1rem;
+}
+.menu-apariencia fieldset { border: 0; padding: 0; margin: 0 0 .8rem; }
+.menu-apariencia legend { font-weight: 900; padding: 0; margin-bottom: .3rem; }
+
+/* Cinta de datos ficticios (de Kinesis) */
+.cinta-datos { background: var(--aviso-suave); color: var(--aviso-texto); text-align: center; padding: .35rem 1rem; font-size: .88rem; font-weight: 700; }
+
+/* Encabezado de espacio con hoja encima */
+main { display: block; min-height: 60vh; }
+main:focus { outline: none; }
+.contenedor { width: 100%; max-width: 1100px; margin: 0 auto; padding: 0 1.25rem; }
+.encabezado-espacio {
+  background: linear-gradient(135deg, var(--e-fuerte), color-mix(in srgb, var(--e-fuerte) 72%, var(--tinta)));
+  color: var(--sobre-fuerte);
+  padding: 2.2rem 0 5.2rem;
+}
+.encabezado-espacio .cabecera { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+.encabezado-espacio svg.marca-espacio { width: 64px; height: 64px; flex: none; }
+.encabezado-espacio h1 { margin: 0; color: var(--sobre-fuerte); }
+.encabezado-espacio p { margin: .2rem 0 0; max-width: 60ch; }
+.pestanas { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1.4rem; }
+.pestanas a {
+  display: inline-flex; align-items: center; min-height: 40px; padding: .4rem 1.1rem;
+  border-radius: 999px; text-decoration: none; font-weight: 800;
+  color: var(--sobre-fuerte);
+  background: color-mix(in srgb, var(--sobre-fuerte) 16%, transparent);
+  border: 2px solid transparent;
+}
+.pestanas a:hover { background: color-mix(in srgb, var(--sobre-fuerte) 28%, transparent); }
+.pestanas a[aria-current="page"] { background: var(--sobre-fuerte); color: var(--e-fuerte); }
+.pestanas a:focus-visible { outline-color: var(--sobre-fuerte); }
+.hoja { position: relative; margin-top: -3.2rem; padding-bottom: 3rem; }
+
+/* Pie */
+.pie { max-width: 1100px; margin: 2rem auto 0; padding: 1.5rem 1.25rem 2.5rem; border-top: 1px solid var(--linea); color: var(--tinta-suave); font-size: .92rem; display: flex; gap: 1rem; align-items: flex-start; }
+.pie svg { width: 30px; height: 30px; flex: none; }
+.pie p { margin: 0 0 .25rem; }
+
+/* Barra flotante del celular (de Kinesis) */
+.nav-movil { display: none; }
+
+/* Panel de ValerIA: el lugar fijo donde se muestra la IA en cualquier espacio. */
+.panel-ia {
+  position: fixed; z-index: 50; top: 0; right: 0; bottom: 0; width: min(430px, 100%);
+  display: flex; flex-direction: column;
+  background: var(--superficie); border-left: 1px solid var(--linea); box-shadow: -10px 0 30px rgba(0, 0, 0, .12);
+}
+.panel-ia__cab { display: flex; align-items: center; gap: .7rem; padding: .8rem 1rem; border-bottom: 1px solid var(--linea); }
+.panel-ia__cab svg { width: 36px; height: 36px; flex: none; }
+.panel-ia__cab h2 { margin: 0; font-size: 1.1rem; }
+.panel-ia__cab .cerrar { margin-left: auto; }
+.panel-ia__cuerpo { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+
+@media (max-width: 860px) {
+  .barra { padding: .5rem 1rem; }
+  .nav-principal { display: none; }
+  .contenedor { padding: 0 1rem; }
+  .encabezado-espacio { padding: 1.6rem 0 4.6rem; }
+  body { padding-bottom: 5.4rem; }
+  .nav-movil {
+    display: flex; position: fixed; z-index: 35; left: .75rem; right: .75rem; bottom: .75rem;
+    justify-content: space-around; padding: .35rem;
+    background: var(--superficie); border: 1px solid var(--linea); border-radius: 999px; box-shadow: var(--sombra);
+  }
+  .nav-movil a { flex-direction: column; gap: 0; padding: .3rem .5rem; font-size: .7rem; min-width: 56px; border-radius: 18px; }
+  .panel-ia { top: auto; left: 0; width: 100%; height: 78vh; border-left: 0; border-top: 1px solid var(--linea); border-radius: 22px 22px 0 0; }
+}

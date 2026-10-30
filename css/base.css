@@ -1,0 +1,93 @@
+/* base.css: reinicio y componentes comunes. Todos leen las variables --e-*, así que el mismo
+   botón, tarjeta o pestaña se ve verde en Kinesis, coral en Wisfox e índigo en ValerIA. */
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  font: 400 1rem/1.6 var(--fuente);
+  color: var(--tinta);
+  background: var(--papel);
+  -webkit-text-size-adjust: 100%;
+}
+img, svg { max-width: 100%; }
+h1, h2, h3 { font-weight: 900; line-height: 1.15; margin: 0 0 .5rem; letter-spacing: -.01em; }
+h1 { font-size: clamp(2rem, 5vw, 2.6rem); }
+h2 { font-size: clamp(1.5rem, 3.4vw, 1.9rem); }
+h3 { font-size: 1.15rem; }
+p { margin: 0 0 .85rem; }
+a { color: var(--e-texto); text-underline-offset: 3px; }
+a:hover { text-decoration-thickness: 2px; }
+:focus-visible { outline: 3px solid var(--foco); outline-offset: 2px; border-radius: 6px; }
+[hidden] { display: none !important; }
+.solo-lectores { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.saltar { position: absolute; left: 1rem; top: -4rem; z-index: 100; background: var(--e-fuerte); color: var(--sobre-fuerte); padding: .6rem 1rem; border-radius: var(--radio-chico); font-weight: 800; }
+.saltar:focus { top: .75rem; }
+.suave { color: var(--tinta-suave); }
+
+/* Botones */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+  min-height: 44px; padding: .55rem 1.2rem;
+  font: 800 1rem var(--fuente); text-decoration: none; cursor: pointer;
+  color: var(--sobre-fuerte); background: var(--e-fuerte);
+  border: 2px solid var(--e-fuerte); border-radius: 999px;
+}
+.btn:hover { filter: brightness(1.08); }
+.btn[disabled], .btn[aria-disabled="true"] { opacity: .5; cursor: not-allowed; filter: none; }
+.btn--suave { background: transparent; color: var(--e-texto); border-color: var(--e-fuerte); }
+.btn--chico { min-height: 36px; padding: .3rem .9rem; font-size: .9rem; }
+.acciones { display: flex; flex-wrap: wrap; gap: .6rem; margin-top: 1rem; }
+
+/* Tarjetas y rejillas */
+.tarjeta {
+  background: var(--superficie); border: 1px solid var(--linea);
+  border-radius: var(--radio); padding: 1.3rem 1.4rem; box-shadow: var(--sombra);
+}
+.tarjeta--borde { border-top: 8px solid var(--e-vivo); }
+.rejilla { display: grid; gap: 1rem; }
+.rejilla--2 { grid-template-columns: repeat(2, 1fr); }
+.rejilla--3 { grid-template-columns: repeat(3, 1fr); }
+.rejilla--aside { grid-template-columns: minmax(0, 320px) minmax(0, 1fr); align-items: start; }
+.rejilla--chat { grid-template-columns: minmax(0, 1fr) minmax(0, 340px); align-items: start; }
+
+/* Sellos y etiquetas. El color nunca va solo: siempre llevan texto. */
+.sello { display: inline-block; padding: .1rem .7rem; border-radius: 999px; font: 800 .8rem var(--fuente); }
+.sello--ok { background: var(--ok-suave); color: var(--ok-texto); }
+.sello--aviso { background: var(--aviso-suave); color: var(--aviso-texto); }
+.sello--e { background: var(--e-suave); color: var(--e-texto); }
+.etiqueta { font: 800 .78rem var(--fuente); letter-spacing: .1em; text-transform: uppercase; color: var(--tinta-suave); margin-bottom: .3rem; }
+
+/* Formularios */
+label { font-weight: 800; display: block; margin-bottom: .25rem; }
+input[type="text"], select, textarea {
+  width: 100%; font: 400 1rem var(--fuente); color: var(--tinta); background: var(--superficie);
+  border: 2px solid var(--linea); border-radius: var(--radio-chico); padding: .6rem .8rem;
+}
+textarea { resize: vertical; min-height: 5rem; }
+input:focus-visible, select:focus-visible, textarea:focus-visible { border-color: var(--e-vivo); }
+.campo { margin-bottom: 1rem; }
+/* La casilla mide 1,5 rem (24 px) y toda la fila es el área de toque, para el celular. */
+.casilla { display: flex; gap: .7rem; align-items: center; font-weight: 600; margin: 0 0 .25rem; padding: .3rem 0; min-height: 44px; cursor: pointer; }
+.casilla input { width: 1.5rem; height: 1.5rem; accent-color: var(--e-fuerte); flex: none; }
+
+/* Medidor */
+.medidor { height: 12px; background: var(--hundido); border-radius: 999px; overflow: hidden; }
+.medidor > span { display: block; height: 100%; background: var(--e-vivo); border-radius: 999px; transition: width .3s; }
+
+/* Estados vacíos y avisos */
+.vacio { border: 2px dashed var(--linea); border-radius: var(--radio); padding: 1.5rem; color: var(--tinta-suave); text-align: center; }
+.aviso { background: var(--aviso-suave); color: var(--aviso-texto); border-radius: var(--radio-chico); padding: .8rem 1rem; font-weight: 600; }
+
+/* Listas con filete */
+.lista { list-style: none; padding: 0; margin: 0; }
+.lista > li { padding: .55rem 0; border-bottom: 1px solid var(--linea); }
+.lista > li:last-child { border-bottom: 0; }
+
+@media (max-width: 860px) {
+  .rejilla--2, .rejilla--3, .rejilla--aside, .rejilla--chat { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .medidor > span { transition: none; }
+}

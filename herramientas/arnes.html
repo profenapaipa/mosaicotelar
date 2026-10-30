@@ -1,0 +1,171 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Arnés de pruebas de Mosaico Telar</title>
+<!-- Lo lanza herramientas/auditar.py. Por qué existe: los fallos de este tipo de página no se
+     ven leyendo el código, se ven midiendo en un navegador. Carga cada pantalla dentro de un
+     marco del ancho de un celular o de un escritorio, y mide. Necesita servirse por http (no
+     por file://) para poder leer el marco. -->
+<body style="margin:0;background:#888">
+<iframe id="f" style="border:0;display:block;background:#fff"></iframe>
+<pre id="resultado" style="position:fixed;top:0;left:0;max-width:100%;background:#fff;color:#000;font:11px monospace;white-space:pre-wrap"></pre>
+<script>
+const RUTAS = ['#/', '#/kinesis/docente', '#/kinesis/orientacion', '#/kinesis/familia', '#/wisfox/ruta', '#/wisfox/leccion', '#/wisfox/juego', '#/wisfox/logros', '#/valeria', '#/recorrido', '#/estado'];
+const ANCHOS = [390, 1280];
+const TEMAS = ['claro', 'oscuro'];
+const espera = (ms) => new Promise((r) => setTimeout(r, ms));
+const f = document.getElementById('f');
+const salida = { casos: [], flujo: [], fatal: null };
+let n = 0;
+
+function cargar(ruta, ancho) {
+  return new Promise((res) => {
+    f.style.width = ancho + 'px'; f.style.height = '900px';
+    f.onload = () => res();
+    f.src = '../index.html?t=' + (++n) + ruta;
+  });
+}
+const doc = () => f.contentDocument;
+const ventana = () => f.contentWindow;
+
+/* ---- contraste ---- */
+function parsear(c) {
+  let m = c.match(/^rgba?\(([^)]+)\)/);
+  if (m) { const p = m[1].split(/[ ,\/]+/).filter(Boolean).map(Number); return [p[0], p[1], p[2], p[3] === undefined ? 1 : p[3]]; }
+  m = c.match(/^color\(srgb ([^)]+)\)/);
+  if (m) { const p = m[1].split(/[ \/]+/).filter(Boolean).map(Number); return [p[0] * 255, p[1] * 255, p[2] * 255, p[3] === undefined ? 1 : p[3]]; }
+  return null;
+}
+function mezclar(sobre, base) { const a = sobre[3]; return [0, 1, 2].map((i) => sobre[i] * a + base[i] * (1 - a)); }
+function fondoEfectivo(el) {
+  const capas = [];
+  for (let e = el; e; e = e.parentElement) {
+    const cs = ventana().getComputedStyle(e);
+    if (cs.backgroundImage !== 'none') return null;          // degradado: se omite y se cuenta aparte
+    const c = parsear(cs.backgroundColor);
+    if (c && c[3] > 0) { capas.push(c); if (c[3] >= 1) break; }
+  }
+  let base = [255, 255, 255];
+  for (let i = capas.length - 1; i >= 0; i--) base = mezclar(capas[i], base);
+  return base;
+}
+const lum = (c) => { const f2 = (v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }; return 0.2126 * f2(c[0]) + 0.7152 * f2(c[1]) + 0.0722 * f2(c[2]); };
+const razon = (a, b) => { const x = lum(a), y = lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); };
+
+function medirContraste() {
+  const malos = []; let omitidos = 0; let medidos = 0;
+  const d = doc();
+  d.querySelectorAll('header *, main *, footer *, .nav-movil *').forEach((el) => {
+    const tieneTexto = [...el.childNodes].some((x) => x.nodeType === 3 && x.textContent.trim());
+    if (!tieneTexto || !el.getClientRects().length) return;
+    const cs = ventana().getComputedStyle(el);
+    if (cs.visibility === 'hidden' || parseFloat(cs.opacity) < 1) return;
+    const fondo = fondoEfectivo(el);
+    if (!fondo) { omitidos++; return; }
+    let fg = parsear(cs.color); if (!fg) return;
+    fg = mezclar(fg, fondo);
+    const px = parseFloat(cs.fontSize); const grande = px >= 24 || (px >= 18.66 && parseInt(cs.fontWeight, 10) >= 700);
+    const minimo = grande ? 3 : 4.5; const r = razon(fg, fondo); medidos++;
+    if (r < minimo) malos.push(`${el.tagName.toLowerCase()}.${(el.className || '').toString().split(' ')[0]} "${el.textContent.trim().slice(0, 28)}" ${r.toFixed(2)}`);
+  });
+  return { malos: malos.slice(0, 6), total: malos.length, omitidos, medidos };
+}
+
+/* ---- una pantalla en un ancho y un tema ---- */
+function medirCaso(ruta, ancho, tema) {
+  const d = doc(); const w = ventana(); const fallos = [];
+  d.documentElement.dataset.tema = tema;
+  const e = d.documentElement;
+  if (e.scrollWidth > e.clientWidth + 1) fallos.push(`desborda a lo ancho (${e.scrollWidth} > ${e.clientWidth})`);
+  const fuera = [...d.querySelectorAll('main *')].filter((x) => { const r = x.getBoundingClientRect(); return r.width && (r.right > e.clientWidth + 1 || r.left < -1); }).slice(0, 3).map((x) => x.tagName.toLowerCase() + '.' + (x.className || ''));
+  if (fuera.length) fallos.push('elementos fuera de pantalla: ' + fuera.join(', '));
+  if (w.__errores && w.__errores.length) fallos.push('errores: ' + w.__errores.join(' | '));
+  const h1 = d.querySelectorAll('main h1').length;
+  if (h1 !== 1) fallos.push(`hay ${h1} títulos h1 (debe haber 1)`);
+  ['header', 'main', 'footer'].forEach((t) => { if (!d.querySelector(t)) fallos.push('falta <' + t + '>'); });
+  const sinNombre = [...d.querySelectorAll('button, a, input, select, textarea')].filter((x) => x.getClientRects().length && !(x.textContent.trim() || x.getAttribute('aria-label') || (x.labels && x.labels.length) || x.getAttribute('aria-labelledby')));
+  if (sinNombre.length) fallos.push(`${sinNombre.length} controles sin nombre accesible`);
+  const chicos = [...d.querySelectorAll('button, .btn, input:not([type=hidden]), select, textarea')].filter((x) => { const r = x.getBoundingClientRect(); return r.height > 0 && r.height < 24; });
+  if (chicos.length) fallos.push(`${chicos.length} controles de menos de 24 px de alto`);
+  // Errores que se ven en pantalla pero no lanzan excepción: un append con una lista, un dato que falta.
+  const crudo = d.body.innerText.match(/\[object [A-Za-z]+\]|\bundefined\b|\bNaN\b|\bnull\b/);
+  if (crudo) fallos.push('texto roto en pantalla: "' + crudo[0] + '"');
+  // Una tarjeta aplastada (un estilo en línea que gana al diseño de celular) no desborda, pero no se puede usar.
+  const aplastadas = [...d.querySelectorAll('main .tarjeta, main .chat')].filter((x) => { const r = x.getBoundingClientRect(); return x.getClientRects().length && r.width < 150; });
+  if (aplastadas.length) fallos.push(`${aplastadas.length} tarjetas aplastadas (menos de 150 px de ancho)`);
+  const c = medirContraste();
+  if (c.total) fallos.push(`${c.total} textos sin contraste suficiente: ` + c.malos.join(' ; '));
+  return { ruta, ancho, tema, fallos, contraste: { medidos: c.medidos, omitidos: c.omitidos } };
+}
+
+/* ---- el recorrido completo, como lo haría una persona ---- */
+const hallar = (txt) => [...doc().querySelectorAll('button, a')].find((x) => x.textContent.trim().startsWith(txt) && x.getClientRects().length);
+const textoPagina = () => doc().body.innerText;
+function afirmar(nombre, ok, detalle) { salida.flujo.push({ nombre, ok: !!ok, detalle: ok ? '' : (detalle || '') }); }
+async function ir(hash) { ventana().location.hash = hash; await espera(250); }
+async function pulsar(txt) { const b = hallar(txt); if (!b) { afirmar('existe "' + txt + '"', false, 'no se encontró'); return false; } b.click(); await espera(250); return true; }
+
+async function flujo() {
+  localStorage.clear();
+  await cargar('#/kinesis/docente', 1280); await espera(400);
+  const sel = doc().querySelector('.roster button[aria-pressed="true"]');
+  afirmar('Kinesis muestra a P-03 seleccionado', sel && sel.textContent.includes('P-03'));
+  // Términos clínicos que nunca deben aparecer en una vista de docente o de familia.
+  const CLINICOS = /TDAH|autismo|dislexia|discapacidad intelectual|d[eé]ficit de atenci[oó]n/i;
+  afirmar('el perfil muestra apoyos y no diagnóstico', textoPagina().includes('Apoyos que le sirven') && !CLINICOS.test(textoPagina()));
+  await pulsar('Ajustar al perfil de P-03');
+  afirmar('el ajuste queda pendiente de orientación', textoPagina().includes('Pendiente de orientación'));
+  await ir('#/kinesis/orientacion');
+  afirmar('orientación recibe el ajuste', !!hallar('Aprobar el ajuste'));
+  await pulsar('Aprobar el ajuste');
+  afirmar('el ajuste queda aprobado', textoPagina().includes('Aprobado a las'));
+  await ir('#/kinesis/familia');
+  afirmar('la familia ve la aprobación', textoPagina().includes('Orientación aprobó'));
+  afirmar('la familia no ve diagnóstico', !CLINICOS.test(textoPagina()));
+  await ir('#/wisfox/leccion');
+  afirmar('Wisfox recibe la actividad a su medida', textoPagina().includes('Versión a tu medida'));
+  await pulsar('Marcar la lección');
+  await pulsar('Empezar el quiz');
+  for (let i = 0; i < 4; i++) {
+    const op = doc().querySelector('.opciones .opcion'); if (op) op.click(); await espera(150);
+    await pulsar(i < 3 ? 'Siguiente' : 'Ver resultado');
+  }
+  afirmar('el quiz termina con resultado', textoPagina().includes('Quiz terminado'));
+  await ir('#/wisfox/juego');
+  for (const w of ['She', 'eats', 'breakfast', 'at', 'seven']) { const b = [...doc().querySelectorAll('.fichas:not(.fichas--respuesta) .ficha')].find((x) => x.textContent === w); if (b) { b.click(); await espera(80); } }
+  await pulsar('Comprobar');
+  afirmar('el juego reconoce la frase correcta', textoPagina().includes('Ganaste 15 XP'));
+  await ir('#/wisfox/logros');
+  afirmar('Wisfox muestra logros ganados', /Conseguido/.test(textoPagina()));
+  await ir('#/valeria');
+  doc().getElementById('btn-ia').click(); await espera(300); // el botón de la barra, no el enlace del menú
+  const panel = doc().getElementById('slot-ia');
+  afirmar('el panel de ValerIA se abre', panel && !panel.hidden);
+  const campo = panel.querySelector('textarea'); campo.value = 'No entiendo la s del verbo';
+  panel.querySelector('button[type=submit]').click(); await espera(1500);
+  afirmar('ValerIA responde (ejemplo o en vivo)', panel.innerText.includes('Buena pregunta'));
+  afirmar('ValerIA dice que es una respuesta de ejemplo', /ejemplo|En vivo|respaldo/i.test(panel.innerText));
+  panel.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); await espera(100);
+  afirmar('Escape cierra el panel', panel.hidden);
+  await ir('#/recorrido');
+  afirmar('el recorrido marca los seis pasos', textoPagina().includes('6 de 6 pasos'), textoPagina().match(/\d de 6 pasos/));
+  await ir('#/estado');
+  afirmar('el foco llega al título al cambiar de pantalla', doc().activeElement && doc().activeElement.tagName === 'H1');
+  // Sin errores de ejecución en todo el recorrido
+  afirmar('sin errores de ejecución en el recorrido', !(ventana().__errores && ventana().__errores.length), ventana().__errores && ventana().__errores.join(' | '));
+}
+
+(async () => {
+  try {
+    for (const ancho of ANCHOS) for (const ruta of RUTAS) {
+      localStorage.clear();
+      await cargar(ruta, ancho); await espera(350);
+      for (const tema of TEMAS) { salida.casos.push(medirCaso(ruta, ancho, tema)); await espera(60); }
+    }
+  } catch (e) { salida.fatal = 'pantallas: ' + String(e && e.stack || e); }
+  try {
+    await flujo();
+  } catch (e) { salida.fatal = (salida.fatal ? salida.fatal + ' | ' : '') + 'recorrido: ' + String(e && e.stack || e); }
+  document.getElementById('resultado').textContent = JSON.stringify(salida);
+  document.title = 'listo';
+})();
+</script>
