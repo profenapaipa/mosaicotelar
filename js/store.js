@@ -10,6 +10,7 @@
 
   function inicial() {
     return {
+      rol: '',                 // el rol que eligió la persona: docente, orientacion, familia, estudiante
       estudiante: 'P-03',
       plan: { asignatura: 'Inglés', tema: 'Present simple: mi rutina del día', dua: { repr: [], accion: [], compromiso: [] } },
       actividad: '',

@@ -1,104 +1,184 @@
-/* layout.css: el marco que comparten los tres espacios y la página de inicio.
-   Toma de Kinesis la "hoja" de tarjetas montada sobre un encabezado en degradado, las
-   pestañas en píldora y la barra flotante para el celular. */
+/* layout.css: el marco de la plataforma.
 
-/* Un color por enlace de navegación, sin tocar los colores del espacio activo. */
-.e-kinesis { --l-vivo: var(--c-kinesis); --l-texto: var(--c-kinesis-texto); --l-suave: var(--c-kinesis-suave); }
-.e-wisfox  { --l-vivo: var(--c-wisfox);  --l-texto: var(--c-wisfox-texto);  --l-suave: var(--c-wisfox-suave); }
-.e-valeria { --l-vivo: var(--c-valeria); --l-texto: var(--c-valeria-texto); --l-suave: var(--c-valeria-suave); }
-.e-marca   { --l-vivo: var(--c-valeria); --l-texto: var(--c-valeria-texto); --l-suave: var(--c-valeria-suave); }
+   Dos niveles de navegación, como en Slack o en Google Workspace:
+   1. El RIEL (izquierda, siempre igual): el colectivo. Lleva a Kinesis, Wisfox y ValerIA.
+   2. La BARRA LATERAL de cada espacio: lo propio de cada proyecto, tal como ya la tenía.
+   Así cada hilo conserva su cara y la plataforma los une por encima, sin reemplazarlos. */
 
-/* Barra superior */
-.barra {
-  position: sticky; top: 0; z-index: 30;
-  display: flex; align-items: center; gap: .75rem 1.5rem; flex-wrap: wrap;
-  padding: .6rem 1.5rem;
-  background: color-mix(in srgb, var(--papel) 92%, transparent);
-  backdrop-filter: blur(8px);
-  border-bottom: 1px solid var(--linea);
+/* ---------- Riel de marca ---------- */
+.riel {
+  position: fixed; z-index: 45; top: 0; bottom: 0; left: 0; width: var(--riel-ancho);
+  display: flex; flex-direction: column; align-items: center; gap: .3rem;
+  padding: .9rem 0; background: var(--riel-bg); color: var(--riel-texto);
 }
-.marca { display: flex; align-items: center; gap: .6rem; text-decoration: none; color: var(--tinta); font: 900 1.3rem var(--fuente); margin-right: auto; }
-.marca svg { width: 34px; height: 34px; flex: none; }
-.nav-principal { display: flex; gap: .25rem; }
-.nav-principal a, .nav-movil a {
-  display: flex; align-items: center; gap: .45rem; text-decoration: none;
-  color: var(--tinta-suave); font-weight: 800; border-radius: 999px;
+.riel { --logo-fondo: #1A1726; --logo-1: #6FD08C; --logo-2: #F0B85A; --logo-3: #B9A6FF; }
+.riel-logo { color: #FFFFFF; display: grid; place-items: center; width: 56px; height: 56px; border-radius: 16px; margin-bottom: .6rem; }
+.riel-logo svg { width: 46px; height: 46px; }
+.pie svg { color: var(--tinta); }
+.rol-actual { color: var(--aviso-texto); font-weight: 800; text-underline-offset: 3px; }
+.riel-items { display: flex; flex-direction: column; gap: .25rem; align-items: center; }
+.riel-abajo { margin-top: auto; display: flex; flex-direction: column; gap: .25rem; align-items: center; }
+.riel a {
+  position: relative; display: flex; flex-direction: column; align-items: center; gap: .2rem;
+  width: 70px; padding: .55rem .2rem .45rem; border-radius: 16px;
+  color: var(--riel-texto); text-decoration: none; font: 800 .68rem/1.1 var(--fuente);
 }
-.nav-principal a { padding: .4rem .85rem; font-size: .95rem; }
-.nav-principal a svg, .nav-movil a svg { width: 22px; height: 22px; flex: none; }
-.nav-principal a:hover, .nav-movil a:hover { background: var(--l-suave); color: var(--l-texto); }
-.nav-principal a[aria-current="page"], .nav-movil a[aria-current="page"] { background: var(--l-suave); color: var(--l-texto); }
-.barra-acciones { display: flex; gap: .5rem; align-items: center; position: relative; }
+.riel a svg { width: 30px; height: 30px; flex: none; }
+.riel a:hover { background: rgba(255, 255, 255, .08); color: var(--riel-fuerte); }
+.riel a[aria-current="page"] { background: rgba(255, 255, 255, .13); color: var(--riel-fuerte); }
+.riel a[aria-current="page"]::before {
+  content: ""; position: absolute; left: -7px; top: 22%; bottom: 22%; width: 4px; border-radius: 4px; background: var(--l-vivo, #fff);
+}
+.riel .e-kinesis { --l-vivo: var(--hilo-kinesis); }
+.riel .e-wisfox { --l-vivo: var(--hilo-wisfox); }
+.riel .e-valeria { --l-vivo: #8F8EE0; }
+.riel :focus-visible { outline-color: #fff; }
 
-/* Menú de apariencia */
+/* ---------- Cuerpo, franja superior y pie ---------- */
+.cuerpo { margin-left: var(--riel-ancho); min-width: 0; }
+.franja {
+  display: flex; align-items: center; justify-content: space-between; gap: .5rem 1rem; flex-wrap: wrap;
+  padding: .35rem 1rem; background: var(--aviso-suave); color: var(--aviso-texto); font-size: .86rem; font-weight: 700;
+  position: relative; z-index: 30;
+}
+.franja p { margin: 0; }
+.franja-acciones { display: flex; gap: .4rem; align-items: center; position: relative; }
+.franja .btn { min-height: 30px; padding: .1rem .8rem; font-size: .82rem; color: var(--aviso-texto); border-color: var(--aviso-texto); background: transparent; }
 .menu-apariencia {
-  position: absolute; right: 0; top: calc(100% + .5rem); z-index: 40; width: 17rem;
-  background: var(--superficie); border: 1px solid var(--linea); border-radius: var(--radio);
-  box-shadow: var(--sombra); padding: 1rem 1.1rem;
+  position: absolute; right: 0; top: calc(100% + .4rem); z-index: 60; width: 17rem; text-align: left;
+  background: var(--superficie); color: var(--tinta); border: 1px solid var(--linea); border-radius: var(--radio);
+  box-shadow: var(--sombra); padding: 1rem 1.1rem; font-weight: 400;
 }
 .menu-apariencia fieldset { border: 0; padding: 0; margin: 0 0 .8rem; }
 .menu-apariencia legend { font-weight: 900; padding: 0; margin-bottom: .3rem; }
-
-/* Cinta de datos ficticios (de Kinesis) */
-.cinta-datos { background: var(--aviso-suave); color: var(--aviso-texto); text-align: center; padding: .35rem 1rem; font-size: .88rem; font-weight: 700; }
-
-/* Encabezado de espacio con hoja encima */
-main { display: block; min-height: 60vh; }
+main { display: block; min-height: 70vh; }
 main:focus { outline: none; }
 .contenedor { width: 100%; max-width: 1100px; margin: 0 auto; padding: 0 1.25rem; }
-.encabezado-espacio {
-  background: linear-gradient(135deg, var(--e-fuerte), color-mix(in srgb, var(--e-fuerte) 72%, var(--tinta)));
-  color: var(--sobre-fuerte);
-  padding: 2.2rem 0 5.2rem;
-}
-.encabezado-espacio .cabecera { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
-.encabezado-espacio svg.marca-espacio { width: 64px; height: 64px; flex: none; }
-.encabezado-espacio h1 { margin: 0; color: var(--sobre-fuerte); }
-.encabezado-espacio p { margin: .2rem 0 0; max-width: 60ch; }
-.pestanas { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1.4rem; }
-.pestanas a {
-  display: inline-flex; align-items: center; min-height: 40px; padding: .4rem 1.1rem;
-  border-radius: 999px; text-decoration: none; font-weight: 800;
-  color: var(--sobre-fuerte);
-  background: color-mix(in srgb, var(--sobre-fuerte) 16%, transparent);
-  border: 2px solid transparent;
-}
-.pestanas a:hover { background: color-mix(in srgb, var(--sobre-fuerte) 28%, transparent); }
-.pestanas a[aria-current="page"] { background: var(--sobre-fuerte); color: var(--e-fuerte); }
-.pestanas a:focus-visible { outline-color: var(--sobre-fuerte); }
-.hoja { position: relative; margin-top: -3.2rem; padding-bottom: 3rem; }
-
-/* Pie */
 .pie { max-width: 1100px; margin: 2rem auto 0; padding: 1.5rem 1.25rem 2.5rem; border-top: 1px solid var(--linea); color: var(--tinta-suave); font-size: .92rem; display: flex; gap: 1rem; align-items: flex-start; }
-.pie svg { width: 30px; height: 30px; flex: none; }
+.pie svg { width: 34px; height: 34px; flex: none; }
 .pie p { margin: 0 0 .25rem; }
 
-/* Barra flotante del celular (de Kinesis) */
-.nav-movil { display: none; }
+/* ---------- Páginas del colectivo (inicio, recorrido, estado, identidad) ---------- */
+.pagina-cab { padding: 2.2rem 0 .5rem; }
+.pagina-cab .etiqueta { color: var(--e-texto); }
+.pagina-cab p { max-width: 62ch; color: var(--tinta-suave); font-size: 1.08rem; }
 
-/* Panel de ValerIA: el lugar fijo donde se muestra la IA en cualquier espacio. */
+/* ---------- Espacio de un hilo: su barra lateral + su contenido ---------- */
+.espacio { display: grid; grid-template-columns: 276px minmax(0, 1fr); min-height: calc(100vh - 38px); background: var(--papel); color: var(--tinta); }
+.lateral { position: sticky; top: 0; align-self: start; height: calc(100vh - 38px); padding: .8rem; }
+.lateral-panel {
+  height: 100%; display: flex; flex-direction: column; gap: .35rem; padding: 1rem .9rem;
+  background: var(--superficie); border: 1px solid var(--linea); border-radius: 30px;
+}
+.lockup { display: flex; align-items: center; gap: .65rem; padding: .2rem .3rem .8rem; text-decoration: none; color: var(--tinta); }
+.lockup svg { width: 42px; height: 42px; flex: none; }
+.lockup b { display: block; font: 900 1.35rem/1.1 var(--fuente); }
+.lockup small { display: block; color: var(--tinta-suave); font-size: .76rem; font-weight: 600; }
+.nav-lateral { display: flex; flex-direction: column; gap: .2rem; }
+.nav-lateral a {
+  display: flex; align-items: center; gap: .75rem; padding: .7rem .95rem; border-radius: 16px;
+  text-decoration: none; font-weight: 800; color: var(--tinta-suave);
+}
+.nav-lateral a svg { width: 22px; height: 22px; flex: none; }
+.nav-lateral a:hover { background: var(--e-suave); color: var(--e-texto); }
+.nav-lateral a[aria-current="page"] { background: var(--e-fuerte); color: var(--sobre-fuerte); box-shadow: 0 8px 18px color-mix(in srgb, var(--e-fuerte) 32%, transparent); }
+.nav-lateral .nuevo { margin-left: auto; font-size: .68rem; font-weight: 900; padding: .05rem .5rem; border-radius: 999px; background: var(--e-suave); color: var(--e-texto); }
+.nav-lateral a[aria-current="page"] .nuevo { background: rgba(255, 255, 255, .22); color: inherit; }
+.usuario { margin-top: auto; display: flex; align-items: center; gap: .65rem; padding: .6rem .7rem; background: var(--hundido); border-radius: 18px; }
+.avatar { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; flex: none; font: 900 .9rem var(--fuente); background: var(--e-fuerte); color: var(--sobre-fuerte); }
+.usuario b { display: block; line-height: 1.15; }
+.usuario small { color: var(--tinta-suave); font-weight: 600; }
+.contenido { padding: 0 1.6rem 3rem 0; min-width: 0; }
+
+/* Wisfox: barra lateral plana de lado a lado, como la suya */
+[data-espacio="wisfox"] .lateral { padding: 0; }
+[data-espacio="wisfox"] .lateral-panel { border-radius: 0; border-width: 0 1px 0 0; padding: 1.2rem 1rem; }
+[data-espacio="wisfox"] .contenido { padding: 1.2rem 1.6rem 3rem; }
+[data-espacio="valeria"] .lateral { padding: 0; }
+[data-espacio="valeria"] .lateral-panel { border-radius: 0; border-width: 0 1px 0 0; padding: 1.2rem 1rem; }
+[data-espacio="valeria"] .contenido { padding: 1.2rem 1.6rem 3rem; }
+
+/* ---------- Kinesis: encabezado de bienvenida con degradado y panel de cifras montado encima ---------- */
+.hero {
+  position: relative; overflow: hidden; color: #FFFFFF;
+  padding: 2.2rem 2rem 5.6rem; border-radius: 0 0 40px 40px;
+  background: linear-gradient(112deg, var(--k-hero-a) 0%, var(--k-hero-b) 58%, var(--k-hero-c) 100%);
+  display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 1.6rem; align-items: end;
+}
+.hero::before, .hero::after { content: ""; position: absolute; border-radius: 50%; background: rgba(255, 255, 255, .08); pointer-events: none; }
+.hero::before { width: 360px; height: 360px; right: -80px; top: -120px; }
+.hero::after { width: 240px; height: 240px; left: -70px; bottom: -110px; }
+.hero > * { position: relative; z-index: 1; }
+.hero .rol { display: inline-block; background: rgba(255, 255, 255, .18); border-radius: 999px; padding: .15rem .8rem; font-weight: 800; font-size: .82rem; margin-bottom: 1.4rem; }
+.hero .fecha { font: 800 .8rem var(--fuente); letter-spacing: .12em; text-transform: uppercase; margin-bottom: .2rem; }
+.hero h1 { color: #FFFFFF; margin-bottom: .4rem; font-size: clamp(2rem, 4.4vw, 2.9rem); }
+.hero p { color: #FFFFFF; max-width: 46ch; margin: 0; }
+.paso-siguiente { background: color-mix(in srgb, var(--superficie) 96%, transparent); color: var(--tinta); border-radius: 26px; padding: 1.2rem 1.3rem; box-shadow: var(--sombra); }
+.paso-siguiente .etiqueta { color: var(--e-texto); }
+.paso-siguiente h2 { font-size: 1.2rem; margin: 0 0 .3rem; }
+.paso-siguiente p { color: var(--tinta-suave); font-size: .96rem; margin: 0 0 .8rem; }
+.panel-cifras {
+  position: relative; z-index: 2; margin: -3.4rem 0 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem;
+  background: var(--superficie); border: 1px solid var(--linea); border-radius: 28px; padding: 1.2rem 1.6rem; box-shadow: var(--sombra);
+}
+.panel-cifras strong { display: block; font: 900 2.5rem/1 var(--fuente); color: var(--e-texto); font-variant-numeric: tabular-nums; }
+.panel-cifras span { display: block; font-weight: 800; }
+.panel-cifras small { color: var(--tinta-suave); font-weight: 600; }
+.bloque { margin-top: 1.4rem; }
+.bloque > h2 { font-size: 1.35rem; margin-bottom: .8rem; }
+
+/* ---------- Wisfox: saludo y cabecera de página ---------- */
+.saludo { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.1rem; }
+.saludo h1 { font-size: clamp(1.5rem, 3vw, 1.9rem); margin: 0; }
+.saludo p { margin: 0; color: var(--tinta-suave); }
+.saludo-chips { display: flex; gap: .5rem; align-items: center; }
+.chip-xp { display: inline-flex; gap: .4rem; align-items: center; background: var(--superficie); border: 1px solid var(--linea); border-radius: 999px; padding: .3rem .9rem; font-weight: 800; box-shadow: var(--sombra); }
+.chip-xp svg { width: 20px; height: 20px; }
+
+/* ---------- Panel de ValerIA, el lugar fijo de la IA ---------- */
 .panel-ia {
-  position: fixed; z-index: 50; top: 0; right: 0; bottom: 0; width: min(430px, 100%);
+  position: fixed; z-index: 70; top: 0; right: 0; bottom: 0; width: min(430px, 100%);
   display: flex; flex-direction: column;
-  background: var(--superficie); border-left: 1px solid var(--linea); box-shadow: -10px 0 30px rgba(0, 0, 0, .12);
+  background: var(--superficie); color: var(--tinta); border-left: 1px solid var(--linea); box-shadow: -10px 0 30px rgba(0, 0, 0, .18);
+  --papel: var(--v-papel); --superficie: var(--v-superficie); --hundido: var(--v-hundido); --linea: var(--v-linea); --tinta: var(--v-tinta); --tinta-suave: var(--v-suave);
+  --e-vivo: var(--v-vivo); --e-fuerte: var(--v-fuerte); --e-texto: var(--v-texto); --e-suave: var(--v-tinte); --sobre-fuerte: var(--v-sobre);
 }
 .panel-ia__cab { display: flex; align-items: center; gap: .7rem; padding: .8rem 1rem; border-bottom: 1px solid var(--linea); }
-.panel-ia__cab svg { width: 36px; height: 36px; flex: none; }
+.panel-ia__cab svg { width: 38px; height: 38px; flex: none; }
 .panel-ia__cab h2 { margin: 0; font-size: 1.1rem; }
 .panel-ia__cab .cerrar { margin-left: auto; }
 .panel-ia__cuerpo { flex: 1; min-height: 0; display: flex; flex-direction: column; }
 
+/* ---------- Celular: el riel baja a la barra inferior y la lateral pasa a ser una tira de pestañas ---------- */
 @media (max-width: 860px) {
-  .barra { padding: .5rem 1rem; }
-  .nav-principal { display: none; }
-  .contenedor { padding: 0 1rem; }
-  .encabezado-espacio { padding: 1.6rem 0 4.6rem; }
-  body { padding-bottom: 5.4rem; }
-  .nav-movil {
-    display: flex; position: fixed; z-index: 35; left: .75rem; right: .75rem; bottom: .75rem;
-    justify-content: space-around; padding: .35rem;
-    background: var(--superficie); border: 1px solid var(--linea); border-radius: 999px; box-shadow: var(--sombra);
+  .cuerpo { margin-left: 0; padding-bottom: 5.6rem; }
+  .riel {
+    top: auto; left: .6rem; right: .6rem; bottom: .6rem; width: auto; flex-direction: row; justify-content: space-around;
+    padding: .3rem; border-radius: 26px; box-shadow: 0 8px 26px rgba(0, 0, 0, .35);
   }
-  .nav-movil a { flex-direction: column; gap: 0; padding: .3rem .5rem; font-size: .7rem; min-width: 56px; border-radius: 18px; }
+  .riel-logo, .riel-abajo { display: none; }
+  .riel-items { flex-direction: row; width: 100%; justify-content: space-around; }
+  .riel a { width: auto; min-width: 58px; padding: .35rem .3rem; font-size: .66rem; }
+  .riel a svg { width: 26px; height: 26px; }
+  .riel a[aria-current="page"]::before { display: none; }
+  .contenedor { padding: 0 1rem; }
+  /* align-content: start: en una página corta, la rejilla no reparte el espacio sobrante entre la tira y el contenido. */
+  .espacio { grid-template-columns: minmax(0, 1fr); min-height: 0; align-content: start; }
+  .franja { padding: .3rem .8rem; font-size: .78rem; }
+  .lateral { min-width: 0; }
+  .lateral-panel { max-width: 100%; }
+  .lateral, [data-espacio="wisfox"] .lateral, [data-espacio="valeria"] .lateral { position: static; height: auto; padding: .6rem 1rem 0; }
+  .lateral-panel, [data-espacio="wisfox"] .lateral-panel, [data-espacio="valeria"] .lateral-panel {
+    height: auto; flex-direction: row; align-items: center; gap: .6rem; padding: .5rem; border-radius: 22px; border-width: 1px; overflow-x: auto;
+  }
+  .lockup { padding: 0 .4rem 0 .2rem; flex: none; }
+  .lockup small, .usuario { display: none; }
+  .lockup svg { width: 34px; height: 34px; }
+  .lockup b { font-size: 1.1rem; }
+  .nav-lateral { flex-direction: row; gap: .3rem; }
+  .nav-lateral a { white-space: nowrap; padding: .55rem .9rem; }
+  .contenido, [data-espacio="wisfox"] .contenido, [data-espacio="valeria"] .contenido { padding: .6rem 1rem 2rem; }
+  .hero { grid-template-columns: 1fr; padding: 1.4rem 1.2rem 4.8rem; border-radius: 0 0 28px 28px; align-items: start; }
+  .panel-cifras { grid-template-columns: repeat(2, 1fr); margin-top: -3rem; padding: 1rem 1.1rem; }
   .panel-ia { top: auto; left: 0; width: 100%; height: 78vh; border-left: 0; border-top: 1px solid var(--linea); border-radius: 22px 22px 0 0; }
 }

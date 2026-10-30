@@ -1,15 +1,26 @@
-/* kinesis.js: el hilo del aula. Conserva lo esencial de Kinesis: el docente ve apoyos y no
-   diagnósticos, planea con los tres principios del DUA, la orientación valida y la familia ve
-   el proceso. Lo que NO trae esta versión: base de datos, inicio de sesión y administración;
-   eso sigue siendo el proyecto completo (github.com/profenapaipa/Kinesis). */
+/* kinesis.js: el hilo del aula, con la cara que ya tenía Kinesis: barra lateral propia, encabezado
+   de bienvenida con degradado, tarjeta de "Siguiente paso" y el panel de cifras montado encima.
+
+   Conserva lo esencial: el docente ve apoyos y no diagnósticos, planea con los tres principios del
+   DUA, la orientación valida y la familia ve el proceso. Lo que NO trae esta versión: base de datos,
+   inicio de sesión y administración; eso sigue en el proyecto completo (github.com/profenapaipa/Kinesis). */
 (function (MT) {
   'use strict';
   const { h } = MT.ui;
-  const { espacio, hora } = MT.comun;
+  const { espacio, hero, panelCifras, hora } = MT.comun;
   const st = MT.store;
   const D = MT.datos;
 
-  const TABS = [{ id: 'docente', etiqueta: 'Docente' }, { id: 'orientacion', etiqueta: 'Orientación' }, { id: 'familia', etiqueta: 'Familia' }];
+  const TABS = [
+    { id: 'docente', etiqueta: 'Docente', icono: 'docente' },
+    { id: 'orientacion', etiqueta: 'Orientación', icono: 'orientacion' },
+    { id: 'familia', etiqueta: 'Familia', icono: 'familia' },
+  ];
+  const USUARIOS = {
+    docente: { iniciales: 'DC', nombre: 'Docente', rol: 'Vista de demostración' },
+    orientacion: { iniciales: 'OR', nombre: 'Equipo de orientación', rol: 'Vista de demostración' },
+    familia: { iniciales: 'AC', nombre: 'Acudiente', rol: 'Vista de demostración' },
+  };
 
   const selloAjuste = (a) => ({
     ninguno: h('span', { class: 'sello sello--e' }, 'Sin ajuste'),
@@ -18,15 +29,32 @@
     devuelto: h('span', { class: 'sello sello--aviso' }, 'Devuelto al docente'),
   }[a.estado]);
 
-  function listaAjustes(items) {
-    return h('ul', { class: 'ajuste-lista' }, items.map((i) => h('li', null, h('strong', null, i.cambio), h('span', { class: 'suave' }, 'Por qué: ' + i.porque))));
-  }
+  const listaAjustes = (items) => h('ul', { class: 'ajuste-lista' }, items.map((i) => h('li', null, h('strong', null, i.cambio), h('span', { class: 'suave' }, 'Por qué: ' + i.porque))));
+  const irA = (id) => () => { const el = document.getElementById(id); if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); el.focus({ preventScroll: true }); } };
+  const duaCubiertos = (s) => ['repr', 'accion', 'compromiso'].filter((k) => s.plan.dua[k].length).length;
 
-  function docente(hoja) {
+  function docente(c) {
     const s = st.obtener();
     const est = D.estudiantes.find((e) => e.id === s.estudiante) || D.estudiantes[0];
     // Ver el perfil de apoyos de un estudiante con PIAR es el paso 1 del recorrido.
     if (est.piar && !s.pasos.apoyos) st.cambiar((x) => { x.pasos.apoyos = true; });
+    const dua = duaCubiertos(s);
+    const aj = s.ajuste;
+
+    const siguiente = aj.estado === 'ninguno'
+      ? { titulo: dua < 3 ? `Completa el DUA de “${s.plan.tema}”` : 'Ajusta la actividad al perfil', texto: dua < 3 ? `Tienes ${dua} de 3 principios escritos. Con el diseño universal completo, los ajustes individuales se reducen a lo que de verdad hace falta.` : 'Ya cubriste los tres principios. Ahora ajusta lo que el diseño universal no alcanza.', boton: { texto: 'Abrir la planeación', onclick: irA('planeacion') } }
+      : aj.estado === 'propuesto' ? { titulo: 'Tu ajuste espera a orientación', texto: 'Mientras tanto puedes planear otra clase o pedirle ideas a ValerIA.', boton: { texto: 'Hablar con ValerIA', onclick: () => MT.ia.panel.abrir() } }
+      : aj.estado === 'devuelto' ? { titulo: 'Orientación devolvió tu ajuste', texto: aj.nota || 'Revísalo y vuelve a enviarlo.', boton: { texto: 'Ver el ajuste', onclick: irA('estado-ajuste') } }
+      : { titulo: 'Tu ajuste ya llegó al estudiante', texto: 'Está aprobado y disponible en Wisfox.', boton: { texto: 'Verlo en Wisfox', onclick: () => { window.location.hash = '#/wisfox/leccion'; } } };
+
+    c.append(
+      hero({ rol: 'Docente', titulo: 'Hola, docente', texto: 'Diseña tu clase una vez para todo el curso y deja los ajustes individuales para lo que el diseño universal no alcanza a cubrir.', siguiente }),
+      panelCifras([
+        { valor: String(D.estudiantes.length), etiqueta: 'Estudiantes', detalle: 'En 1 curso' },
+        { valor: String(D.estudiantes.filter((e) => e.piar).length), etiqueta: 'Con PIAR', detalle: 'Tienen apoyos registrados' },
+        { valor: aj.estado === 'ninguno' ? '0' : '1', etiqueta: 'Ajustes enviados', detalle: 'A orientación' },
+        { valor: `${dua}/3`, etiqueta: 'Principios del DUA', detalle: 'Cubiertos en esta clase' },
+      ]));
 
     const roster = h('div', { class: 'tarjeta' },
       h('h2', null, 'Mi curso · ' + D.curso),
@@ -45,12 +73,11 @@
            h('p', { class: 'suave' }, 'El diagnóstico no aparece aquí: solo lo ve quien tiene permiso. El docente ve apoyos.')]
         : h('div', { class: 'vacio' }, 'Sin apoyos registrados. La actividad general ya le sirve, y el DUA beneficia a todos.'));
 
-    // Planeación con DUA
-    const planear = h('div', { class: 'tarjeta tarjeta--borde' });
+    const planear = h('div', { class: 'tarjeta tarjeta--borde', id: 'planeacion', tabindex: '-1' });
     const medidor = h('span', { style: 'width:0%' });
     const resumen = h('p', { class: 'suave', 'aria-live': 'polite' });
     const pintarDua = () => {
-      const n = ['repr', 'accion', 'compromiso'].filter((k) => st.obtener().plan.dua[k].length).length;
+      const n = duaCubiertos(st.obtener());
       medidor.style.width = Math.round((n / 3) * 100) + '%';
       resumen.textContent = `DUA: ${n} de 3 principios cubiertos.` + (n === 3 ? ' Planeación completa.' : '');
     };
@@ -76,7 +103,7 @@
       const p = st.obtener().plan;
       MT.ia.panel.abrir({ tarea: 'disenar', texto: `Necesito una actividad de 20 minutos de ${p.asignatura} sobre ${p.tema} para grado 8.º.` });
     } }, 'Pedir ayuda a ValerIA');
-    const ajustar = h('button', { class: 'btn btn--suave', type: 'button', disabled: !est.piar || (s.ajuste.estado === 'propuesto' && s.ajuste.estudiante === est.id),
+    const ajustar = h('button', { class: 'btn btn--suave', type: 'button', disabled: !est.piar || (aj.estado === 'propuesto' && aj.estudiante === est.id),
       onclick: () => {
         st.cambiar((x) => {
           x.ajuste = { estado: 'propuesto', estudiante: est.id, items: D.generarAjuste(est), hora: '', nota: '' };
@@ -88,29 +115,39 @@
     planear.append(h('div', { class: 'acciones' }, pedirIA, ajustar));
     if (!est.piar) planear.append(h('p', { class: 'suave' }, 'El ajuste individual está disponible para estudiantes con apoyos registrados.'));
 
-    const aj = s.ajuste;
-    const estado = aj.estado !== 'ninguno' ? h('div', { class: 'tarjeta' },
-      h('p', { class: 'etiqueta' }, 'Ajuste de ' + aj.estudiante), selloAjuste(aj),
-      listaAjustes(aj.items),
+    const estado = aj.estado !== 'ninguno' ? h('div', { class: 'tarjeta', id: 'estado-ajuste', tabindex: '-1' },
+      h('p', { class: 'etiqueta' }, 'Ajuste de ' + aj.estudiante), selloAjuste(aj), listaAjustes(aj.items),
       aj.estado === 'devuelto' ? [h('p', { class: 'aviso' }, 'Orientación devolvió el ajuste' + (aj.nota ? ': ' + aj.nota : '.')),
         h('div', { class: 'acciones' }, h('button', { class: 'btn', type: 'button', onclick: () => { st.cambiar((x) => { x.ajuste.estado = 'propuesto'; x.ajuste.nota = ''; }); MT.router.recargar(); } }, 'Volver a enviar a orientación'))] : null,
       aj.estado === 'aprobado' ? h('p', { class: 'suave' }, 'Aprobado a las ' + aj.hora + '. Ya está disponible para el estudiante en Wisfox.') : null) : null;
 
-    hoja.append(h('div', { class: 'rejilla rejilla--aside' }, roster, h('div', { class: 'rejilla' }, perfil, planear, estado)));
+    c.append(h('div', { class: 'bloque rejilla rejilla--aside' }, roster, h('div', { class: 'rejilla' }, perfil, planear, estado)));
   }
 
-  function orientacion(hoja) {
+  function orientacion(c) {
     const aj = st.obtener().ajuste;
+    c.append(
+      hero({ rol: 'Orientación', titulo: 'Hola, equipo', texto: 'Todo el colegio en una vista: qué ajustes proponen los docentes y cuáles esperan tu validación.',
+        siguiente: aj.estado === 'propuesto'
+          ? { titulo: 'Revisa el ajuste de ' + aj.estudiante, texto: 'El docente propone y tú validas. Nada llega al estudiante ni a la familia sin tu aprobación.', boton: { texto: 'Abrir la revisión', onclick: irA('revision') } }
+          : { titulo: 'Todo al día', texto: aj.estado === 'ninguno' ? 'No hay ajustes pendientes. Cuando un docente envíe uno, aparecerá aquí.' : 'Ya resolviste el ajuste más reciente.' } }),
+      panelCifras([
+        { valor: String(D.estudiantes.length), etiqueta: 'Estudiantes', detalle: 'En 1 curso' },
+        { valor: String(D.estudiantes.filter((e) => e.piar).length), etiqueta: 'Con PIAR', detalle: 'Perfil pedagógico registrado' },
+        { valor: aj.estado === 'propuesto' ? '1' : '0', etiqueta: 'Por revisar', detalle: 'Ajustes pendientes' },
+        { valor: aj.estado === 'aprobado' ? '1' : '0', etiqueta: 'Aprobados', detalle: 'Ya llegaron al estudiante' },
+      ]));
+
     if (aj.estado === 'ninguno') {
-      hoja.append(h('div', { class: 'vacio' }, h('p', null, 'No hay ajustes pendientes.'), h('a', { class: 'btn', href: '#/kinesis/docente' }, 'Pedir uno desde Docente')));
+      c.append(h('div', { class: 'bloque vacio' }, h('p', null, 'No hay ajustes pendientes.'), h('a', { class: 'btn', href: '#/kinesis/docente' }, 'Ver cómo lo propone el docente')));
       return;
     }
     const nota = h('textarea', { id: 'o-nota', maxlength: '200', 'aria-label': 'Nota para el docente (opcional)' }, aj.nota);
-    const decidir = (estadoNuevo) => {
+    const decidir = (nuevo) => {
       st.cambiar((x) => {
-        x.ajuste.estado = estadoNuevo;
+        x.ajuste.estado = nuevo;
         x.ajuste.nota = nota.value.slice(0, 200);
-        if (estadoNuevo === 'aprobado') {
+        if (nuevo === 'aprobado') {
           x.ajuste.hora = new Date().toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
           x.pasos.aprobado = true;
           st.evento('Orientación aprobó los ajustes de la actividad.', true);
@@ -120,10 +157,8 @@
       });
       MT.router.recargar();
     };
-    hoja.append(h('div', { class: 'tarjeta tarjeta--borde' },
-      h('p', { class: 'etiqueta' }, 'Revisión de orientación'),
-      h('h2', null, 'Ajuste para ' + aj.estudiante), selloAjuste(aj),
-      h('p', { class: 'suave' }, 'El docente propone y orientación valida. Nada llega al estudiante ni a la familia sin esta aprobación.'),
+    c.append(h('div', { class: 'bloque tarjeta tarjeta--borde', id: 'revision', tabindex: '-1' },
+      h('p', { class: 'etiqueta' }, 'Revisión'), h('h2', null, 'Ajuste para ' + aj.estudiante), selloAjuste(aj),
       listaAjustes(aj.items),
       aj.estado === 'propuesto'
         ? [h('div', { class: 'campo' }, h('label', { for: 'o-nota' }, 'Nota para el docente (opcional)'), nota),
@@ -133,22 +168,31 @@
         : h('p', { class: 'aviso' }, aj.estado === 'aprobado' ? 'Aprobado a las ' + aj.hora + '.' : 'Devuelto al docente' + (aj.nota ? ': ' + aj.nota : '.'))));
   }
 
-  function familia(hoja) {
+  function familia(c) {
     const s = st.obtener();
     const aj = s.ajuste;
     if (aj.estado === 'aprobado' && !s.pasos.familia) st.cambiar((x) => { x.pasos.familia = true; });
     const eventos = s.eventos.filter((e) => e.familia);
-    hoja.append(h('div', { class: 'rejilla rejilla--2' },
+    const codigo = aj.estudiante || s.estudiante;
+    c.append(
+      hero({ rol: 'Familia', titulo: 'Hola, acudiente', texto: `Así va ${codigo} en el colegio: lo que se hace en clase para que aprenda a su manera y cómo acompañar desde casa.` }),
+      panelCifras([
+        { valor: String(aj.estado === 'aprobado' ? aj.items.length : 0), etiqueta: 'Ajustes en clase', detalle: 'Apoyos que le funcionan' },
+        { valor: String(eventos.length), etiqueta: 'Novedades', detalle: 'Compartidas por el colegio' },
+        { valor: aj.estado === 'aprobado' ? 'Listo' : 'En espera', etiqueta: 'Estado del ajuste', detalle: 'Aprobado por orientación' },
+      ]));
+    c.append(h('div', { class: 'bloque rejilla rejilla--2' },
       h('div', { class: 'tarjeta tarjeta--borde' },
-        h('p', { class: 'etiqueta' }, 'Vista de la familia'),
-        h('h2', null, 'Lo que se está haciendo por ' + (aj.estudiante || s.estudiante)),
+        h('p', { class: 'etiqueta' }, 'Lo que está pasando'),
+        h('h2', null, 'Por ' + codigo),
         eventos.length
           ? h('ul', { class: 'linea-tiempo' }, eventos.map((e) => h('li', null, h('time', null, hora(e.t)), e.texto)),
               aj.estado !== 'aprobado' ? h('li', { class: 'pendiente' }, 'Falta la aprobación de orientación.') : null)
           : h('div', { class: 'vacio' }, 'Todavía no hay novedades. Cuando el docente prepare una actividad con apoyos, aparecerá aquí.'),
         h('p', { class: 'suave' }, 'La familia se entera mientras ocurre, no en la entrega de notas.')),
       h('div', { class: 'tarjeta' },
-        h('p', { class: 'etiqueta' }, 'Mensaje para casa'),
+        h('p', { class: 'etiqueta' }, 'Para la casa'),
+        h('h2', null, 'Cómo puedes acompañar'),
         aj.estado === 'aprobado'
           ? h('p', null, 'La actividad de inglés ya tiene apoyos: pasos cortos, imágenes y más tiempo. Puedes preguntarle cómo le fue y qué aprendió.')
           : h('p', { class: 'suave' }, 'Cuando la actividad esté lista te contaremos qué cambió y por qué.'),
@@ -158,9 +202,9 @@
   MT.router.registrar({
     id: 'kinesis', titulo: 'Kinesis', espacio: 'kinesis', subs: TABS,
     render(main, { sub }) {
-      const hoja = espacio(main, { marca: 'kinesis', titulo: 'Kinesis', ruta: 'kinesis', tabs: TABS, sub,
-        descripcion: 'Aprender en movimiento: apoyos que avanzan con cada estudiante. Planeación inclusiva con PIAR y DUA.' });
-      ({ docente, orientacion, familia })[sub](hoja);
+      if (st.obtener().rol !== sub) st.cambiar((x) => { x.rol = sub; });
+      const c = espacio(main, { marca: 'kinesis', nombre: 'Kinesis', descripcion: 'PIAR · DUA · Aula', ruta: 'kinesis', tabs: TABS, sub, usuario: USUARIOS[sub] });
+      ({ docente, orientacion, familia })[sub](c);
     },
   });
 })(window.MT = window.MT || {});

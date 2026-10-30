@@ -3,31 +3,31 @@
    registra cualquier error para que las pruebas automáticas puedan verlo. */
 (function (MT) {
   'use strict';
-  const { h, marca, icono, telar } = MT.ui;
+  const { h, marca, icono } = MT.ui;
 
   // Errores de ejecución a la vista de herramientas/auditar.py. No se envía nada a ningún sitio.
   window.__errores = window.__errores || [];
   window.addEventListener('error', (e) => window.__errores.push(e.message));
   window.addEventListener('unhandledrejection', (e) => window.__errores.push('promesa: ' + ((e.reason && e.reason.message) || e.reason)));
 
+  // La lista única del riel. "abajo" son las páginas del colectivo; el resto son los tres hilos.
   const ESPACIOS = [
-    { id: 'inicio', hash: '#/', etiqueta: 'Inicio', cls: 'e-marca', icono: () => icono('inicio'), movil: true },
-    { id: 'kinesis', hash: '#/kinesis', etiqueta: 'Kinesis', cls: 'e-kinesis', icono: () => marca('kinesis'), movil: true },
-    { id: 'wisfox', hash: '#/wisfox', etiqueta: 'Wisfox', cls: 'e-wisfox', icono: () => marca('wisfox'), movil: true },
-    { id: 'valeria', hash: '#/valeria', etiqueta: 'ValerIA', cls: 'e-valeria', icono: () => marca('valeria'), movil: true },
-    { id: 'recorrido', hash: '#/recorrido', etiqueta: 'Recorrido', cls: 'e-marca', icono: () => icono('recorrido'), movil: true },
-    { id: 'estado', hash: '#/estado', etiqueta: 'Estado', cls: 'e-marca', icono: () => icono('estado'), movil: false },
+    { id: 'kinesis', hash: '#/kinesis', etiqueta: 'Kinesis', cls: 'e-kinesis', icono: () => marca('kinesis') },
+    { id: 'wisfox', hash: '#/wisfox', etiqueta: 'Wisfox', cls: 'e-wisfox', icono: () => marca('wisfox') },
+    { id: 'valeria', hash: '#/valeria', etiqueta: 'ValerIA', cls: 'e-valeria', icono: () => marca('valeria') },
+    { id: 'recorrido', hash: '#/recorrido', etiqueta: 'Recorrido', cls: 'e-marca', icono: () => icono('recorrido') },
+    { id: 'estado', hash: '#/estado', etiqueta: 'Estado', cls: 'e-marca', icono: () => icono('estado'), abajo: true },
+    { id: 'identidad', hash: '#/identidad', etiqueta: 'Marca', cls: 'e-marca', icono: () => icono('identidad'), abajo: true },
   ];
 
   function decorativo(svg) { svg.removeAttribute('role'); svg.removeAttribute('aria-label'); svg.setAttribute('aria-hidden', 'true'); return svg; }
 
   function construirNavegacion() {
     const enlace = (e) => h('a', { href: e.hash, class: e.cls, 'data-ruta': e.id }, e.icono(), e.etiqueta);
-    document.getElementById('nav-principal').append(...ESPACIOS.map(enlace));
-    document.getElementById('nav-movil').append(...ESPACIOS.filter((e) => e.movil).map(enlace));
-    document.getElementById('logo-barra').replaceChildren(decorativo(telar(3, 3, 14, 5, 3, '')));
-    document.getElementById('logo-pie').replaceChildren(decorativo(telar(3, 3, 14, 5, 3, '')));
-    document.getElementById('btn-ia').prepend(marca('valeria'));
+    document.getElementById('riel-logo').append(marca('mosaico'));
+    document.getElementById('riel-items').append(...ESPACIOS.filter((e) => !e.abajo).map(enlace));
+    document.getElementById('riel-abajo').append(...ESPACIOS.filter((e) => e.abajo).map(enlace));
+    document.getElementById('logo-pie').replaceChildren(marca('mosaico'));
   }
 
   /* Apariencia (de Kinesis): modo claro, oscuro o del sistema, y texto más grande. Se guarda en
@@ -58,7 +58,17 @@
     document.addEventListener('click', (e) => { if (!menu.hidden && !menu.contains(e.target) && !boton.contains(e.target)) cerrar(); });
   }
 
+  // La franja siempre dice con qué rol se está mirando, y deja cambiarlo en un clic.
+  function pintarRol() {
+    const r = MT.roles.por(MT.store.obtener().rol);
+    const el = document.getElementById('rol-actual');
+    el.textContent = r ? 'Rol: ' + r.nombre + ' · cambiar' : 'Elegir mi rol';
+    el.setAttribute('href', '#/');
+  }
+  MT.store.suscribir(pintarRol);
+
   construirNavegacion();
+  pintarRol();
   construirApariencia();
   document.getElementById('btn-ia').addEventListener('click', () => MT.ia.panel.alternar());
   MT.ia.detectar();

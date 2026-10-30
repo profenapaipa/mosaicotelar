@@ -13,7 +13,7 @@ Qué hace
 --------
 1. Revisa que cada archivo que referencia index.html exista.
 2. Sirve la carpeta por http y abre herramientas/arnes.html en Chrome sin pantalla. El arnés
-   recorre las 11 pantallas en 390 y 1280 px de ancho, en tema claro y oscuro, y mide:
+   recorre todas las pantallas en 390 y 1280 px de ancho, en tema claro y oscuro, y mide:
    desborde horizontal, errores de ejecución, un único h1, controles sin nombre, controles de
    menos de 24 px y contraste del texto (4,5 a 1, o 3 a 1 en texto grande).
 3. Ejecuta el recorrido completo como lo haría una persona: ajustar en Kinesis, aprobar en
@@ -68,6 +68,8 @@ def revisar_referencias():
             refs += [os.path.normpath(os.path.join(base, u)).replace('\\', '/')
                      for u in re.findall(r'url\("?([^")]+)"?\)', f.read())]
     for ref in sorted(set(refs)):
+        if ref.startswith('data:') or 'data:image' in ref:
+            continue  # imágenes incrustadas en el propio CSS
         if not os.path.exists(os.path.join(RAIZ, ref)):
             fallos.append('falta el archivo ' + ref)
     return fallos
@@ -158,7 +160,7 @@ def main():
     malos = [c for c in casos if c['fallos']]
     medidos = sum(c['contraste']['medidos'] for c in casos)
     omitidos = sum(c['contraste']['omitidos'] for c in casos)
-    print(f'\n2. Pantallas: {len(casos)} casos (11 pantallas x 2 anchos x 2 temas), {len(malos)} con fallos.')
+    print(f'\n2. Pantallas: {len(casos)} casos (pantallas x 2 anchos x 2 temas), {len(malos)} con fallos.')
     print(f'   Contraste: {medidos} textos medidos; {omitidos} sobre degradado omitidos (se revisan a ojo).')
     for c in malos:
         print(f"   FALLA {c['ruta']} {c['ancho']}px tema {c['tema']}")

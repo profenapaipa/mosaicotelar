@@ -2,8 +2,8 @@
 
 **Tejemos caminos para aprender.**
 
-Colectivo de educación inclusiva con tecnología. Este repositorio es el espacio público donde
-tres proyectos estudiantiles se encuentran con una sola identidad, una sola navegación y un
+Colectivo de educación inclusiva con tecnología. Este repositorio es la plataforma pública donde
+tres proyectos estudiantiles se encuentran con una sola identidad, una navegación por rol y un
 estado compartido:
 
 | Hilo | Proyecto | Para quién | Su proyecto completo |
@@ -26,6 +26,12 @@ su autonomía. Aquí viven la versión unificada de lo esencial de cada uno y lo
 - **IA ValerIA:** su lugar propio. Hoy responde con textos de ejemplo, y lo dice en pantalla.
 - **Ambos:** la tipografía Nunito, que los dos ya usaban y es la voz común.
 
+## Dónde empezar
+
+- **Quien usa la plataforma:** abre la página y elige su rol. Todo lo demás sale de ahí.
+- **Quien quiere entender cómo se unió todo:** [docs/AUDITORIA_DE_UNIFICACION.md](docs/AUDITORIA_DE_UNIFICACION.md).
+- **Quien diseña o programa:** [docs/MANUAL_DE_MARCA.md](docs/MANUAL_DE_MARCA.md), y la sección "Marca" de la propia plataforma.
+
 ## Lo nuevo: un solo hilo entre los espacios
 
 Lo que el docente hace en Kinesis aparece en Orientación, en Familia y en Wisfox sin copiar
@@ -39,7 +45,10 @@ Sin dependencias, sin paso de construcción, con scripts clásicos. Por eso func
 `index.html` directamente, en GitHub Pages y sin internet.
 
 ```
-index.html          marco: barra, navegación, panel de ValerIA, pie
+index.html          marco: riel de la plataforma, franja, panel de ValerIA, pie
+docs/
+  AUDITORIA_DE_UNIFICACION.md   cómo se unen los tres hilos sin perder lo suyo
+  MANUAL_DE_MARCA.md            propósito, logo, color, tipografía, recursos
 css/
   tokens.css        la identidad: colores por hilo, tema claro y oscuro, texto grande
   base.css          botones, tarjetas, formularios y demás componentes comunes
@@ -49,10 +58,11 @@ js/
   ui.js             constructor de elementos, texto seguro y los símbolos de la marca
   store.js          el estado compartido (localStorage, con respaldo en memoria)
   datos.js          todo lo ficticio: estudiantes, DUA, lección, quiz, respuestas de ejemplo
+  roles.js          los cuatro roles, qué hace cada uno y su siguiente paso
   ia-config.js      el único archivo que se toca para conectar ValerIA
   ia.js             adaptador de ValerIA, chat y panel
   router.js         navegación por hash (#/kinesis/docente)
-  vistas/           una por pantalla: inicio, kinesis, wisfox, valeria, recorrido, estado
+  vistas/           una por pantalla: inicio, kinesis, wisfox, valeria, recorrido, estado, identidad
 herramientas/
   auditar.py        prueba todo en un navegador real
   arnes.html        lo que auditar.py ejecuta dentro del navegador
@@ -77,7 +87,7 @@ python herramientas/auditar.py            # todo
 python herramientas/auditar.py --enlaces  # además, que los enlaces externos respondan
 ```
 
-Recorre las 11 pantallas en celular y escritorio, en tema claro y oscuro, y mide desborde,
+Recorre las 15 pantallas en celular y escritorio, en tema claro y oscuro, y mide desborde,
 errores de ejecución, un solo título por pantalla, controles sin nombre o menores de 24 px,
 texto roto y contraste. Después ejecuta el recorrido completo como lo haría una persona. Necesita
 Chrome o Edge y Python 3. Sale con código 1 si algo falla.

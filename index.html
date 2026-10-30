@@ -4,12 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Mosaico Telar</title>
-<meta name="description" content="Mosaico Telar es un colectivo de educación inclusiva con tecnología. Kinesis, Wisfox e IA ValerIA, tres proyectos estudiantiles tejidos en un solo espacio para que cada estudiante aprenda a su manera.">
+<meta name="description" content="Mosaico Telar es una plataforma educativa inclusiva que integra tres proyectos estudiantiles: Kinesis, Wisfox e IA ValerIA. Tejemos caminos para aprender.">
 <meta property="og:title" content="Mosaico Telar. Tejemos caminos para aprender.">
-<meta property="og:description" content="Colectivo de educación inclusiva con tecnología: tres proyectos estudiantiles en un solo espacio.">
+<meta property="og:description" content="Plataforma educativa inclusiva: tres proyectos estudiantiles en un solo espacio.">
 <meta property="og:type" content="website">
-<meta name="theme-color" content="#FAF6EF" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#17151F" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#1A1726">
 <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
 <!-- Aplica la apariencia guardada antes de pintar, para que no haya un destello del tema equivocado. -->
 <script>try{var a=JSON.parse(localStorage.getItem('mosaicotelar.apariencia')||'{}'),r=document.documentElement;if(a.tema==='claro'||a.tema==='oscuro')r.dataset.tema=a.tema;if(a.texto==='grande')r.dataset.texto='grande';}catch(e){}</script>
@@ -22,37 +21,44 @@
 <body>
 <a class="saltar" href="#app">Saltar al contenido</a>
 
-<header class="barra">
-  <a class="marca" href="#/" aria-label="Mosaico Telar, inicio"><span id="logo-barra"></span>Mosaico Telar</a>
-  <nav class="nav-principal" id="nav-principal" aria-label="Espacios"></nav>
-  <div class="barra-acciones">
-    <button class="btn btn--chico btn--suave" id="btn-ia" type="button" aria-expanded="false" aria-controls="slot-ia">ValerIA</button>
-    <button class="btn btn--chico btn--suave" id="btn-apariencia" type="button" aria-expanded="false" aria-controls="menu-apariencia">Apariencia</button>
-    <div class="menu-apariencia" id="menu-apariencia" hidden></div>
-  </div>
-</header>
+<!-- Riel del colectivo: siempre igual, lleva a cada hilo. Lo construye js/main.js desde una sola lista. -->
+<nav class="riel" aria-label="Plataforma">
+  <a class="riel-logo" href="#/" data-ruta="inicio" aria-label="Mosaico Telar, inicio" id="riel-logo"></a>
+  <div class="riel-items" id="riel-items"></div>
+  <div class="riel-abajo" id="riel-abajo"></div>
+</nav>
 
-<div class="cinta-datos" role="note">Datos ficticios: nada de lo que ves pertenece a una persona real.</div>
+<div class="cuerpo">
+  <header class="franja">
+    <p>Datos ficticios: nada de lo que ves pertenece a una persona real.</p>
+    <div class="franja-acciones">
+      <a class="rol-actual" id="rol-actual" href="#/"></a>
+      <button class="btn btn--chico btn--suave" id="btn-ia" type="button" aria-expanded="false" aria-controls="slot-ia">Hablar con ValerIA</button>
+      <button class="btn btn--chico btn--suave" id="btn-apariencia" type="button" aria-expanded="false" aria-controls="menu-apariencia">Apariencia</button>
+      <div class="menu-apariencia" id="menu-apariencia" hidden></div>
+    </div>
+  </header>
 
-<main id="app" tabindex="-1">
-  <noscript><div class="contenedor"><p class="aviso">Esta página necesita JavaScript para funcionar. Es una demostración sin servidor y no envía datos a ningún sitio.</p></div></noscript>
-</main>
+  <main id="app" tabindex="-1">
+    <noscript><div class="contenedor"><p class="aviso">Esta página necesita JavaScript para funcionar. Es una demostración sin servidor y no envía datos a ningún sitio.</p></div></noscript>
+  </main>
 
-<footer class="pie">
-  <span id="logo-pie"></span>
-  <div>
-    <p><strong>Mosaico Telar</strong> · Tejemos caminos para aprender.</p>
-    <p>Colectivo de proyectos estudiantiles del Semillero Maker de Tecnología con Sentido. Representante legal: Néstor Andrés Paipa.</p>
-    <p><a href="#/estado">Qué funciona y qué no</a></p>
-  </div>
-</footer>
+  <footer class="pie">
+    <span id="logo-pie"></span>
+    <div>
+      <p><strong>Mosaico Telar</strong> · Tejemos caminos para aprender.</p>
+      <p>Plataforma de proyectos estudiantiles del Semillero Maker de Tecnología con Sentido. Representante legal: Néstor Andrés Paipa.</p>
+      <p><a href="#/estado">Qué funciona y qué no</a> · <a href="#/identidad">Identidad de marca</a></p>
+    </div>
+  </footer>
+</div>
 
-<nav class="nav-movil" id="nav-movil" aria-label="Espacios"></nav>
 <aside class="panel-ia" id="slot-ia" hidden></aside>
 
 <script src="js/ui.js"></script>
 <script src="js/store.js"></script>
 <script src="js/datos.js"></script>
+<script src="js/roles.js"></script>
 <script src="js/ia-config.js"></script>
 <script src="js/ia.js"></script>
 <script src="js/router.js"></script>
@@ -63,6 +69,7 @@
 <script src="js/vistas/valeria.js"></script>
 <script src="js/vistas/recorrido.js"></script>
 <script src="js/vistas/estado.js"></script>
+<script src="js/vistas/identidad.js"></script>
 <script src="js/main.js"></script>
 </body>
 </html>

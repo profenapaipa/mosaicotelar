@@ -9,7 +9,7 @@
 <iframe id="f" style="border:0;display:block;background:#fff"></iframe>
 <pre id="resultado" style="position:fixed;top:0;left:0;max-width:100%;background:#fff;color:#000;font:11px monospace;white-space:pre-wrap"></pre>
 <script>
-const RUTAS = ['#/', '#/kinesis/docente', '#/kinesis/orientacion', '#/kinesis/familia', '#/wisfox/ruta', '#/wisfox/leccion', '#/wisfox/juego', '#/wisfox/logros', '#/valeria', '#/recorrido', '#/estado'];
+const RUTAS = ['#/', '#/kinesis/docente', '#/kinesis/orientacion', '#/kinesis/familia', '#/wisfox/inicio', '#/wisfox/leccion', '#/wisfox/juego', '#/wisfox/logros', '#/valeria/chat', '#/valeria/conexion', '#/recorrido/camino', '#/recorrido/roles', '#/recorrido/datos', '#/estado', '#/identidad'];
 const ANCHOS = [390, 1280];
 const TEMAS = ['claro', 'oscuro'];
 const espera = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -76,7 +76,9 @@ function medirCaso(ruta, ancho, tema) {
   d.documentElement.dataset.tema = tema;
   const e = d.documentElement;
   if (e.scrollWidth > e.clientWidth + 1) fallos.push(`desborda a lo ancho (${e.scrollWidth} > ${e.clientWidth})`);
-  const fuera = [...d.querySelectorAll('main *')].filter((x) => { const r = x.getBoundingClientRect(); return r.width && (r.right > e.clientWidth + 1 || r.left < -1); }).slice(0, 3).map((x) => x.tagName.toLowerCase() + '.' + (x.className || ''));
+  // Lo que está dentro de una tira con scroll propio (overflow-x auto) puede salirse a propósito.
+  const enScroll = (x) => { for (let p = x.parentElement; p && p !== d.body; p = p.parentElement) { const o = w.getComputedStyle(p).overflowX; if (o === 'auto' || o === 'scroll') return true; } return false; };
+  const fuera = [...d.querySelectorAll('main *')].filter((x) => { const r = x.getBoundingClientRect(); return r.width && (r.right > e.clientWidth + 1 || r.left < -1) && !enScroll(x); }).slice(0, 3).map((x) => x.tagName.toLowerCase() + '.' + (x.className || ''));
   if (fuera.length) fallos.push('elementos fuera de pantalla: ' + fuera.join(', '));
   if (w.__errores && w.__errores.length) fallos.push('errores: ' + w.__errores.join(' | '));
   const h1 = d.querySelectorAll('main h1').length;
@@ -106,6 +108,15 @@ async function pulsar(txt) { const b = hallar(txt); if (!b) { afirmar('existe "'
 
 async function flujo() {
   localStorage.clear();
+  // Entrada por rol: lo primero que ve cualquier persona es "¿quién eres?" y de ahí sale todo.
+  await cargar('#/', 1280); await espera(400);
+  afirmar('el inicio pregunta quién eres', textoPagina().includes('¿Quién eres?'));
+  afirmar('hay una tarjeta por rol (4)', doc().querySelectorAll('.rol-tarjeta').length === 4);
+  await pulsar('Soy docente');
+  afirmar('elegir docente lleva a Kinesis docente', ventana().location.hash === '#/kinesis/docente');
+  afirmar('la franja dice con qué rol se mira', doc().getElementById('rol-actual').textContent.includes('Docente'));
+  afirmar('Kinesis conserva su cara: barra lateral, encabezado y panel de cifras', !!doc().querySelector('.lateral .lockup') && !!doc().querySelector('.hero') && !!doc().querySelector('.panel-cifras'));
+  afirmar('el riel de la plataforma lleva a los tres hilos', ['kinesis', 'wisfox', 'valeria'].every((id) => doc().querySelector(`.riel a[data-ruta="${id}"]`)));
   await cargar('#/kinesis/docente', 1280); await espera(400);
   const sel = doc().querySelector('.roster button[aria-pressed="true"]');
   afirmar('Kinesis muestra a P-03 seleccionado', sel && sel.textContent.includes('P-03'));
@@ -136,7 +147,7 @@ async function flujo() {
   afirmar('el juego reconoce la frase correcta', textoPagina().includes('Ganaste 15 XP'));
   await ir('#/wisfox/logros');
   afirmar('Wisfox muestra logros ganados', /Conseguido/.test(textoPagina()));
-  await ir('#/valeria');
+  await ir('#/valeria/chat');
   doc().getElementById('btn-ia').click(); await espera(300); // el botón de la barra, no el enlace del menú
   const panel = doc().getElementById('slot-ia');
   afirmar('el panel de ValerIA se abre', panel && !panel.hidden);
@@ -146,8 +157,14 @@ async function flujo() {
   afirmar('ValerIA dice que es una respuesta de ejemplo', /ejemplo|En vivo|respaldo/i.test(panel.innerText));
   panel.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); await espera(100);
   afirmar('Escape cierra el panel', panel.hidden);
-  await ir('#/recorrido');
+  await ir('#/recorrido/camino');
   afirmar('el recorrido marca los seis pasos', textoPagina().includes('6 de 6 pasos'), textoPagina().match(/\d de 6 pasos/));
+  await ir('#/recorrido/roles');
+  afirmar('la matriz dice qué ve cada rol', textoPagina().includes('Información clínica') && textoPagina().includes('Nunca la recibe'));
+  await ir('#/recorrido/datos');
+  afirmar('el flujo de datos muestra lo que nunca sale de su lugar', textoPagina().includes('Nunca sale de su lugar'));
+  await ir('#/');
+  afirmar('el inicio muestra el siguiente paso del rol elegido', /tu siguiente paso/i.test(textoPagina()));
   await ir('#/estado');
   afirmar('el foco llega al título al cambiar de pantalla', doc().activeElement && doc().activeElement.tagName === 'H1');
   // Sin errores de ejecución en todo el recorrido
