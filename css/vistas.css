@@ -315,3 +315,8 @@ input[type="file"] { width: 100%; font: 400 1rem var(--fuente); color: var(--tin
   .guia-paso { grid-template-columns: auto minmax(0, 1fr); }
   .guia-paso .acciones { grid-column: 1 / -1; justify-content: flex-start; }
 }
+
+/* ---- Portales incrustados ---- */
+.portal-franja { display: flex; flex-wrap: wrap; gap: .6rem 1rem; align-items: center; justify-content: space-between; background: var(--lino); border: 1px solid var(--linea); border-left: 6px solid var(--e-vivo); border-radius: var(--radio-chico); padding: .7rem 1rem; margin-bottom: .8rem; }
+.portal-franja .acciones { margin: 0; }
+.portal-marco { display: block; width: 100%; height: calc(100vh - 14rem); min-height: 560px; border: 1px solid var(--linea); border-radius: var(--radio); background: #fff; }

@@ -15,7 +15,6 @@
     { id: 'mi', hash: '#/mi', etiqueta: 'Mi espacio', cls: 'e-marca', icono: () => icono('inicio') },
     { id: 'portales', hash: '#/portales', etiqueta: 'Portales', cls: 'e-marca', icono: () => icono('recorrido') },
     { id: 'mapa', hash: '#/mapa', etiqueta: 'Mapa', cls: 'e-marca', icono: () => icono('mapa') },
-    { id: 'valeria', hash: '#/valeria', etiqueta: 'ValerIA', cls: 'e-valeria', icono: () => marca('valeria') },
     { id: 'recorrido', hash: '#/recorrido', etiqueta: 'Roles', cls: 'e-marca', icono: () => icono('docente') },
     { id: 'hoja', hash: '#/hoja', etiqueta: 'Hoja de ruta', cls: 'e-marca', icono: () => icono('estado'), abajo: true },
     { id: 'identidad', hash: '#/identidad', etiqueta: 'Marca', cls: 'e-marca', icono: () => icono('identidad'), abajo: true },

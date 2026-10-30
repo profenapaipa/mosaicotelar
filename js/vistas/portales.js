@@ -32,12 +32,9 @@
   };
 
   const urlPortal = (id) => (MT.config.portales || {})[id] || null;
-  function abrirPortal(id) {
-    if (id === 'valeria') { MT.ia.panel.abrir(); return; }
-    const u = urlPortal(id); if (u) window.open(u, '_blank', 'noopener');
-  }
-  const botonPortal = (id, clase) => h('button', { class: 'btn ' + (clase || ''), type: 'button', onclick: () => abrirPortal(id) },
-    id === 'valeria' ? 'Hablar con ValerIA' : 'Abrir ' + PORTALES[id].nombre);
+  // Los portales se ven dentro de Mosaico Telar, en su propia pestaña: no hace falta salir para viajar entre ellos.
+  const abrirPortal = (id) => { location.hash = '#/portales/' + id; };
+  const botonPortal = (id, clase) => h('button', { class: 'btn ' + (clase || ''), type: 'button', onclick: () => abrirPortal(id) }, 'Ir a ' + PORTALES[id].nombre);
 
   // Un ajuste recorriendo los tres portales: cada paso cae en el carril donde ocurre.
   const CARRILES = ['kinesis', 'valeria', 'wisfox'];
@@ -53,9 +50,36 @@
     ['kinesis', 'Docente', 'Ve el progreso del estudiante y decide el siguiente paso.'],
   ];
 
+  const TABS = [{ id: 'general', etiqueta: 'Vista general' }, { id: 'kinesis', etiqueta: 'Kinesis' }, { id: 'wisfox', etiqueta: 'Wisfox' }, { id: 'valeria', etiqueta: 'ValerIA' }];
+  const pestanas = (sub) => h('nav', { class: 'pestanas-pagina', 'aria-label': 'Portales' }, TABS.map((t) => h('a', { href: '#/portales/' + t.id, 'aria-current': t.id === sub ? 'page' : null }, t.etiqueta)));
+
+  // Un portal dentro de Mosaico Telar: se viaja de uno a otro con las pestañas, sin salir de la plataforma.
+  function vistaPortal(main, id) {
+    const p = PORTALES[id]; const rol = st.obtener().rol; const r = rol ? MT.roles.por(rol) : null;
+    const c = pagina(main, { etiqueta: 'Portales', titulo: p.nombre + ': ' + p.rotulo.toLowerCase(), descripcion: p.que });
+    c.append(pestanas(id));
+    c.append(h('div', { class: 'portal-franja', 'data-espacio': id },
+      h('span', null, r ? h('span', null, h('strong', null, 'Tu rol: ' + r.nombre + '. '), 'Tu guía te dice qué hacer aquí.') : h('span', null, 'Elige tu rol para ver qué te toca hacer aquí.')),
+      h('span', { class: 'acciones' }, h('a', { class: 'btn btn--chico', href: r ? '#/guia/' + rol : '#/guia' }, 'Mi guía de inicio'),
+        id === 'valeria' ? null : h('button', { class: 'btn btn--chico btn--suave', type: 'button', onclick: () => { if (r) { location.hash = '#/mi/resumen'; } else { location.hash = '#/guia'; } } }, 'Hacerlo en Mi espacio'))));
+    if (id === 'valeria') {
+      const caja = h('div', { class: 'tarjeta tarjeta--chat' });
+      c.append(caja, h('p', { class: 'suave' }, 'ValerIA propone y no decide. Hoy responde con textos de ejemplo y nunca recibe información clínica.'));
+      const ch = MT.ia.montarChat(caja, MT.ia.panel.sugerenciasPara());
+      MT.router.alSalir(() => ch.destruir());
+      return;
+    }
+    const url = urlPortal(id);
+    c.append(h('iframe', { class: 'portal-marco', src: url, title: p.nombre + ', ' + p.rotulo.toLowerCase(), loading: 'lazy', referrerpolicy: 'no-referrer',
+      allow: 'clipboard-write', sandbox: 'allow-scripts allow-same-origin allow-forms allow-popups allow-downloads' }));
+    c.append(h('p', { class: 'suave' }, p.nombre + ' es una aplicación de su equipo, con sus propios datos y su propio inicio de sesión. Se muestra aquí tal como la construyeron. ',
+      h('a', { href: url, target: '_blank', rel: 'noopener' }, 'Si no carga, ábrela en una pestaña aparte.')));
+  }
+
   function vistaPortales(main) {
     const c = pagina(main, { etiqueta: 'Portales', titulo: 'Tres portales, una sola plataforma',
-      descripcion: 'Kinesis, Wisfox y ValerIA trabajan en paralelo y se pasan el trabajo entre sí. Aquí ves qué hace cada uno, cómo se conectan y cuál te toca.' });
+      descripcion: 'Kinesis, Wisfox y ValerIA trabajan en paralelo y se pasan el trabajo entre sí. Viaja entre ellos con las pestañas, sin salir de Mosaico Telar.' });
+    c.append(pestanas('general'));
 
     c.append(h('div', { class: 'rejilla rejilla--3 portales' }, Object.entries(PORTALES).map(([id, p]) => h('article', { class: 'tarjeta portal', 'data-espacio': id },
       h('div', { class: 'proyecto-cab' }, marca(id), h('div', null, h('h2', null, p.nombre), h('small', null, p.rotulo))),
@@ -138,12 +162,16 @@
       h('div', { class: 'guia-paso__texto' }, h('p', { class: 'etiqueta' }, 'En ' + PORTALES[p.portal].nombre), h('h3', null, p.t), h('p', null, p.d)),
       h('div', { class: 'acciones' },
         p.aqui ? h('button', { class: 'btn btn--chico', type: 'button', onclick: () => irAqui(rol, p.aqui) }, 'Hacerlo aquí') : null,
-        h('button', { class: 'btn btn--chico btn--suave', type: 'button', 'aria-label': (p.portal === 'valeria' ? 'Hablar con ValerIA' : 'Abrir ' + PORTALES[p.portal].nombre) + ', paso ' + (i + 1), onclick: () => abrirPortal(p.portal) },
-          p.portal === 'valeria' ? 'Hablar con ValerIA' : 'Abrir ' + PORTALES[p.portal].nombre))))));
-    c.append(h('p', { class: 'suave' }, '“Abrir” lleva al portal original en otra pestaña. “Hacerlo aquí” lo hace en Mi espacio, la versión que reúne los tres. ', h('a', { href: '#/portales' }, 'Ver qué hace cada portal')));
+        h('button', { class: 'btn btn--chico btn--suave', type: 'button', 'aria-label': 'Ir a ' + PORTALES[p.portal].nombre + ', paso ' + (i + 1), onclick: () => abrirPortal(p.portal) },
+          'Ir a ' + PORTALES[p.portal].nombre))))));
+    c.append(h('p', { class: 'suave' }, '“Ir a” abre el portal aquí mismo, sin salir de Mosaico Telar. “Hacerlo aquí” lo hace en Mi espacio, la versión que reúne los tres. ', h('a', { href: '#/portales' }, 'Ver qué hace cada portal')));
   }
 
-  MT.router.registrar({ id: 'portales', titulo: 'Portales', espacio: '', render: vistaPortales });
+  MT.router.registrar({
+    id: 'portales', titulo: 'Portales', subs: TABS,
+    espacio: (sub) => (['kinesis', 'wisfox', 'valeria'].includes(sub) ? sub : ''),
+    render(main, { sub }) { if (sub === 'general') vistaPortales(main); else vistaPortal(main, sub); },
+  });
   MT.router.registrar({
     id: 'guia', titulo: 'Inicio rápido', espacio: '',
     // La guía abre en el rol de quien la lee; los demás quedan a un clic.
