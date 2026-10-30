@@ -147,7 +147,11 @@ async function flujo() {
   afirmar('Ir a Kinesis lo muestra dentro de Mosaico Telar', ventana().location.hash === '#/portales/kinesis' && !!marcoK && marcoK.getAttribute('src') === ventana().MT.config.portales.kinesis && abiertas.length === 0, ventana().location.hash);
   afirmar('la pestaña activa se marca y el portal queda como abierto', doc().querySelector('#barra-portales .pestana[data-portal="kinesis"] .pestana__ir').getAttribute('aria-current') === 'page' && doc().querySelector('#barra-portales .pestana[data-portal="kinesis"]').classList.contains('pestana--abierta'));
   afirmar('el portal dice qué le toca hacer al rol', /Tu rol: Docente/.test(textoPagina()) && /te toca/.test(textoPagina()));
-  afirmar('el portal avisa que es una aplicación aparte con sus propios datos', /propios datos/.test(textoPagina()));
+  const mk = doc().querySelector('.vivos iframe').getBoundingClientRect(); const vent = ventana();
+  afirmar('el portal ocupa todo el panel: casi todo el ancho y casi todo el alto de la pantalla', mk.width >= vent.innerWidth * 0.7 && mk.height >= vent.innerHeight * 0.65, Math.round(mk.width) + 'x' + Math.round(mk.height) + ' de ' + vent.innerWidth + 'x' + vent.innerHeight);
+  afirmar('la barra del portal es de una sola fila delgada', doc().querySelector('.vivo-barra').getBoundingClientRect().height < 90, String(doc().querySelector('.vivo-barra').getBoundingClientRect().height));
+  afirmar('el portal se puede pasar a pantalla completa', [...doc().querySelectorAll('.vivo-barra button')].some((b) => /Pantalla completa/.test(b.textContent)));
+  afirmar('el portal avisa que es una aplicación aparte con sus propios datos', /Aplicación aparte/.test(textoPagina()) && /propios datos/.test(doc().querySelector('.vivo-badge').title));
   // Lista desplegable de cada portal: qué hace tu rol ahí y dónde trabajarlo
   const caretWisfox = doc().querySelector('#barra-portales .pestana[data-portal="wisfox"] .pestana__abrir');
   caretWisfox.click(); await espera(200);

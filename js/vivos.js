@@ -17,7 +17,7 @@
   const TARDA = 8000;
 
   function iniciar(main) {
-    encabezado = h('div', { class: 'vivo-cab' });
+    encabezado = h('div', { class: 'vivo-barra' });
     marcos = h('div', { class: 'vivo-marcos' });
     raiz = h('section', { class: 'vivos', 'data-persistente': '', hidden: true, 'aria-label': 'Portales abiertos' }, encabezado, marcos);
     main.prepend(raiz);
@@ -34,7 +34,7 @@
       const url = (MT.config.portales || {})[id];
       const estado = h('p', { class: 'vivo-estado', role: 'status' }, MT.tejido.cargador(), `Cargando ${p.nombre}…`);
       const marco = h('iframe', { class: 'portal-marco', src: url, title: `${p.nombre}, ${p.rotulo.toLowerCase()}`, referrerpolicy: 'no-referrer',
-        allow: 'clipboard-write', sandbox: 'allow-scripts allow-same-origin allow-forms allow-popups allow-downloads' });
+        allow: 'clipboard-write; fullscreen', sandbox: 'allow-scripts allow-same-origin allow-forms allow-popups allow-downloads' });
       const espera = setTimeout(() => { estado.replaceChildren(`${p.nombre} está tardando. Revisa tu conexión o ábrelo en una pestaña aparte con el enlace de arriba.`); estado.classList.add('vivo-estado--tarda'); }, TARDA);
       marco.addEventListener('load', () => { clearTimeout(espera); estado.remove(); });
       el.append(h('p', { class: 'vivo-panel__nombre' }, marca(id), `${p.nombre} · ${p.rotulo.toLowerCase()}`), estado, marco);
@@ -49,23 +49,39 @@
     const pasos = rol ? MT.guias.pasosEn(rol, activo) : [];
     const otros = ORDEN.filter((x) => x !== activo);
     const url = (MT.config.portales || {})[activo];
-    // replaceChildren (nativo) convertiría un null en el texto "null": por eso solo se pasan nodos reales.
-    encabezado.replaceChildren(...[
-      h('div', { class: 'vivo-cab__titulo', 'data-espacio': activo },
-        marca(activo, 'vivo-cab__marca'),
-        h('div', null, h('p', { class: 'vivo-titulo', role: 'heading', 'aria-level': '1' }, `${p.nombre}: ${p.rotulo.toLowerCase()}`), h('p', { class: 'suave vivo-cab__que' }, p.que))),
-      h('div', { class: 'vivo-cab__pasos' },
+    const aviso = `${p.nombre} es una aplicación de su equipo, con sus propios datos y su propio inicio de sesión. Lo que hagas aquí todavía no aparece en Mi espacio.`;
+    // La explicación va en un desplegable: el portal necesita todo el espacio.
+    const ayuda = h('details', { class: 'vivo-ayuda' },
+      h('summary', { class: 'btn btn--chico btn--suave' }, r ? `Tu rol: ${r.nombre} · qué te toca aquí` : 'Qué te toca aquí'),
+      h('div', { class: 'vivo-ayuda__cuerpo' },
+        h('p', null, p.que),
         r ? h('p', null, h('strong', null, `Tu rol: ${r.nombre}. `), pasos.length ? `En ${p.nombre} te toca:` : `En ${p.nombre} no tienes pasos propios; mira tu guía para ver dónde trabajas.`)
           : h('p', null, h('strong', null, 'Elige tu rol '), `para ver qué te toca hacer en ${p.nombre}.`),
-        pasos.length ? h('ol', null, pasos.map((s) => h('li', null, h('span', null, s.t), s.aqui ? h('button', { class: 'enlace-boton', type: 'button', onclick: () => MT.guias.irAqui(rol, s.aqui) }, 'Hacerlo en Mi espacio') : null))) : null),
-      h('div', { class: 'vivo-cab__acciones' },
+        pasos.length ? h('ol', null, pasos.map((x) => h('li', null, h('span', null, x.t), x.aqui ? h('button', { class: 'enlace-boton', type: 'button', onclick: () => MT.guias.irAqui(rol, x.aqui) }, 'Hacerlo en Mi espacio') : null))) : null,
+        activo !== 'valeria' ? h('p', { class: 'suave' }, aviso) : null));
+    // replaceChildren (nativo) convertiría un null en el texto "null": por eso solo se pasan nodos reales.
+    encabezado.replaceChildren(...[
+      h('div', { class: 'vivo-barra__titulo', 'data-espacio': activo },
+        marca(activo, 'vivo-cab__marca'),
+        h('p', { class: 'vivo-titulo', role: 'heading', 'aria-level': '1' }, `${p.nombre}: ${p.rotulo.toLowerCase()}`)),
+      ayuda,
+      activo !== 'valeria' ? h('span', { class: 'vivo-badge', title: aviso }, 'Aplicación aparte') : null,
+      h('div', { class: 'vivo-barra__acciones' },
         lado
           ? h('button', { class: 'btn btn--chico btn--suave', type: 'button', onclick: () => { lado = null; refrescar(); } }, 'Quitar vista dividida')
           : h('span', { class: 'dividir' }, h('label', { for: 'dividir-con' }, 'Ver al lado'),
             h('select', { id: 'dividir-con', onchange: (e) => { if (e.target.value) { lado = e.target.value; refrescar(); } } },
               h('option', { value: '' }, 'Elegir portal…'), otros.map((o) => h('option', { value: o }, PORTALES[o].nombre)))),
-        url && activo !== 'valeria' ? h('a', { class: 'btn btn--chico btn--suave', href: url, target: '_blank', rel: 'noopener' }, 'Abrir en pestaña aparte') : null),
-      activo !== 'valeria' ? h('p', { class: 'aviso aviso--suave' }, `${p.nombre} es una aplicación de su equipo, con sus propios datos y su propio inicio de sesión. Lo que hagas aquí todavía no aparece en Mi espacio.`) : null].filter(Boolean));
+        document.fullscreenEnabled ? h('button', { class: 'btn btn--chico btn--suave', type: 'button', onclick: () => { if (document.fullscreenElement) document.exitFullscreen(); else marcos.requestFullscreen().catch(() => {}); } }, 'Pantalla completa') : null,
+        url && activo !== 'valeria' ? h('a', { class: 'btn btn--chico btn--suave', href: url, target: '_blank', rel: 'noopener' }, 'Abrir aparte') : null),
+    ].filter(Boolean));
+  }
+
+  // La altura del portal es "todo lo que queda bajo la franja y la barra de pestañas": se mide para no adivinar.
+  function medirCabeza() {
+    if (!raiz) return;
+    const f = document.querySelector('.franja'); const b = document.getElementById('barra-portales');
+    raiz.style.setProperty('--cabeza', ((f ? f.offsetHeight : 0) + (b ? b.offsetHeight : 0)) + 'px');
   }
 
   function refrescar() {
@@ -82,9 +98,15 @@
     if (!raiz) iniciar(document.getElementById('app'));
     activo = id; if (lado === id) lado = null;
     raiz.hidden = false;
+    medirCabeza();
     refrescar();
   }
   function ocultar() { if (raiz) raiz.hidden = true; if (MT.barra) MT.barra.actualizar(); }
+
+  window.addEventListener('resize', medirCabeza);
+  // El desplegable de "qué te toca" se cierra al tocar fuera o con Escape.
+  document.addEventListener('click', (e) => { document.querySelectorAll('.vivo-ayuda[open]').forEach((d) => { if (!d.contains(e.target)) d.removeAttribute('open'); }); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') document.querySelectorAll('.vivo-ayuda[open]').forEach((d) => d.removeAttribute('open')); });
 
   MT.vivos = { mostrar, ocultar, abiertos: () => Object.keys(paneles), activo: () => (raiz && !raiz.hidden ? activo : null), lado: () => lado, dividir(id) { if (id && id !== activo) { lado = id; refrescar(); } } };
   MT.vivos.iniciar = iniciar;

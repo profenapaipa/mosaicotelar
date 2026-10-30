@@ -1,0 +1,57 @@
+/* portales-vivos.css: Kinesis, ValerIA y Wisfox a panel completo.
+
+   Lo que hay dentro de cada portal es mucha información, así que el portal ocupa TODO el espacio que queda bajo la barra de
+   pestañas. Arriba queda una sola barra de herramientas delgada; la explicación de qué te toca hacer ahí está en un
+   desplegable, y se puede pasar a pantalla completa. */
+.vivos { --cabeza: 96px; height: calc(100dvh - var(--cabeza)); min-height: 520px; display: flex; flex-direction: column; gap: .5rem; padding: .5rem .7rem .6rem; }
+.vivos[hidden], .vivo-panel[hidden] { display: none !important; }
+
+/* Barra de herramientas del portal: una sola fila */
+.vivo-barra { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem .9rem; min-height: 44px; flex: none; }
+.vivo-barra__titulo { display: flex; align-items: center; gap: .6rem; border-left: 5px solid var(--e-vivo); padding-left: .6rem; min-width: 0; }
+.vivo-cab__marca { width: 30px; height: 30px; flex: none; color: var(--tinta); }
+.vivo-titulo { font: 700 1.2rem/1.1 var(--fuente-titulo); margin: 0; }
+.vivo-badge { font-size: .78rem; font-weight: 700; color: var(--tinta-suave); border: 1px dashed var(--linea); border-radius: 999px; padding: .1rem .7rem; white-space: nowrap; }
+.vivo-barra__acciones { margin-left: auto; display: flex; flex-wrap: wrap; gap: .4rem; align-items: center; }
+.dividir { display: flex; gap: .4rem; align-items: center; }
+.dividir label { margin: 0; font-size: .82rem; }
+.dividir select { width: auto; padding: .2rem .5rem; font-size: .85rem; min-height: 32px; }
+
+/* "Qué te toca aquí": un desplegable sobre el portal, para no quitarle espacio */
+.vivo-ayuda { position: relative; }
+.vivo-ayuda > summary { list-style: none; cursor: pointer; display: inline-flex; align-items: center; }
+.vivo-ayuda > summary::-webkit-details-marker { display: none; }
+.vivo-ayuda > summary::after { content: "▾"; margin-left: .4rem; }
+.vivo-ayuda[open] > summary::after { content: "▴"; }
+.vivo-ayuda__cuerpo { position: absolute; z-index: 30; top: calc(100% + .3rem); left: 0; width: min(34rem, calc(100vw - 2rem)); background: var(--papel); color: var(--tinta); border: 1px solid var(--linea); border-radius: var(--radio); box-shadow: 0 14px 40px rgba(0, 0, 0, .22); padding: 1rem 1.1rem; font-size: .92rem; }
+.vivo-ayuda__cuerpo p { margin: 0 0 .5rem; }
+.vivo-ayuda__cuerpo ol { margin: 0 0 .6rem; padding-left: 1.2rem; display: grid; gap: .3rem; }
+.vivo-ayuda__cuerpo li span { margin-right: .6rem; }
+
+/* Los portales llenan el resto de la pantalla */
+.vivo-marcos { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: .6rem; }
+.vivo-marcos--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.vivo-marcos:fullscreen { background: var(--papel); padding: .5rem; }
+.vivo-panel { min-width: 0; min-height: 0; position: relative; display: flex; flex-direction: column; }
+.vivo-panel__nombre { display: none; align-items: center; gap: .5rem; font-weight: 800; margin: 0 0 .3rem; flex: none; }
+.vivo-panel__nombre svg { width: 22px; height: 22px; }
+.vivo-marcos--2 .vivo-panel__nombre { display: flex; }
+.vivos .portal-marco { flex: 1; width: 100%; height: auto; min-height: 0; display: block; border: 1px solid var(--linea); border-radius: var(--radio); background: #fff; }
+.vivo-panel .tarjeta--chat { flex: 1; height: auto; min-height: 0; }
+.pro-fila { flex: none; }
+.vivo-estado { display: flex; align-items: center; gap: .6rem; position: absolute; z-index: 1; top: 3rem; left: 50%; transform: translateX(-50%); background: var(--papel); border: 1px solid var(--linea); border-radius: 999px; padding: .4rem 1rem; font-weight: 700; margin: 0; box-shadow: var(--sombra); }
+.vivo-estado--tarda { background: var(--ambar-suave); color: var(--ambar-texto); border-color: var(--ambar-texto); }
+.vivo-estado .logo-cargador { width: 30px; height: 30px; flex: none; }
+
+@media (max-width: 860px) {
+  .vivos { height: calc(100dvh - var(--cabeza) - 5.4rem); min-height: 420px; padding: .4rem .5rem .4rem; }
+  .vivo-marcos--2 { grid-template-columns: 1fr; }
+  .dividir { display: none; }
+  .vivo-badge { display: none; }
+  /* La pestaña de ValerIA ya está arriba: el botón de la franja sobra en el celular y le quita una fila al portal. */
+  #btn-ia { display: none; }
+  /* En el celular el desplegable se ancla a los bordes de la pantalla: pegado a su botón se saldría por la derecha. */
+  .vivo-ayuda { position: static; }
+  .vivo-ayuda__cuerpo { position: fixed; left: .5rem; right: .5rem; width: auto; top: calc(var(--cabeza) + 3.4rem); max-height: 60vh; overflow-y: auto; }
+  .vivo-barra__acciones { margin-left: 0; }
+}

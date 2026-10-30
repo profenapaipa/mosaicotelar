@@ -54,41 +54,12 @@
 .aviso--suave { background: var(--lino); color: var(--tinta); font-weight: 600; font-size: .88rem; margin: .5rem 0 0; }
 
 /* ---- Portales vivos: se quedan abiertos mientras se cambia de pestaña ---- */
-.vivos { padding: 1rem 1.2rem 0; }
-.vivo-cab { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) auto; gap: .8rem 1.4rem; align-items: start; margin-bottom: .8rem; }
-.vivo-cab__titulo { display: flex; gap: .8rem; align-items: center; border-left: 6px solid var(--e-vivo); padding-left: .8rem; }
-.vivo-cab__marca { width: 44px; height: 44px; flex: none; color: var(--tinta); }
-.vivo-titulo { font: 700 clamp(1.5rem, 3vw, 2rem)/1.1 var(--fuente-titulo); margin: 0; }
-.vivo-cab__que { margin: .2rem 0 0; font-size: .88rem; max-width: 60ch; }
-.vivo-cab__pasos { font-size: .9rem; }
-.vivo-cab__pasos p { margin: 0 0 .3rem; }
-.vivo-cab__pasos ol { margin: 0; padding-left: 1.2rem; display: grid; gap: .2rem; }
-.vivo-cab__pasos li span { margin-right: .6rem; }
-.vivo-cab__acciones { display: grid; gap: .5rem; justify-items: end; }
-.vivo-cab > .aviso { grid-column: 1 / -1; margin: 0; }
-.dividir { display: flex; gap: .5rem; align-items: center; }
-.dividir label { margin: 0; font-size: .85rem; }
-.dividir select { width: auto; padding: .25rem .5rem; font-size: .88rem; min-height: 32px; }
-.vivo-marcos { display: grid; grid-template-columns: minmax(0, 1fr); gap: .8rem; }
-.vivo-marcos--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-.vivo-panel { min-width: 0; position: relative; }
-.vivo-panel__nombre { display: none; align-items: center; gap: .5rem; font-weight: 800; margin: 0 0 .4rem; }
-.vivo-panel__nombre svg { width: 22px; height: 22px; }
-.vivo-marcos--2 .vivo-panel__nombre { display: flex; }
-.vivo-panel .tarjeta--chat { height: calc(100vh - 17rem); min-height: 420px; }
-.vivo-estado { display: flex; align-items: center; gap: .6rem; position: absolute; z-index: 1; top: 3.2rem; left: 50%; transform: translateX(-50%); background: var(--papel); border: 1px solid var(--linea); border-radius: 999px; padding: .4rem 1rem; font-weight: 700; margin: 0; box-shadow: var(--sombra); }
-.vivo-estado--tarda { background: var(--ambar-suave); color: var(--ambar-texto); border-color: var(--ambar-texto); }
-.vivos .portal-marco { height: calc(100vh - 17rem); min-height: 520px; }
 
-@media (max-width: 1100px) { .vivo-cab { grid-template-columns: 1fr; } .vivo-cab__acciones { justify-items: start; } }
 @media (max-width: 860px) {
   .barra-portales { padding: 0 .4rem; }
   .barra-portales__ayuda { display: none; }
   .pestana__texto small { display: none; }
   .menu-portal { position: fixed; left: .6rem; right: .6rem; top: 7.6rem; width: auto; }
-  .vivo-marcos--2 { grid-template-columns: 1fr; }
-  .dividir { display: none; }
-  .vivos { padding: .8rem .8rem 0; }
   .menu-portal__secciones { grid-template-columns: 1fr; }
 }
 
@@ -101,5 +72,4 @@
   a { color: #000; text-decoration: none; }
 }
 
-.vivo-estado .logo-cargador { width: 30px; height: 30px; flex: none; }
 .marca-hero__controles { display: flex; gap: .4rem; flex-wrap: wrap; }
