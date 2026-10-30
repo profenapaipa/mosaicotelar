@@ -17,6 +17,7 @@
   const CORTES = [0, 1, 2].map((k) => [2 + k * (LADO + HILO), 2 + k * (LADO + HILO) + LADO]);
   // Los cuatro hilos: verticales (izquierdo, derecho) y horizontales (superior, inferior).
   const COLOR = { v: ['var(--hilo-kinesis)', 'var(--hilo-wisfox)'], h: ['var(--hilo-valeria)', 'var(--hilo-mosaico)'] };
+  const EXTRA = 1;      // cuánto se mete cada hilo bajo las piezas vecinas
   const DURACION = 3400; // ms: cuando termina la animación y se pasa a la forma única
 
   function pieza(x0, y0, x1, y1, tl, tr, br, bl) {
@@ -34,40 +35,50 @@
   function geometria() {
     const piezas = [];
     CORTES.forEach(([y0, y1], j) => CORTES.forEach(([x0, x1], i) => piezas.push(pieza(x0, y0, x1, y1, i === 0 && j === 0 ? R : 0, i === 2 && j === 0 ? R : 0, i === 2 && j === 2 ? R : 0, i === 0 && j === 2 ? R : 0))));
-    const puentes = []; const cruces = [];
+    const puentes = [];
+    // Quién pasa por encima en cada cruce (a = hilo vertical, b = hilo horizontal): se alterna, como en un tejido.
+    const encima = (a, b) => ((a + b) % 2 === 0 ? 'h' : 'v');
     for (let a = 0; a < 2; a++) for (let b = 0; b < 2; b++) {
       const cx = CORTES[a][1]; const cy = CORTES[b][1];
-      if ((a + b) % 2 === 0) { // el hilo horizontal pasa por encima: el vertical se interrumpe
-        puentes.push(`M${cx} ${cy - PUENTE}h${HILO}v${PUENTE}h-${HILO}Z`, `M${cx} ${cy + HILO}h${HILO}v${PUENTE}h-${HILO}Z`);
-        cruces.push([cx, cy, COLOR.h[b]]);
-      } else {                 // el vertical pasa por encima: el horizontal se interrumpe
-        puentes.push(`M${cx - PUENTE} ${cy}h${PUENTE}v${HILO}h-${PUENTE}Z`, `M${cx + HILO} ${cy}h${PUENTE}v${HILO}h-${PUENTE}Z`);
-        cruces.push([cx, cy, COLOR.v[a]]);
-      }
+      if (encima(a, b) === 'h') puentes.push(`M${cx} ${cy - PUENTE}h${HILO}v${PUENTE}h-${HILO}Z`, `M${cx} ${cy + HILO}h${HILO}v${PUENTE}h-${HILO}Z`);
+      else puentes.push(`M${cx - PUENTE} ${cy}h${PUENTE}v${HILO}h-${PUENTE}Z`, `M${cx + HILO} ${cy}h${PUENTE}v${HILO}h-${PUENTE}Z`);
     }
-    return { piezas, puentes: puentes.join(''), cruces };
+    /* Los hilos de color, por tramos. Dos decisiones que evitan las líneas finas del borde:
+       1. Donde un hilo pasa por debajo, su tramo termina DENTRO del puente negro (2 unidades), nunca en seco; y el hilo que pasa
+          por encima lo cruza de una sola pieza. Así no hay cuadritos de "cruce" superpuestos, que dejaban rayas del mismo color.
+       2. Cada tramo es 1 unidad más ancho que el espacio entre piezas y se mete debajo de ellas: si coincidieran borde con borde,
+          el suavizado de los bordes dejaría ver el fondo como una línea clara entre la pieza y el hilo. */
+    const hilos = [];
+    const tramos = (desde, corte) => { const t = []; let ini = 2; for (const c of corte) { t.push([ini, c - 2]); ini = c + HILO + PUENTE - 2; } t.push([ini, 62]); return t; };
+    for (let a = 0; a < 2; a++) {
+      const cortes = [0, 1].filter((b) => encima(a, b) === 'h').map((b) => CORTES[b][1]);
+      tramos(2, cortes).forEach(([i, f], k) => hilos.push({ eje: 'v', x: CORTES[a][1] - EXTRA, y: i, w: HILO + 2 * EXTRA, h: f - i, color: COLOR.v[a], d: 0.5 + a * 0.4 + k * 0.1 }));
+    }
+    for (let b = 0; b < 2; b++) {
+      const cortes = [0, 1].filter((a) => encima(a, b) === 'v').map((a) => CORTES[a][1]);
+      tramos(2, cortes).forEach(([i, f], k) => hilos.push({ eje: 'h', x: i, y: CORTES[b][1] - EXTRA, w: f - i, h: HILO + 2 * EXTRA, color: COLOR.h[b], d: 0.7 + b * 0.4 + k * 0.1 }));
+    }
+    return { piezas, puentes: puentes.join(''), hilos };
   }
 
   /* El logo. opciones: { animar: true, mono: false, clase: '' }. Devuelve { el, repetir, alternar, esMono }. */
   function logo(op) {
     const o = Object.assign({ animar: true, mono: false, clase: '' }, op);
     const g = geometria();
-    const hilos = [
-      ...[0, 1].map((a) => `<rect class="hilo hilo--v" style="--d:${0.55 + a * 0.45}s" x="${CORTES[a][1]}" y="2" width="${HILO}" height="60" fill="${COLOR.v[a]}"/>`),
-      ...[0, 1].map((b) => `<rect class="hilo hilo--h" style="--d:${0.8 + b * 0.45}s" x="2" y="${CORTES[b][1]}" width="60" height="${HILO}" fill="${COLOR.h[b]}"/>`),
-    ].join('');
-    const cruces = g.cruces.map(([x, y, c], i) => `<rect class="cruce" style="--d:${1.75 + i * 0.1}s" x="${x}" y="${y}" width="${HILO}" height="${HILO}" fill="${c}"/>`).join('');
+    const hilos = g.hilos.map((t) => `<rect class="hilo hilo--${t.eje}" style="--d:${t.d}s" x="${t.x}" y="${t.y}" width="${t.w}" height="${t.h}" fill="${t.color}"/>`).join('');
     const unica = g.piezas.join('') + g.puentes;
     const el = svg(`<svg class="logo-tejido ${o.clase}" viewBox="0 0 64 64" role="img" aria-label="Mosaico Telar: nueve piezas unidas por cuatro hilos de colores que se cruzan" focusable="false">
-      <g class="hilos">${hilos}</g><g class="cruces">${cruces}</g>
+      <g class="hilos">${hilos}</g>
       <path class="tela-unica" fill="currentColor" d="${unica}"/>
       <g class="piezas">${g.piezas.map((d, i) => `<path class="pieza" style="--i:${i}" fill="currentColor" d="${d}"/>`).join('')}<path class="puentes" fill="currentColor" d="${g.puentes}"/></g></svg>`);
     if (o.mono) el.classList.add('mono');
     let temporizador = null;
-    const terminar = () => { el.classList.remove('tejiendo'); };
+    let solape = null;
+    const terminar = () => { el.classList.remove('tejiendo', 'cerrando'); };
     const repetir = () => {
-      clearTimeout(temporizador);
-      el.classList.remove('tejiendo'); void el.getBoundingClientRect(); el.classList.add('tejiendo');
+      clearTimeout(temporizador); clearTimeout(solape);
+      el.classList.remove('tejiendo', 'cerrando'); void el.getBoundingClientRect(); el.classList.add('tejiendo');
+      solape = setTimeout(() => el.classList.add('cerrando'), DURACION - 350);
       temporizador = setTimeout(terminar, DURACION);
     };
     if (o.animar && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) repetir();

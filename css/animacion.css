@@ -5,32 +5,32 @@
 /* ---- El logo tejido ---- */
 .logo-tejido { display: block; width: 100%; height: auto; color: var(--tinta); overflow: visible; }
 .logo-tejido .piezas { display: none; }
-.logo-tejido .hilos, .logo-tejido .cruces { opacity: 1; transition: opacity .7s ease; }
-.logo-tejido.mono .hilos, .logo-tejido.mono .cruces { opacity: 0; }
-.logo-tejido .hilo, .logo-tejido .cruce, .logo-tejido .pieza, .logo-tejido .puentes { transform-box: fill-box; }
+.logo-tejido { shape-rendering: geometricPrecision; }
+.logo-tejido .hilos { opacity: 1; transition: opacity .7s ease; }
+.logo-tejido.mono .hilos { opacity: 0; }
+.logo-tejido .hilo, .logo-tejido .pieza, .logo-tejido .puentes { transform-box: fill-box; }
 .logo-tejido .hilo--v { transform-origin: top; }
 .logo-tejido .hilo--h { transform-origin: left; }
-.logo-tejido .cruce, .logo-tejido .pieza, .logo-tejido .puentes { transform-origin: center; }
+.logo-tejido .pieza, .logo-tejido .puentes { transform-origin: center; }
 
 /* Mientras se teje: las nueve piezas aparecen una a una, los hilos cruzan con un pequeño rebote, y al final se pasa a la forma única */
 .logo-tejido.tejiendo { transform-origin: center; animation: tj-pulso .7s ease-in-out 2.3s; }
 .logo-tejido.tejiendo .tela-unica { display: none; }
+.logo-tejido.tejiendo.cerrando .tela-unica { display: inline; }   /* el relevo: las dos formas, idénticas, una sobre otra */
 .logo-tejido.tejiendo .piezas { display: inline; }
-.logo-tejido.tejiendo .pieza { animation: tj-pieza .75s cubic-bezier(.34, 1.56, .64, 1) calc(var(--i) * .07s) both; }
-.logo-tejido.tejiendo .hilo--v { animation: tj-hilo-v .75s cubic-bezier(.34, 1.4, .64, 1) var(--d) both; }
-.logo-tejido.tejiendo .hilo--h { animation: tj-hilo-h .75s cubic-bezier(.34, 1.4, .64, 1) var(--d) both; }
+.logo-tejido.tejiendo .pieza { animation: tj-pieza .8s cubic-bezier(.22, 1.25, .36, 1) calc(var(--i) * .06s) both; will-change: transform, opacity; }
+.logo-tejido.tejiendo .hilo--v { animation: tj-hilo-v .9s cubic-bezier(.16, 1, .3, 1) var(--d) both; will-change: transform; }
+.logo-tejido.tejiendo .hilo--h { animation: tj-hilo-h .9s cubic-bezier(.16, 1, .3, 1) var(--d) both; will-change: transform; }
 .logo-tejido.tejiendo .puentes { animation: tj-pop .4s ease-out 1.6s both; }
-.logo-tejido.tejiendo .cruce { animation: tj-pop .45s cubic-bezier(.34, 1.56, .64, 1) var(--d) both; }
 
-@keyframes tj-pieza { from { opacity: 0; transform: scale(.15) rotate(-28deg); } to { opacity: 1; transform: none; } }
+@keyframes tj-pieza { from { opacity: 0; transform: scale(.3) rotate(-18deg); } to { opacity: 1; transform: none; } }
 @keyframes tj-hilo-v { from { transform: scaleY(0); } to { transform: scaleY(1); } }
 @keyframes tj-hilo-h { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 @keyframes tj-pop { from { opacity: 0; transform: scale(.2); } to { opacity: 1; transform: none; } }
-@keyframes tj-pulso { 0%, 100% { transform: scale(1); } 45% { transform: scale(1.06); } }
+@keyframes tj-pulso { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.035); } }
 
 /* Cargador: los hilos suben y bajan sin parar, para esperas reales */
 .logo-cargador { width: 56px; height: 56px; }
-.logo-cargador .cruces { opacity: 0; }
 .logo-cargador.cargando .hilo--v { animation: tj-vaiven 1.1s ease-in-out infinite alternate; }
 .logo-cargador.cargando .hilo--h { animation: tj-vaiven-h 1.1s ease-in-out .3s infinite alternate; }
 @keyframes tj-vaiven { from { transform: scaleY(.1); } to { transform: scaleY(1); } }

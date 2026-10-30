@@ -443,7 +443,10 @@ async function flujo() {
   // El logo: cuatro hilos de colores distintos y sin costuras al terminar
   await ir('#/'); ventana().MT.router.recargar(); await espera(4200);
   const hilosColor = [...doc().querySelectorAll('.logo-tejido .hilo')].map((r) => ventana().getComputedStyle(r).fill);
-  afirmar('el logo trae cuatro hilos de cuatro colores distintos', hilosColor.length === 4 && new Set(hilosColor).size === 4, hilosColor.join(' | '));
+  afirmar('el logo trae cuatro hilos de cuatro colores distintos', hilosColor.length >= 4 && new Set(hilosColor).size === 4, hilosColor.join(' | '));
+  const cajas = [...doc().querySelectorAll('.logo-tejido .hilo')].map((r) => ['x', 'y', 'width', 'height'].map((k) => parseFloat(r.getAttribute(k))));
+  const solapan = cajas.some((p, i) => cajas.some((q, j) => j > i && p[0] < q[0] + q[2] && q[0] < p[0] + p[2] && p[1] < q[1] + q[3] && q[1] < p[1] + p[3]));
+  afirmar('los hilos no se superponen entre sí ni hay cuadritos de cruce (así no quedan rayas del borde)', !solapan && doc().querySelectorAll('.logo-tejido .cruce, .logo-tejido .cruces').length === 0, 'tramos=' + cajas.length);
   const lg = doc().querySelector('.marca-hero .logo-tejido');
   afirmar('al terminar la animación el logo pasa a una sola forma, sin las aristas de las piezas', !lg.classList.contains('tejiendo') && ventana().getComputedStyle(lg.querySelector('.piezas')).display === 'none' && ventana().getComputedStyle(lg.querySelector('.tela-unica')).display !== 'none');
   doc().querySelectorAll('.marca-hero__controles button')[1].click(); await espera(900);
