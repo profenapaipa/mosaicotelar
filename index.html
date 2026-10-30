@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Mosaico Telar</title>
-<meta name="description" content="Mosaico Telar es una plataforma educativa inclusiva que integra tres proyectos estudiantiles: Kinesis, Wisfox e IA ValerIA. Tejemos caminos para aprender.">
+<meta name="description" content="Mosaico Telar es una plataforma de educación inclusiva: el docente planea, orientación valida, la familia ve y cada estudiante aprende a su medida. Tejemos caminos para aprender.">
 <meta property="og:title" content="Mosaico Telar. Tejemos caminos para aprender.">
-<meta property="og:description" content="Plataforma educativa inclusiva: tres proyectos estudiantiles en un solo espacio.">
+<meta property="og:description" content="Plataforma de educación inclusiva con tecnología.">
 <meta property="og:type" content="website">
 <meta name="theme-color" content="#1A1714">
 <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
@@ -30,7 +30,7 @@
 
 <div class="cuerpo">
   <header class="franja">
-    <p>Datos ficticios: nada de lo que ves pertenece a una persona real.</p>
+    <p>Versión de demostración: los datos de partida son de ejemplo y lo que creas se guarda solo en tu navegador.</p>
     <div class="franja-acciones">
       <a class="rol-actual" id="rol-actual" href="#/"></a>
       <button class="btn btn--chico btn--suave" id="btn-ia" type="button" aria-expanded="false" aria-controls="slot-ia">Hablar con ValerIA</button>
@@ -40,15 +40,15 @@
   </header>
 
   <main id="app" tabindex="-1">
-    <noscript><div class="contenedor"><p class="aviso">Esta página necesita JavaScript para funcionar. Es una demostración sin servidor y no envía datos a ningún sitio.</p></div></noscript>
+    <noscript><div class="contenedor"><p class="aviso">Esta plataforma necesita JavaScript para funcionar. No envía datos a ningún sitio.</p></div></noscript>
   </main>
 
   <footer class="pie">
     <span id="logo-pie"></span>
     <div>
       <p><strong>Mosaico Telar</strong> · Tejemos caminos para aprender.</p>
-      <p>Plataforma de proyectos estudiantiles del Semillero Maker de Tecnología con Sentido. Representante legal: Néstor Andrés Paipa.</p>
-      <p><a href="#/mapa">Mapa</a> · <a href="#/recorrido">Roles y datos</a> · <a href="#/estado">Qué funciona y qué no</a> · <a href="#/identidad">Identidad de marca</a></p>
+      <p>Semillero Maker de Tecnología con Sentido. Representante legal: Néstor Andrés Paipa.</p>
+      <p><a href="#/mapa">Mapa</a> · <a href="#/recorrido">Roles y datos</a> · <a href="#/hoja">Hoja de ruta</a> · <a href="#/piloto">Solicitar un piloto</a> · <a href="#/identidad">Identidad de marca</a></p>
     </div>
   </footer>
 </div>
@@ -56,22 +56,25 @@
 <aside class="panel-ia" id="slot-ia" hidden></aside>
 
 <script src="js/ui.js"></script>
-<script src="js/store.js"></script>
+<script src="js/config.js"></script>
 <script src="js/datos.js"></script>
+<script src="js/contenido-ingles.js"></script>
+<script src="js/store.js"></script>
+<script src="js/archivos.js"></script>
 <script src="js/roles.js"></script>
+<script src="js/dialogos.js"></script>
+<script src="js/biblioteca.js"></script>
 <script src="js/ia-config.js"></script>
 <script src="js/ia.js"></script>
 <script src="js/router.js"></script>
 <script src="js/vistas/comun.js"></script>
 <script src="js/vistas/inicio.js"></script>
-<script src="js/vistas/kinesis.js"></script>
-<script src="js/vistas/wisfox.js"></script>
-<script src="js/vistas/embed.js"></script>
-<script src="js/vistas/demo.js"></script>
+<script src="js/vistas/espacio.js"></script>
 <script src="js/vistas/mapa.js"></script>
 <script src="js/vistas/valeria.js"></script>
 <script src="js/vistas/recorrido.js"></script>
 <script src="js/vistas/estado.js"></script>
+<script src="js/vistas/piloto.js"></script>
 <script src="js/vistas/identidad.js"></script>
 <script src="js/main.js"></script>
 </body>

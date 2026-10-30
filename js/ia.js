@@ -78,12 +78,8 @@
     st.cambiar((s) => {
       s.ia.push({ rol: 'ia', texto: respuesta.texto, fuente: respuesta.fuente });
       if (s.ia.length > 30) s.ia.shift();
-      s.pasos.ia = true;
       MT.store.logro('ia');
-      if (tarea === 'disenar') {
-        s.actividad = respuesta.texto;
-        MT.store.evento('El docente preparó una actividad con ayuda de ValerIA.', false);
-      }
+      if (tarea === 'disenar') s.actividad = respuesta.texto;
     });
     return respuesta;
   }
@@ -155,9 +151,11 @@
   const panel = {
     chat: null,
     abierto: false,
-    sugerenciasPara(id) {
-      if (id === 'kinesis') return [{ etiqueta: 'Diseñar una actividad de inglés', texto: 'Necesito una actividad de 20 minutos para enseñar el present simple a grado 8.º.', tarea: 'disenar' }];
-      if (id === 'wisfox') return [{ etiqueta: 'No entiendo la s del verbo', texto: 'No entiendo cuándo se le pone la s al verbo.', tarea: 'ayuda' }];
+    // Las sugerencias dependen de quién habla: el docente diseña, el estudiante pregunta.
+    sugerenciasPara() {
+      const rol = MT.store.obtener().rol;
+      if (rol === 'docente') return [{ etiqueta: 'Diseñar una actividad de inglés', texto: 'Necesito una actividad de 20 minutos para enseñar el present simple a grado 8.º.', tarea: 'disenar' }];
+      if (rol === 'estudiante') return [{ etiqueta: 'No entiendo la s del verbo', texto: 'No entiendo cuándo se le pone la s al verbo.', tarea: 'ayuda' }];
       return [{ etiqueta: 'Diseñar una actividad', texto: 'Necesito una actividad de 20 minutos para enseñar el present simple a grado 8.º.', tarea: 'disenar' },
               { etiqueta: 'Explicar la s del verbo', texto: 'No entiendo cuándo se le pone la s al verbo.', tarea: 'ayuda' }];
     },
@@ -174,9 +172,8 @@
         slot.addEventListener('keydown', (e) => { if (e.key === 'Escape') this.cerrar(); });
         this.cuerpo = cuerpo;
       }
-      const id = (MT.router && MT.router.actual().id) || 'inicio';
       if (this.chat) this.chat.destruir();
-      this.chat = montarChat(this.cuerpo, this.sugerenciasPara(id));
+      this.chat = montarChat(this.cuerpo, this.sugerenciasPara());
       slot.hidden = false;
       this.abierto = true;
       const btn = document.getElementById('btn-ia');

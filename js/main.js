@@ -10,15 +10,13 @@
   window.addEventListener('error', (e) => window.__errores.push(e.message));
   window.addEventListener('unhandledrejection', (e) => window.__errores.push('promesa: ' + ((e.reason && e.reason.message) || e.reason)));
 
-  // La lista única del riel. "abajo" son las páginas del colectivo; el resto son el mapa, los tres hilos y la demostración.
+  // La lista única del riel. "abajo" son las páginas de la plataforma; el resto es donde se trabaja.
   const ESPACIOS = [
+    { id: 'mi', hash: '#/mi', etiqueta: 'Mi espacio', cls: 'e-marca', icono: () => icono('inicio') },
     { id: 'mapa', hash: '#/mapa', etiqueta: 'Mapa', cls: 'e-marca', icono: () => icono('mapa') },
-    { id: 'kinesis', hash: '#/kinesis', etiqueta: 'Kinesis', cls: 'e-kinesis', icono: () => marca('kinesis') },
-    { id: 'wisfox', hash: '#/wisfox', etiqueta: 'Wisfox', cls: 'e-wisfox', icono: () => marca('wisfox') },
     { id: 'valeria', hash: '#/valeria', etiqueta: 'ValerIA', cls: 'e-valeria', icono: () => marca('valeria') },
-    { id: 'demo', hash: '#/demo/docente', etiqueta: 'Demo', cls: 'e-marca', icono: () => icono('recorrido') },
     { id: 'recorrido', hash: '#/recorrido', etiqueta: 'Roles', cls: 'e-marca', icono: () => icono('docente') },
-    { id: 'estado', hash: '#/estado', etiqueta: 'Estado', cls: 'e-marca', icono: () => icono('estado'), abajo: true },
+    { id: 'hoja', hash: '#/hoja', etiqueta: 'Hoja de ruta', cls: 'e-marca', icono: () => icono('estado'), abajo: true },
     { id: 'identidad', hash: '#/identidad', etiqueta: 'Marca', cls: 'e-marca', icono: () => icono('identidad'), abajo: true },
   ];
 

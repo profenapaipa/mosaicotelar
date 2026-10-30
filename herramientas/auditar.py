@@ -16,8 +16,8 @@ Qué hace
    recorre todas las pantallas en 390 y 1280 px de ancho, en tema claro y oscuro, y mide:
    desborde horizontal, errores de ejecución, un único h1, controles sin nombre, controles de
    menos de 24 px y contraste del texto (4,5 a 1, o 3 a 1 en texto grande).
-3. Ejecuta el recorrido completo como lo haría una persona: ajustar en Kinesis, aprobar en
-   Orientación, verlo en Familia, recibirlo en Wisfox, hacer el quiz y el juego, y hablar con
+3. Ejecuta el recorrido completo como lo haría una persona: ajustar como docente, aprobar en
+   Orientación, verlo en Familia, recibirlo como estudiante, hacer el quiz y hablar con
    ValerIA.
 4. Imprime un informe. Sale con código 1 si algo falla.
 

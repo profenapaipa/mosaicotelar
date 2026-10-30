@@ -1,6 +1,6 @@
 /* mapa.js: el mapa interactivo. Responde, en una sola imagen, "¿qué es esto y cómo se conecta?".
 
-   - Conexiones: tres columnas (los tres proyectos) con sus módulos reales, y flechas con lo que viaja
+   - Conexiones: tres columnas (los tres proyectos) con sus módulos, y flechas con lo que viaja
      entre ellos. Toca un módulo para ver qué hace, quién lo usa y qué recibe y entrega. Elige un rol
      para atenuar todo lo que ese rol no toca.
    - Frente a otras plataformas: qué nos diferencia de PIARPLUS y dónde vamos atrás, con la fuente de cada afirmación.
@@ -15,7 +15,7 @@
   const ESTADOS = {
     funciona: ['Funciona hoy', 'ok'],
     integracion: ['En integración', 'e'],
-    simulado: ['Simulado en la demo', 'aviso'],
+    simulado: ['Respuestas de ejemplo', 'aviso'],
     viene: ['Viene', 'e'],
   };
 
@@ -26,31 +26,31 @@
   ];
 
   const MODULOS = {
-    admin: { hilo: 'kinesis', nombre: 'Administración', estado: 'funciona', roles: ['coordinacion'], real: '#/kinesis/coordinacion', demo: '#/demo/coordinacion',
+    admin: { hilo: 'kinesis', nombre: 'Administración', estado: 'funciona', roles: ['coordinacion'], ir: ['coordinacion', 'estudiantes'],
       que: 'Crea y edita usuarios, cursos, periodos, categorías de apoyo y vínculos con las familias. No ve el diagnóstico ni el PIAR completo.' },
-    perfiles: { hilo: 'kinesis', nombre: 'Perfiles de apoyos', estado: 'funciona', roles: ['docente', 'orientacion', 'familia'], real: '#/kinesis/docente', demo: '#/demo/docente',
+    perfiles: { hilo: 'kinesis', nombre: 'Perfiles de apoyos', estado: 'funciona', roles: ['docente', 'orientacion', 'familia'], ir: ['orientacion', 'estudiantes'],
       que: 'Reúne, por estudiante, qué apoyos le sirven y qué fortalezas tiene, sin mostrar el diagnóstico. La información clínica queda aislada.' },
-    planeacion: { hilo: 'kinesis', nombre: 'Planeación con DUA', estado: 'funciona', roles: ['docente', 'orientacion'], real: '#/kinesis/docente', demo: '#/demo/docente',
+    planeacion: { hilo: 'kinesis', nombre: 'Planeación con DUA', estado: 'funciona', roles: ['docente', 'orientacion'], ir: ['docente', 'actividades'],
       que: 'El docente diseña la clase una vez, desde los tres principios del Diseño Universal para el Aprendizaje, y la cruza con los perfiles.' },
-    ajustes: { hilo: 'kinesis', nombre: 'Ajustes individuales', estado: 'simulado', roles: ['docente', 'orientacion'], real: '#/kinesis/docente', demo: '#/demo/docente',
-      que: 'Convierte cada apoyo en un cambio concreto de la actividad, con su razón. Es la fase 5 de Kinesis; aquí se representa con reglas sencillas.' },
-    aprobacion: { hilo: 'kinesis', nombre: 'Aprobación de orientación', estado: 'simulado', roles: ['orientacion'], real: '#/kinesis/orientacion', demo: '#/demo/orientacion',
+    ajustes: { hilo: 'kinesis', nombre: 'Ajustes individuales', estado: 'funciona', roles: ['docente', 'orientacion'], ir: ['docente', 'ajustes'],
+      que: 'Convierte cada apoyo en un cambio concreto de la actividad, con su razón. Hoy lo hacen reglas sencillas y explicables; no genera el documento PIAR completo.' },
+    aprobacion: { hilo: 'kinesis', nombre: 'Aprobación de orientación', estado: 'funciona', roles: ['orientacion'], ir: ['orientacion', 'ajustes'],
       que: 'Orientación valida el ajuste antes de que llegue a nadie más. Es la decisión que desbloquea todo lo siguiente.' },
-    familia: { hilo: 'kinesis', nombre: 'Vista de familia', estado: 'funciona', roles: ['familia'], real: '#/kinesis/familia', demo: '#/demo/familia',
+    familia: { hilo: 'kinesis', nombre: 'Vista de familia', estado: 'funciona', roles: ['familia'], ir: ['familia', 'resumen'],
       que: 'La familia ve lo que se hace en clase por su hijo o hija y cómo acompañar desde casa, en lenguaje sencillo.' },
-    asistente: { hilo: 'valeria', nombre: 'Asistente que propone', estado: 'integracion', roles: ['docente', 'estudiante'], real: '#/valeria/chat', demo: '#/valeria/chat',
+    asistente: { hilo: 'valeria', nombre: 'Asistente que propone', estado: 'simulado', roles: ['docente', 'estudiante'], ir: ['docente', 'actividades'],
       que: 'Propone una actividad con DUA al docente y explica dudas al estudiante. Propone; decide quien enseña. Hoy responde con textos de ejemplo.' },
-    voz: { hilo: 'valeria', nombre: 'Voz y análisis de fuentes', estado: 'viene', roles: [], real: '#/valeria/conexion', demo: null,
+    voz: { hilo: 'valeria', nombre: 'Voz y análisis de fuentes', estado: 'viene', roles: [], ir: null,
       que: 'La visión de ValerIA: hablar y leer las fuentes del colegio. Es un concepto todavía, y no se promete como si existiera.' },
-    tutora: { hilo: 'wisfox', nombre: 'Tutora de IA', estado: 'integracion', roles: ['estudiante'], real: '#/wisfox', demo: '#/valeria/chat',
-      que: 'El chat de apoyo del estudiante que ya tiene Wisfox. Se unifica con ValerIA para que sea la misma guía en los tres proyectos.' },
-    notas: { hilo: 'wisfox', nombre: 'Notas y recursos', estado: 'funciona', roles: ['estudiante'], real: '#/wisfox', demo: null,
+    tutora: { hilo: 'wisfox', nombre: 'Tutora de IA', estado: 'simulado', roles: ['estudiante'], ir: ['estudiante', 'resumen'],
+      que: 'El chat de apoyo del estudiante. Es la misma guía que ayuda al docente: ValerIA.' },
+    notas: { hilo: 'wisfox', nombre: 'Notas y recursos', estado: 'funciona', roles: ['estudiante'], ir: ['docente', 'notas'],
       que: 'El estudiante guarda notas y encuentra recursos de estudio.' },
-    logros: { hilo: 'wisfox', nombre: 'Logros, XP y misiones', estado: 'funciona', roles: ['estudiante'], real: '#/wisfox', demo: null,
+    logros: { hilo: 'wisfox', nombre: 'Logros, XP y misiones', estado: 'funciona', roles: ['estudiante'], ir: ['estudiante', 'logros'],
       que: 'Puntos, niveles, logros y misiones diarias que mantienen la motivación, con el zorro como compañía.' },
-    quizes: { hilo: 'wisfox', nombre: 'Quizes y minijuegos', estado: 'funciona', roles: ['estudiante'], real: '#/wisfox', demo: '#/demo/estudiante',
+    quizes: { hilo: 'wisfox', nombre: 'Quizes y minijuegos', estado: 'funciona', roles: ['estudiante'], ir: ['estudiante', 'resumen'],
       que: 'Preguntas de opción múltiple y minijuegos (verdadero o falso, memoria, ordenar frases).' },
-    rutas: { hilo: 'wisfox', nombre: 'Rutas de aprendizaje', estado: 'funciona', roles: ['estudiante'], real: '#/wisfox', demo: '#/demo/estudiante',
+    rutas: { hilo: 'wisfox', nombre: 'Rutas de aprendizaje', estado: 'funciona', roles: ['estudiante'], ir: ['estudiante', 'ruta'],
       que: 'Caminos guiados paso a paso en cada materia. Aquí es donde llega la actividad ya aprobada y ajustada a la medida del estudiante.' },
   };
 
@@ -69,6 +69,12 @@
     ['quizes', 'logros', 'puntos'],
     ['tutora', 'asistente', 'misma guía'],
   ];
+
+  // Entra al espacio del rol que usa el módulo y lleva a la sección donde se trabaja.
+  function abrirEn([rol, seccion]) {
+    MT.store.cambiar((x) => { x.rol = rol; });
+    location.hash = '#/mi/' + seccion;
+  }
 
   function conexiones(c) {
     let rol = null;
@@ -126,9 +132,7 @@
           h('div', null, h('h3', null, 'Quién lo usa'), m.roles.length ? h('p', null, m.roles.map(nombreRol).join(', ')) : h('p', { class: 'suave' }, 'Nadie todavía.')),
           h('div', null, h('h3', null, 'Recibe'), entra.length ? h('ul', { class: 'mapa-conexiones' }, entra.map((t) => h('li', null, t))) : h('p', { class: 'suave' }, 'Nada de otros módulos.')),
           h('div', null, h('h3', null, 'Entrega'), sale.length ? h('ul', { class: 'mapa-conexiones' }, sale.map((t) => h('li', null, t))) : h('p', { class: 'suave' }, 'A nadie: es un final del camino.'))),
-        h('div', { class: 'acciones' },
-          h('a', { class: 'btn btn--chico', href: m.real }, 'Verlo en el proyecto real'),
-          m.demo ? h('a', { class: 'btn btn--chico btn--suave', href: m.demo }, 'Verlo en la demostración') : null));
+        m.ir ? h('div', { class: 'acciones' }, h('button', { class: 'btn btn--chico', type: 'button', onclick: () => abrirEn(m.ir) }, 'Abrir en la plataforma')) : null);
     }
 
     function actualizar() {
@@ -172,14 +176,14 @@
   const FILAS = [
     ['Qué es', 'Un flujo que une al docente, a orientación, a la familia y al estudiante', 'Un generador de PIAR y de planes de clase con IA para docentes', null],
     ['Documento PIAR en el formato oficial del MEN', 'Todavía no: es la fase 5 de Kinesis', 'Sí. Dice generarlo con IA, en el formato oficial (Decreto 1421 de 2017)', 'atras'],
-    ['Planeación con DUA', 'Sí, en Kinesis', 'Sí: planes de clase alineados con el DUA, la malla curricular y el PEI', null],
-    ['Orientación aprueba antes de que llegue al estudiante y a la familia', 'Sí. Es el centro del flujo (en la demostración se simula)', 'No lo menciona', 'diferente'],
+    ['Planeación con DUA', 'Sí', 'Sí: planes de clase alineados con el DUA, la malla curricular y el PEI', null],
+    ['Orientación aprueba antes de que llegue al estudiante y a la familia', 'Sí. Es el centro del flujo', 'No lo menciona', 'diferente'],
     ['Vista para la familia', 'Sí: ve el proceso mientras ocurre', 'Tiene una página para familias que explica el PIAR', null],
-    ['Material para el estudiante', 'Wisfox: rutas, quizes, juegos, logros y tutora', 'Menciona una actividad interactiva para el estudiante', null],
+    ['Material para el estudiante', 'Rutas, quizes, logros y tutora', 'Menciona una actividad interactiva para el estudiante', null],
     ['Pensado para todos, no solo para quien tiene un diagnóstico', 'Sí: el DUA es la base', 'No lo dice', 'diferente'],
-    ['Información clínica aislada y sin IA', 'Sí, por diseño. La IA solo recibe un perfil anónimo', 'No lo dice', 'diferente'],
-    ['Quién lo hace', 'Tres proyectos de estudiantes, con código público', 'Una empresa', null],
-    ['Alcance hoy', 'Prototipo con datos ficticios, listo para un piloto', 'Dice usarse en 207 colegios de 29 departamentos (cifra de la propia empresa)', 'atras'],
+    ['Información clínica aislada y sin IA', 'Sí, por diseño. La IA nunca la recibe', 'No lo dice', 'diferente'],
+    ['Quién lo hace', 'Tres proyectos de estudiantes, unidos en una sola plataforma', 'Una empresa', null],
+    ['Alcance hoy', 'Plataforma funcional con datos de ejemplo, lista para un piloto', 'Dice usarse en 207 colegios de 29 departamentos (cifra de la propia empresa)', 'atras'],
     ['Precio', 'Piloto sin costo; licencia por definir', 'Empieza gratis; tiene una página de precios que no revisamos', null],
   ];
 
@@ -205,7 +209,7 @@
     id: 'mapa', titulo: 'Mapa', espacio: '', subs: TABS,
     render(main, { sub }) {
       const c = pagina(main, { etiqueta: 'Mapa interactivo', titulo: sub === 'comparar' ? 'Qué nos diferencia, y dónde vamos atrás' : 'Cómo se conecta todo',
-        descripcion: sub === 'comparar' ? 'Una comparación honesta con PIARPLUS, una plataforma de referencia en Colombia.' : 'Tres proyectos de estudiantes, sus módulos y lo que viaja entre ellos. Toca cualquier módulo.' });
+        descripcion: sub === 'comparar' ? 'Una comparación honesta con PIARPLUS, una plataforma de referencia en Colombia.' : 'Los tres proyectos de estudiantes, sus módulos y lo que viaja entre ellos. Toca cualquier módulo.' });
       c.append(h('nav', { class: 'pestanas-pagina', 'aria-label': 'Secciones del mapa' },
         TABS.map((t) => h('a', { href: '#/mapa/' + t.id, 'aria-current': t.id === sub ? 'page' : null }, t.etiqueta))));
       (sub === 'comparar' ? comparar : conexiones)(c);

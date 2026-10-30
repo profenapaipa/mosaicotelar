@@ -17,8 +17,10 @@
     const partes = (window.location.hash || '#/').replace(/^#\/?/, '').split('/').filter(Boolean);
     const id = rutas[partes[0]] ? partes[0] : 'inicio';
     const def = rutas[id];
-    const sub = def.subs && def.subs.some((s) => s.id === partes[1]) ? partes[1] : (def.subs ? def.subs[0].id : null);
-    return { id, sub, def };
+    // Las secciones pueden depender del rol, por eso def.subs puede ser una función.
+    const subs = typeof def.subs === 'function' ? def.subs() : def.subs;
+    const sub = subs && subs.some((s) => s.id === partes[1]) ? partes[1] : (subs && subs.length ? subs[0].id : null);
+    return { id, sub, def, subs };
   }
 
   function marcarNavegacion(id) {
@@ -30,7 +32,7 @@
 
   function render(opciones) {
     const op = Object.assign({ foco: true }, opciones);
-    const { id, sub, def } = actual();
+    const { id, sub, def, subs } = actual();
     const main = document.getElementById('app');
     const y = window.scrollY;
     limpiezas.forEach((f) => { try { f(); } catch (e) { /* ya no importa */ } });
@@ -38,7 +40,7 @@
     main.dataset.espacio = (typeof def.espacio === 'function' ? def.espacio(sub) : def.espacio) || '';
     main.replaceChildren();
     try {
-      def.render(main, { sub });
+      def.render(main, { sub, subs });
     } catch (e) {
       (window.__errores = window.__errores || []).push('vista ' + id + ': ' + e.message);
       console.error(e);

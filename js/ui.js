@@ -50,6 +50,25 @@
     return frag;
   }
 
+  /* Las lecciones de Inglés traen un poco de HTML (negrillas, listas). Se analiza fuera del documento y solo
+     se copian las etiquetas de esta lista, sin ningún atributo: nada de scripts, enlaces ni imágenes. */
+  const PERMITIDAS = new Set(['H4', 'P', 'UL', 'OL', 'LI', 'B', 'I', 'STRONG', 'EM', 'BR']);
+  function htmlSeguro(cadena) {
+    const doc = new DOMParser().parseFromString('<body>' + String(cadena) + '</body>', 'text/html');
+    const copiar = (nodo, destino) => {
+      for (const n of nodo.childNodes) {
+        if (n.nodeType === 3) destino.append(document.createTextNode(n.textContent));
+        else if (n.nodeType === 1) {
+          if (PERMITIDAS.has(n.tagName)) { const nuevo = document.createElement(n.tagName.toLowerCase()); copiar(n, nuevo); destino.append(nuevo); }
+          else copiar(n, destino);
+        }
+      }
+    };
+    const frag = document.createDocumentFragment();
+    copiar(doc.body, frag);
+    return frag;
+  }
+
   function svg(cadena) {
     const t = document.createElement('template');
     t.innerHTML = cadena.trim();
@@ -83,14 +102,13 @@
     return svg(`<svg class="${clase}" viewBox="0 0 ${t.ancho} ${t.alto}" role="img" aria-label="Trama de un telar: tres hilos de color, verde, ámbar e índigo, cruzan hilos claros" focusable="false">${t.cuerpo}</svg>`);
   }
 
-  /* Logo del colectivo: tres hilos y dos pasadas de trama, en una sola tinta por defecto.
-     Los hilos y la trama usan currentColor, así el mismo símbolo sirve en negro sobre claro y en blanco
-     sobre oscuro. La "costura" (el contorno que separa lo que pasa por encima) usa --logo-fondo.
-     A color (.logo--color) cada hilo toma el color de su proyecto: se usa solo donde hace falta distinguirlos. */
-  const LOGO = (c) => {
-    const F = 'stroke="var(--logo-fondo,#FFFFFF)" stroke-width="2.4" paint-order="stroke"';
-    return `<svg class="${c}" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><rect x="4" y="3" width="16" height="58" rx="8" fill="var(--logo-1,currentColor)"/><rect x="24" y="3" width="16" height="58" rx="8" fill="var(--logo-2,currentColor)"/><rect x="44" y="3" width="16" height="58" rx="8" fill="var(--logo-3,currentColor)"/><rect x="0" y="17" width="64" height="9" rx="4.5" fill="currentColor" ${F}/><rect x="0" y="38" width="64" height="9" rx="4.5" fill="currentColor" ${F}/><rect x="24" y="17" width="16" height="9" fill="var(--logo-2,currentColor)" ${F}/><rect x="4" y="38" width="16" height="9" fill="var(--logo-1,currentColor)" ${F}/><rect x="44" y="38" width="16" height="9" fill="var(--logo-3,currentColor)" ${F}/></svg>`;
-  };
+  /* Logo del colectivo: un tejido plano dibujado en espacio negativo.
+     Nueve teselas (el mosaico) separadas por hilos que pasan por encima y por debajo (el telar).
+     Una sola forma, un solo grosor y dos tintas. Gestalt: cierre (se lee un cuadrado entero aunque lo
+     cruzan líneas), similitud (las nueve teselas son iguales), continuidad (cada hilo se lee seguido
+     aunque se interrumpa), proximidad (nueve piezas, una figura) y figura y fondo (blanco sobre negro y al revés).
+     La tesela usa currentColor y los hilos usan --logo-fondo: así sirve en negro sobre claro y en blanco sobre oscuro. */
+  const LOGO = (c) => `<svg class="${c}" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><rect x="2" y="2" width="60" height="60" rx="12" fill="currentColor"/><g fill="var(--logo-fondo,#FFFFFF)"><rect x="20" y="2" width="4" height="60"/><rect x="40" y="2" width="4" height="60"/><rect x="2" y="20" width="60" height="4"/><rect x="2" y="40" width="60" height="4"/></g><g fill="currentColor"><rect x="20" y="16" width="4" height="12"/><rect x="36" y="20" width="12" height="4"/><rect x="16" y="40" width="12" height="4"/><rect x="40" y="36" width="4" height="12"/></g><g fill="var(--logo-fondo,#FFFFFF)"><rect x="20" y="20" width="4" height="4"/><rect x="40" y="20" width="4" height="4"/><rect x="20" y="40" width="4" height="4"/><rect x="40" y="40" width="4" height="4"/></g></svg>`;
 
   /* Las tres teselas, una por hilo, en una sola tinta: cuadrado (Kinesis), hexágono (Wisfox), círculo (ValerIA).
      Las dos primeras conservan el glifo de su proyecto (la K en movimiento, la W); la tercera se diseñó. */
@@ -126,5 +144,5 @@
   const lockup = (clase) => h('span', { class: 'logo-lockup ' + (clase || '') }, marca('mosaico', 'logo-simbolo'), h('span', { class: 'logo-nombre' }, 'Mosaico Telar'));
   const icono = (nombre) => svg(ICONOS[nombre]);
 
-  MT.ui = { h, ricoTexto, svg, telar, marca, lockup, icono, HILOS };
+  MT.ui = { h, ricoTexto, htmlSeguro, svg, telar, marca, lockup, icono, HILOS };
 })(window.MT = window.MT || {});

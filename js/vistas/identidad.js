@@ -1,6 +1,6 @@
 /* identidad.js: el manual de marca, vivo. Cada muestra se dibuja con los mismos componentes y
    variables de la plataforma, así el manual no puede contradecir a la página: si cambia un color
-   en tokens.css, cambia aquí. La versión escrita está en docs/MANUAL_DE_MARCA.md y docs/PALETA.md. */
+   en tokens.css, cambia aquí. */
 (function (MT) {
   'use strict';
   const { h, marca, lockup, icono } = MT.ui;
@@ -36,24 +36,31 @@
         h('div', { class: 'rejilla rejilla--2' },
           h('div', { class: 'tarjeta tarjeta--borde' }, h('p', { class: 'etiqueta' }, 'Por qué existimos'), h('p', { class: 'manual-grande' }, 'Para que ninguna forma de aprender se quede fuera del aula.')),
           h('div', { class: 'tarjeta tarjeta--borde' }, h('p', { class: 'etiqueta' }, 'Eslogan'), h('p', { class: 'manual-grande' }, 'Tejemos caminos para aprender.'))),
-        h('p', null, h('strong', null, 'Qué hacemos: '), 'unimos tres proyectos estudiantiles para que el docente planee una clase inclusiva, la orientación la valide, la familia la vea y cada estudiante la reciba a su medida.'),
+        h('p', null, h('strong', null, 'Qué hacemos: '), 'una plataforma para que el docente planee una clase inclusiva, la orientación la valide, la familia la vea y cada estudiante la reciba a su medida.'),
         h('p', null, h('strong', null, 'Descriptor: '), 'Colectivo de educación inclusiva con tecnología.'),
-        h('div', { class: 'rejilla rejilla--3' }, [['Todos somos mosaico', 'Todos aprendemos distinto, también quienes no tienen un diagnóstico.'], ['Cada hilo es autónomo', 'Se unen sin perder su nombre, su código ni su cara.'], ['Los datos van primero', 'Son menores de edad. Lo que no es necesario, no se pide.'], ['Decimos qué funciona', 'Y qué es simulado. Sin adornos.'], ['Hecho por estudiantes', 'Con revisión de adultos y de otros equipos.']]
+        h('div', { class: 'rejilla rejilla--3' }, [['Todos somos mosaico', 'Todos aprendemos distinto, también quienes no tienen un diagnóstico.'], ['Cada pieza conserva su nombre', 'Kinesis, Wisfox y ValerIA se unen sin perder su identidad.'], ['Los datos van primero', 'Son menores de edad. Lo que no es necesario, no se pide.'], ['Decimos qué hay', 'Y qué responde con ejemplos. Sin adornos.']]
           .map(([t, p]) => h('div', { class: 'tarjeta' }, h('h3', null, t), h('p', null, p))))));
 
       c.append(seccion('logo', 'Logo',
-        h('p', null, 'Un telar en su forma más simple: ', h('strong', null, 'tres hilos y dos pasadas de trama'), ', que se cruzan por encima y por debajo. ', h('strong', null, 'Es blanco y negro primero'), ': el color se usa solo donde hace falta distinguir un hilo de otro.'),
+        h('p', null, 'Una trama de telar vista de cerca: ', h('strong', null, 'nueve teselas negras cruzadas por hilos blancos de un solo grosor'), ', que pasan por encima y por debajo. El mosaico son las piezas; el telar, lo que las une. ', h('strong', null, 'Es blanco y negro'), ': su identidad está en la forma, no en el color.'),
         h('div', { class: 'rejilla rejilla--3' },
           h('div', { class: 'muestra-logo muestra-logo--claro' }, lockup()),
           h('div', { class: 'muestra-logo muestra-logo--oscuro' }, lockup()),
-          h('div', { class: 'muestra-logo muestra-logo--color' }, lockup('logo--color'))),
-        h('p', { class: 'suave', style: 'margin-top:.6rem' }, 'Principal en negro sobre claro, en blanco sobre oscuro, y a color solo cuando hay que identificar a los tres proyectos.'),
+          h('div', { class: 'muestra-logo muestra-logo--verde' }, lockup())),
+        h('p', { class: 'suave', style: 'margin-top:.6rem' }, 'En negro sobre claro, en blanco sobre oscuro y en blanco sobre el verde de la marca.'),
+        h('div', { class: 'tarjeta', style: 'margin-top:1rem' }, h('h3', null, 'Por qué se ve como se ve (leyes de la Gestalt)'),
+          h('ul', null,
+            h('li', null, h('strong', null, 'Cierre: '), 'el cuadrado completo se lee aunque los hilos lo corten en nueve piezas.'),
+            h('li', null, h('strong', null, 'Semejanza: '), 'todos los hilos tienen el mismo grosor y todas las piezas la misma tinta; por eso se lee como una sola trama.'),
+            h('li', null, h('strong', null, 'Continuidad: '), 'cada hilo sigue recto de lado a lado y el ojo lo sigue aunque se oculte bajo otro.'),
+            h('li', null, h('strong', null, 'Figura y fondo: '), 'los hilos son el espacio vacío: el logo se dibuja con lo que no está, y por eso funciona en cualquier fondo.'),
+            h('li', null, h('strong', null, 'Simplicidad: '), 'una sola forma, un solo grosor y una sola tinta. Sin degradados, sin líneas de distinto peso.'))),
         h('div', { class: 'rejilla rejilla--3', style: 'margin-top:1rem' },
-          h('div', { class: 'tarjeta' }, h('div', { class: 'muestra-simbolo' }, marca('mosaico', 'simbolo-grande')), h('p', { class: 'suave' }, 'Símbolo solo, para íconos y favicon.')),
+          h('div', { class: 'tarjeta' }, h('div', { class: 'muestra-simbolo' }, marca('mosaico', 'simbolo-grande')), h('p', { class: 'suave' }, 'Símbolo solo, para íconos y favicon. Se lee desde 16 px.')),
           h('div', { class: 'tarjeta' }, h('h3', null, 'Cómo se usa'), h('ul', null,
-            h('li', null, 'Espacio libre: el ancho de un hilo, por todos los lados.'), h('li', null, 'Tamaño mínimo: 32 px el símbolo; 110 px el logo completo. Por debajo, la trama se vuelve una mancha: usa el favicon a color.'), h('li', null, 'La “costura” del color del fondo separa lo que pasa por encima: no se quita.'))),
+            h('li', null, 'Espacio libre: el ancho de un hilo, por todos los lados.'), h('li', null, 'Tamaño mínimo: 16 px el símbolo; 110 px el logo completo.'), h('li', null, 'Los hilos toman el color del fondo: no se pintan.'))),
           h('div', { class: 'tarjeta' }, h('h3', null, 'Cómo no'), h('ul', null,
-            h('li', null, 'No estirarlo ni girarlo.'), h('li', null, 'No cambiar el color o el orden de un hilo.'), h('li', null, 'No ponerle sombras, degradados ni fichas.'))))));
+            h('li', null, 'No estirarlo ni girarlo.'), h('li', null, 'No colorear las piezas ni los hilos.'), h('li', null, 'No ponerle sombras, degradados ni contornos.'))))));
 
       c.append(seccion('color', 'Color',
         h('p', null, h('strong', null, 'Un color principal, dos funcionales y tres neutros.'), ' El principal es el verde bosque, y se eligió por continuidad: los dos proyectos ya eran verdes, así que la plataforma no les cambia el tono, lo comparte. Los funcionales también salen de las aplicaciones.'),
@@ -67,7 +74,7 @@
             h('li', null, h('strong', null, 'Cubren los tres ejes del color: '), 'un verde (planta), un amarillo naranja (cálido) y un azul (frío). Además, cada hilo tiene su forma (cuadrado, hexágono, círculo) y su nombre: el color nunca va solo.'),
             h('li', null, h('strong', null, 'El ámbar nunca lleva texto: '), 'su contraste con blanco es 2,1:1, por debajo del mínimo. Por eso solo se usa como identificador, siempre con el nombre al lado.'),
             h('li', null, h('strong', null, 'Se descartó el terracota: '), 'se veía más cálido, pero junto a este verde es indistinguible para protanopía (ΔE 1). Tampoco el océano claro: junto al verde casi se confunde en tritanopía (ΔE 3,5).'))),
-        h('p', { class: 'suave', style: 'margin-top:.8rem' }, 'Cada proyecto conserva su propia paleta dentro de su aplicación, que se muestra intacta. Detalle de la validación en docs/PALETA.md.')));
+        h('p', { class: 'suave', style: 'margin-top:.8rem' }, 'Cada color se validó para daltonismo y contraste con una herramienta de paletas antes de usarse.')));
 
       c.append(seccion('tipografia', 'Tipografía',
         h('p', null, h('strong', null, 'Newsreader'), ' para los títulos, que dan un tono editorial y sereno, y ', h('strong', null, 'Nunito'), ' para la interfaz, la voz que Kinesis y Wisfox ya compartían. Ambas se alojan en el sitio, sin depender de internet (licencia SIL OFL).'),
