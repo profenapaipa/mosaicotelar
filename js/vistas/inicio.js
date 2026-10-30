@@ -17,8 +17,9 @@
   }
 
   function componente(id, nombre, rotulo, texto) {
-    return h('article', { class: 'tarjeta proyecto-tarjeta' }, h('div', { class: 'cuerpo' },
-      h('div', { class: 'proyecto-cab' }, marca(id), h('div', null, h('h3', null, nombre), h('small', null, rotulo))), h('p', null, texto)));
+    return h('article', { class: 'tarjeta proyecto-tarjeta portal', 'data-espacio': id }, h('div', { class: 'cuerpo' },
+      h('div', { class: 'proyecto-cab' }, marca(id), h('div', null, h('h3', null, nombre), h('small', null, rotulo))), h('p', null, texto),
+      h('div', { class: 'acciones' }, h('a', { class: 'btn btn--chico btn--suave', href: '#/portales/' + id, 'aria-label': 'Ir a ' + nombre }, 'Ir a ' + nombre))));
   }
 
   MT.router.registrar({
@@ -26,12 +27,16 @@
     render(main) {
       const s = st.obtener();
       const c = h('div', { class: 'contenedor' });
+      const tejido = MT.tejido.logoTejido();
 
       c.append(h('section', { class: 'lienzo' },
         h('div', null,
           h('p', { class: 'descriptor' }, 'Colectivo de educación inclusiva con tecnología'),
-          h('h1', null, 'Tejemos caminos ', h('em', null, 'para aprender.')),
-          h('p', { class: 'intro' }, 'Una plataforma donde el docente planea una clase inclusiva, orientación la valida, la familia la ve y cada estudiante la recibe a su medida. Con Kinesis para el aula, Wisfox para aprender y ValerIA como guía.'),
+          h('div', { class: 'marca-hero' },
+            h('div', { class: 'marca-hero__logo' }, tejido.el, h('button', { class: 'btn btn--chico btn--suave', type: 'button', onclick: tejido.repetir }, 'Ver otra vez')),
+            h('div', null, h('h1', null, 'Mosaico Telar'), h('p', { class: 'marca-hero__lema' }, 'Tejemos caminos para aprender.'))),
+          h('p', { class: 'intro' }, 'La plataforma donde el docente planea una clase inclusiva, orientación la valida, la familia la ve y cada estudiante la recibe a su medida.'),
+          h('ul', { class: 'hilos-leyenda', 'aria-label': 'Sus tres portales' }, [['kinesis', 'Kinesis', 'el aula'], ['wisfox', 'Wisfox', 'el estudiante'], ['valeria', 'ValerIA', 'la guía']].map(([id, n, r]) => h('li', { 'data-espacio': id }, h('i', { 'aria-hidden': 'true' }), h('strong', null, n), ' ' + r))),
           h('div', { class: 'acciones' },
             h('a', { class: 'btn', href: '#roles', onclick: (e) => { e.preventDefault(); const el = document.getElementById('roles'); if (el) el.scrollIntoView({ behavior: 'smooth' }); } }, 'Entrar con mi rol'),
             h('a', { class: 'btn btn--suave', href: '#/piloto' }, 'Solicitar un piloto')),
@@ -46,6 +51,21 @@
           h('div', null, h('p', { class: 'etiqueta' }, 'Estás como ' + r.nombre.toLowerCase()), h('h2', null, 'Continúa donde lo dejaste')),
           h('a', { class: 'btn', href: '#/guia' }, 'Ver mi guía de inicio')));
       }
+
+      c.append(h('section', { class: 'seccion', 'aria-labelledby': 'h-que' },
+        h('h2', { id: 'h-que' }, 'Qué es Mosaico Telar'),
+        h('p', { class: 'bajada' }, 'Mosaico Telar es la plataforma que reúne tres portales para que una clase inclusiva llegue completa, del docente al estudiante. Cada portal nació como un proyecto de estudiantes; juntos comparten una identidad, un camino para cada rol y los mismos datos.'),
+        h('div', { class: 'plataforma' },
+          h('span', { class: 'plataforma__rotulo' }, marca('mosaico', 'plataforma__marca'), 'Mosaico Telar · la plataforma'),
+          h('div', { class: 'rejilla rejilla--3' },
+            componente('kinesis', 'Kinesis', 'El aula', 'Donde se planea la clase con DUA y se decide qué ajuste recibe cada estudiante. Lo usan docentes, orientación, familias y coordinación.'),
+            componente('wisfox', 'Wisfox', 'El estudiante', 'Donde el estudiante aprende a su ritmo: rutas, lecciones, quizes con explicación, puntos y logros, con la actividad hecha a su medida.'),
+            componente('valeria', 'ValerIA', 'La guía', 'Una asistente de IA que propone y no decide. Ayuda al docente a diseñar y al estudiante a resolver dudas. Hoy responde con ejemplos.')),
+          h('p', { class: 'plataforma__une' }, h('strong', null, 'Cómo se conectan: '), 'Kinesis le pasa a Wisfox la actividad ya aprobada, Wisfox le devuelve a Kinesis el progreso, y ValerIA ayuda a los dos.')),
+        h('div', { class: 'objetivo' }, h('p', { class: 'etiqueta' }, 'Para qué existe'),
+          h('p', { class: 'objetivo__texto' }, 'Que cada estudiante que necesita ajustes los reciba en la clase de hoy, y no solo en un documento.')),
+        h('div', { class: 'acciones' }, h('a', { class: 'btn', href: '#roles', onclick: (e) => { e.preventDefault(); const el = document.getElementById('roles'); if (el) el.scrollIntoView({ behavior: 'smooth' }); } }, 'Elegir mi rol'),
+          h('a', { class: 'btn btn--suave', href: '#/portales' }, 'Ver los tres portales'))));
 
       c.append(h('section', { class: 'seccion', id: 'roles', 'aria-labelledby': 'h-roles' },
         h('h2', { id: 'h-roles' }, '¿Quién eres? Empieza por aquí'),
@@ -69,14 +89,6 @@
           h('div', { class: 'tarjeta tarjeta--borde' }, h('h3', null, 'Para todos, no solo con diagnóstico'), h('p', null, 'El DUA es la base: la clase se piensa para todos y el ajuste cubre lo que el diseño no alcanza.')),
           h('div', { class: 'tarjeta tarjeta--borde' }, h('h3', null, 'Protegido por diseño'), h('p', null, 'La información clínica queda aislada y la IA nunca la recibe.'))),
         h('p', { style: 'margin-top:1rem' }, h('a', { href: '#/mapa/comparar' }, 'Ver la comparación con PIARPLUS, incluido dónde vamos atrás'))));
-
-      c.append(h('section', { class: 'seccion', 'aria-labelledby': 'h-proy' },
-        h('h2', { id: 'h-proy' }, 'Tres portales, una sola plataforma'),
-        h('p', { class: 'bajada' }, 'Cada pieza nació como un proyecto de estudiantes y hoy trabajan juntas, con una misma identidad y los mismos datos.'),
-        h('div', { class: 'rejilla rejilla--3' },
-          componente('kinesis', 'Kinesis', 'El aula', 'Planeación inclusiva con PIAR y DUA para docentes, orientación, familias y coordinación. La información clínica queda aislada.'),
-          componente('wisfox', 'Wisfox', 'El estudiante', 'Lecciones, quizes con explicación, puntos y logros, para aprender a su ritmo con la actividad hecha a su medida.'),
-          componente('valeria', 'IA ValerIA', 'La guía', 'Una asistente que propone y no decide. Hoy responde con textos de ejemplo; su lugar y su contrato ya existen.'))));
 
       c.append(h('section', { class: 'seccion', 'aria-labelledby': 'h-problema' },
         h('h2', { id: 'h-problema' }, 'El plan existe en el papel. Falta que llegue al aula.'),

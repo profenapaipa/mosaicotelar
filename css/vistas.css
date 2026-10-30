@@ -320,3 +320,46 @@ input[type="file"] { width: 100%; font: 400 1rem var(--fuente); color: var(--tin
 .portal-franja { display: flex; flex-wrap: wrap; gap: .6rem 1rem; align-items: center; justify-content: space-between; background: var(--lino); border: 1px solid var(--linea); border-left: 6px solid var(--e-vivo); border-radius: var(--radio-chico); padding: .7rem 1rem; margin-bottom: .8rem; }
 .portal-franja .acciones { margin: 0; }
 .portal-marco { display: block; width: 100%; height: calc(100vh - 14rem); min-height: 560px; border: 1px solid var(--linea); border-radius: var(--radio); background: #fff; }
+
+/* ---- La marca en la bienvenida: el logo se teje en color y queda en blanco y negro ---- */
+.marca-hero { display: flex; align-items: center; gap: 1.5rem; margin-bottom: 1.1rem; }
+.marca-hero__logo { width: clamp(104px, 15vw, 158px); flex: none; display: grid; gap: .5rem; justify-items: start; }
+.marca-hero__logo .btn { font-size: .78rem; min-height: 28px; padding: .1rem .6rem; }
+.marca-hero h1 { font-size: clamp(2.4rem, 5.4vw, 3.9rem); line-height: 1; margin: 0; }
+.marca-hero__lema { font: italic 500 clamp(1.1rem, 2.2vw, 1.4rem)/1.3 var(--fuente-titulo); color: var(--tinta-suave); margin: .45rem 0 0; }
+.logo-tejido { display: block; width: 100%; height: auto; color: var(--tinta); overflow: visible; }
+.logo-tejido .hilos, .logo-tejido .cruces { opacity: 0; }                 /* estado final: solo el logo */
+.logo-tejido .hilo { transform-box: fill-box; }
+.logo-tejido .hilo--v { transform-origin: top; }
+.logo-tejido .hilo--h { transform-origin: left; }
+.logo-tejido.tejiendo .tela { transform-box: fill-box; transform-origin: center; animation: tela-entra .7s ease-out both; }
+.logo-tejido.tejiendo .hilos { opacity: 1; animation: hilos-fuera 1s ease-in-out 3.3s forwards; }
+.logo-tejido.tejiendo .hilo--v { animation: hilo-v .6s var(--d) cubic-bezier(.4, 0, .2, 1) both; }
+.logo-tejido.tejiendo .hilo--h { animation: hilo-h .6s var(--d) cubic-bezier(.4, 0, .2, 1) both; }
+.logo-tejido.tejiendo .puentes { animation: aparece .25s ease-out 1.9s both; }
+.logo-tejido.tejiendo .cruces { animation: cruces 4.3s linear both; }
+@keyframes tela-entra { from { opacity: 0; transform: scale(.86); } to { opacity: 1; transform: none; } }
+@keyframes hilo-v { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+@keyframes hilo-h { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes aparece { from { opacity: 0; } to { opacity: 1; } }
+@keyframes hilos-fuera { from { opacity: 1; } to { opacity: 0; } }
+@keyframes cruces { 0%, 43% { opacity: 0; } 47%, 76% { opacity: 1; } 100% { opacity: 0; } }
+.hilos-leyenda { display: flex; flex-wrap: wrap; gap: .5rem 1.4rem; list-style: none; padding: 0; margin: 1rem 0 0; }
+.hilos-leyenda li { display: flex; align-items: center; gap: .45rem; font-size: .95rem; color: var(--tinta-suave); animation: aparece .7s ease-out 3.5s both; }
+.hilos-leyenda li:nth-child(2) { animation-delay: 3.8s; }
+.hilos-leyenda li:nth-child(3) { animation-delay: 4.1s; }
+.hilos-leyenda i { width: 14px; height: 14px; border-radius: 4px; background: var(--e-vivo); flex: none; }
+.hilos-leyenda strong { color: var(--tinta); }
+@media (prefers-reduced-motion: reduce) {
+  .logo-tejido.tejiendo .tela, .logo-tejido.tejiendo .hilo, .logo-tejido.tejiendo .puentes, .logo-tejido.tejiendo .cruces, .hilos-leyenda li { animation: none !important; }
+  .logo-tejido.tejiendo .hilos { opacity: 0; animation: none; }
+}
+@media (max-width: 520px) { .marca-hero { flex-direction: column; align-items: flex-start; } }
+
+/* ---- Qué es Mosaico Telar: la plataforma y sus tres portales ---- */
+.plataforma { position: relative; border: 2px solid var(--tinta); border-radius: var(--radio); padding: 2rem 1.2rem 1.2rem; margin-top: 1.6rem; }
+.plataforma__rotulo { position: absolute; top: -1rem; left: 1rem; display: inline-flex; align-items: center; gap: .5rem; background: var(--papel); padding: 0 .6rem; font: 800 .95rem var(--fuente); }
+.plataforma__marca { width: 26px; height: 26px; color: var(--tinta); }
+.plataforma__une { margin: 1rem 0 0; padding-top: .8rem; border-top: 2px dotted var(--linea); }
+.objetivo { margin: 1.2rem 0; border-left: 6px solid var(--tinta); padding: .4rem 0 .4rem 1.1rem; }
+.objetivo__texto { font: 700 clamp(1.25rem, 2.6vw, 1.7rem)/1.3 var(--fuente-titulo); margin: 0; max-width: 40ch; }
