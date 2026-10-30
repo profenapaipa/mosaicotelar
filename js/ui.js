@@ -57,8 +57,8 @@
   }
 
   /* El telar. Los tres colores de hilo son los de las aplicaciones: el verde bosque de Kinesis,
-     el ámbar de Wisfox y el "uva" que Kinesis ya traía entre sus colores y que aquí es de ValerIA. */
-  const HILOS = ['#1B7F56', '#E8A13C', '#6B4FC8'];
+     el ámbar de Wisfox y el azul tinta (el océano que Kinesis ya traía, un paso más oscuro) y que aquí es de ValerIA. */
+  const HILOS = ['#1B7F56', '#E8A13C', '#2B4FA3'];
 
   function cuerpoTelar(columnas, filas, banda, hueco, margen, neutro, sombra) {
     const paso = banda + hueco;
@@ -83,24 +83,23 @@
     return svg(`<svg class="${clase}" viewBox="0 0 ${t.ancho} ${t.alto}" role="img" aria-label="Trama de un telar: tres hilos de color, verde, ámbar e índigo, cruzan hilos claros" focusable="false">${t.cuerpo}</svg>`);
   }
 
-  /* Logo del colectivo, en su forma más simple: tres hilos de color y dos pasadas de trama.
-     La trama usa currentColor, así el mismo símbolo sirve sobre fondo claro (tinta) y oscuro (blanco).
-     Los colores salen de variables para poder usar la versión clara sobre fondos oscuros. */
+  /* Logo del colectivo: tres hilos y dos pasadas de trama, en una sola tinta por defecto.
+     Los hilos y la trama usan currentColor, así el mismo símbolo sirve en negro sobre claro y en blanco
+     sobre oscuro. La "costura" (el contorno que separa lo que pasa por encima) usa --logo-fondo.
+     A color (.logo--color) cada hilo toma el color de su proyecto: se usa solo donde hace falta distinguirlos. */
   const LOGO = (c) => {
-    const F = 'stroke="var(--logo-fondo,#FAF6EF)" stroke-width="3" paint-order="stroke"';   // costura: separa lo que pasa por encima
-    return `<svg class="${c}" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><rect x="5" y="4" width="14" height="56" rx="7" fill="var(--logo-1,#1B7F56)"/><rect x="25" y="4" width="14" height="56" rx="7" fill="var(--logo-2,#E8A13C)"/><rect x="45" y="4" width="14" height="56" rx="7" fill="var(--logo-3,#6B4FC8)"/><rect x="1" y="17" width="62" height="8" rx="4" fill="currentColor" ${F}/><rect x="1" y="39" width="62" height="8" rx="4" fill="currentColor" ${F}/><rect x="25" y="17" width="14" height="8" fill="var(--logo-2,#E8A13C)" ${F}/><rect x="5" y="39" width="14" height="8" fill="var(--logo-1,#1B7F56)" ${F}/><rect x="45" y="39" width="14" height="8" fill="var(--logo-3,#6B4FC8)" ${F}/></svg>`;
+    const F = 'stroke="var(--logo-fondo,#FFFFFF)" stroke-width="2.4" paint-order="stroke"';
+    return `<svg class="${c}" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><rect x="4" y="3" width="16" height="58" rx="8" fill="var(--logo-1,currentColor)"/><rect x="24" y="3" width="16" height="58" rx="8" fill="var(--logo-2,currentColor)"/><rect x="44" y="3" width="16" height="58" rx="8" fill="var(--logo-3,currentColor)"/><rect x="0" y="17" width="64" height="9" rx="4.5" fill="currentColor" ${F}/><rect x="0" y="38" width="64" height="9" rx="4.5" fill="currentColor" ${F}/><rect x="24" y="17" width="16" height="9" fill="var(--logo-2,currentColor)" ${F}/><rect x="4" y="38" width="16" height="9" fill="var(--logo-1,currentColor)" ${F}/><rect x="44" y="38" width="16" height="9" fill="var(--logo-3,currentColor)" ${F}/></svg>`;
   };
 
+  /* Las tres teselas, una por hilo, en una sola tinta: cuadrado (Kinesis), hexágono (Wisfox), círculo (ValerIA).
+     Las dos primeras conservan el glifo de su proyecto (la K en movimiento, la W); la tercera se diseñó. */
+  const G = 'var(--logo-fondo,#FFFFFF)';
   const MARCAS = {
     mosaico: LOGO,
-    // Kinesis: la "K" en movimiento. El brazo superior sigue de largo y termina en un punto: el estudiante que avanza.
-    kinesis: (c) => `<svg class="${c}" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><rect width="64" height="64" rx="16" fill="var(--k-fuerte)"/><path d="M22 16v32M24 34l18-15M28 34l16 14" fill="none" stroke="var(--k-sobre)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="49" cy="14" r="4.5" fill="var(--k-sobre)"/></svg>`,
-    // Wisfox: el hexágono con la W, como en su plataforma.
-    wisfox: (c) => `<svg class="${c}" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><path d="M32 4l24 14v28L32 60 8 46V18z" fill="var(--w-fuerte)" stroke="var(--w-fuerte)" stroke-width="6" stroke-linejoin="round"/><path d="M19 24l6.5 18L32 29l6.5 13L45 24" fill="none" stroke="var(--w-sobre)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-    // ValerIA: la tercera ficha, un círculo con una chispa de cuatro puntas. La guía que ilumina el camino.
-    valeria: (c) => `<svg class="${c}" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><circle cx="32" cy="32" r="30" fill="var(--v-fuerte)"/><path d="M32 12l5.5 14.5L52 32l-14.5 5.5L32 52l-5.5-14.5L12 32l14.5-5.5z" fill="var(--v-sobre)"/></svg>`,
-    // El zorro de Wisfox: orejas altas y mentón en punta. Es la mascota, no la marca.
-    zorro: (c) => `<svg class="${c}" viewBox="0 0 64 64" role="img" aria-label="El zorro de Wisfox" focusable="false"><path d="M6 4l19 17h14l19-17-2 30-24 26-24-26z" fill="var(--w-acento)"/><path d="M32 60L13 36l19 6 19-6z" fill="var(--superficie)"/><path d="M20 30l6 2.5M44 30l-6 2.5" stroke="var(--tinta)" stroke-width="3.5" stroke-linecap="round"/><circle cx="32" cy="55" r="3" fill="var(--tinta)"/></svg>`,
+    kinesis: (c) => `<svg class="${c}" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><rect width="64" height="64" rx="16" fill="currentColor"/><path d="M22 16v32M24 34l18-15M28 34l16 14" fill="none" stroke="${G}" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="49" cy="14" r="4.5" fill="${G}"/></svg>`,
+    wisfox: (c) => `<svg class="${c}" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><path d="M32 4l24 14v28L32 60 8 46V18z" fill="currentColor" stroke="currentColor" stroke-width="6" stroke-linejoin="round"/><path d="M19 24l6.5 18L32 29l6.5 13L45 24" fill="none" stroke="${G}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+    valeria: (c) => `<svg class="${c}" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><circle cx="32" cy="32" r="30" fill="currentColor"/><path d="M19 21l13 24 13-24" fill="none" stroke="${G}" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="32" cy="45" r="0" fill="${G}"/></svg>`,
   };
 
   // Íconos de línea: un solo trazo, redondeado, 2 px, como los de Kinesis y Wisfox.
@@ -117,7 +116,9 @@
     juego: L('<path d="M9 4h3a1.6 1.6 0 0 1 3.2 0H18v4a1.6 1.6 0 0 0 0 3.2V17h-4a1.6 1.6 0 0 0-3.2 0H6v-4a1.6 1.6 0 0 0 0-3.2V4z"/>'),
     logros: L('<path d="M8 4h8v5a4 4 0 0 1-8 0zM8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M8.5 20h7"/>'),
     flecha: L('<path d="M12 4v16M6 14l6 6 6-6"/>'),
-    chispa: L('<path d="M12 3l2 6 6 3-6 3-2 6-2-6-6-3 6-3z"/>'),
+    chat: L('<path d="M4 5h16v11H9l-5 4z"/><path d="M8.5 9.5h7M8.5 12.5h4"/>'),
+    mapa: L('<circle cx="5.5" cy="6" r="2.2"/><circle cx="18.5" cy="7" r="2.2"/><circle cx="12" cy="18" r="2.2"/><path d="M7.4 7l9.2.6M6.6 8l4.2 8.2M17.6 9l-4.4 7.4"/>'),
+    coordinacion: L('<path d="M4 20V9l8-5 8 5v11M9 20v-6h6v6M3 20h18"/>'),
   };
 
   const marca = (nombre, clase) => svg(MARCAS[nombre](clase || ''));

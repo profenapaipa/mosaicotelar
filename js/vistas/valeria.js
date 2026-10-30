@@ -12,7 +12,7 @@
   const { espacio } = MT.comun;
 
   const TABS = [
-    { id: 'chat', etiqueta: 'Conversar', icono: 'chispa' },
+    { id: 'chat', etiqueta: 'Conversar', icono: 'chat' },
     { id: 'conexion', etiqueta: 'Conexión', icono: 'estado' },
   ];
 

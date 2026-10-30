@@ -14,12 +14,12 @@
   const TABS = [{ id: 'camino', etiqueta: 'Mi camino' }, { id: 'roles', etiqueta: 'Quién ve qué' }, { id: 'datos', etiqueta: 'Cómo viaja la información' }];
 
   const PASOS = [
-    { clave: 'apoyos', rol: 'Docente', espacio: 'kinesis', titulo: 'El docente ve los apoyos', texto: 'En Kinesis, elige a un estudiante con PIAR y mira sus apoyos, sin diagnóstico.', ir: ['#/kinesis/docente', 'Ir a Kinesis'], sello: 'Funciona hoy' },
+    { clave: 'apoyos', rol: 'Docente', espacio: 'kinesis', titulo: 'El docente ve los apoyos', texto: 'En Kinesis, elige a un estudiante con PIAR y mira sus apoyos, sin diagnóstico.', ir: ['#/demo/docente', 'Ir a Kinesis'], sello: 'Funciona hoy' },
     { clave: 'ia', rol: 'Docente', espacio: 'valeria', titulo: 'Pide ayuda a ValerIA', texto: 'La asistente propone una actividad con DUA.', ir: ['ia', 'Abrir ValerIA'], sello: 'Respuesta de ejemplo' },
-    { clave: 'ajuste', rol: 'Docente', espacio: 'kinesis', titulo: 'Se ajusta al perfil', texto: 'Cada apoyo se vuelve un cambio concreto, con su razón.', ir: ['#/kinesis/docente', 'Ajustar'], sello: 'Simulado: fase 5 de Kinesis' },
-    { clave: 'aprobado', rol: 'Orientación', espacio: 'kinesis', titulo: 'Orientación aprueba', texto: 'Nada llega al estudiante sin la validación del equipo de orientación.', ir: ['#/kinesis/orientacion', 'Revisar'], sello: 'Simulado: fase 5 de Kinesis' },
-    { clave: 'familia', rol: 'Familia', espacio: 'kinesis', titulo: 'La familia ve el proceso', texto: 'Se entera mientras ocurre, no en la entrega de notas.', ir: ['#/kinesis/familia', 'Ver'], sello: 'Simulado: fase 6 de Kinesis' },
-    { clave: 'estudiante', rol: 'Estudiante', espacio: 'wisfox', titulo: 'El estudiante la resuelve', texto: 'En Wisfox recibe la actividad ajustada y completa el quiz.', ir: ['#/wisfox/leccion', 'Ir a Wisfox'], sello: 'Wisfox funciona; el ajuste llega simulado' },
+    { clave: 'ajuste', rol: 'Docente', espacio: 'kinesis', titulo: 'Se ajusta al perfil', texto: 'Cada apoyo se vuelve un cambio concreto, con su razón.', ir: ['#/demo/docente', 'Ajustar'], sello: 'Simulado: fase 5 de Kinesis' },
+    { clave: 'aprobado', rol: 'Orientación', espacio: 'kinesis', titulo: 'Orientación aprueba', texto: 'Nada llega al estudiante sin la validación del equipo de orientación.', ir: ['#/demo/orientacion', 'Revisar'], sello: 'Simulado: fase 5 de Kinesis' },
+    { clave: 'familia', rol: 'Familia', espacio: 'kinesis', titulo: 'La familia ve el proceso', texto: 'Se entera mientras ocurre, no en la entrega de notas.', ir: ['#/demo/familia', 'Ver'], sello: 'Simulado: fase 6 de Kinesis' },
+    { clave: 'estudiante', rol: 'Estudiante', espacio: 'wisfox', titulo: 'El estudiante la resuelve', texto: 'En Wisfox recibe la actividad ajustada y completa el quiz.', ir: ['#/demo/estudiante', 'Ir a Wisfox'], sello: 'Wisfox funciona; el ajuste llega simulado' },
   ];
 
   function camino(c) {

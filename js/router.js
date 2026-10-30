@@ -35,7 +35,7 @@
     const y = window.scrollY;
     limpiezas.forEach((f) => { try { f(); } catch (e) { /* ya no importa */ } });
     limpiezas = [];
-    main.dataset.espacio = def.espacio || '';
+    main.dataset.espacio = (typeof def.espacio === 'function' ? def.espacio(sub) : def.espacio) || '';
     main.replaceChildren();
     try {
       def.render(main, { sub });

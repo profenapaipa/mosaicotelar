@@ -1,7 +1,7 @@
 # Manual de marca de Mosaico Telar
 
-Versión 1.0, 30 de octubre de 2026. La versión viva, hecha con los mismos componentes que el
-sitio, está en la plataforma (**Marca**). Si algo cambia en `css/tokens.css`, cambia allí.
+Versión 2.0, 30 de octubre de 2026. La versión viva, hecha con los mismos componentes que el sitio,
+está en la plataforma (**Marca**). La justificación de los colores está en [PALETA.md](PALETA.md).
 
 ## 1. Propósito
 
@@ -26,100 +26,99 @@ sitio, está en la plataforma (**Marca**). Si algo cambia en `css/tokens.css`, c
 proceso artesanal donde varios hilos hacen una sola tela. La urdimbre es la malla curricular; la
 trama, los ajustes de cada estudiante.
 
-## 2. Logo
+## 2. Principio de identidad: blanco y negro primero
 
-**Tres hilos de color y dos pasadas de trama.** Un telar en su forma más simple. Cada hilo es un
-proyecto; la trama los cruza por encima y por debajo, y una "costura" del color del fondo separa
-lo que pasa por encima. El logo **no lleva ficha ni fondo**.
+La estructura, el logo y los íconos son **una sola tinta**. El color aparece solo para la **acción**
+(el verde) y para **identificar cada hilo** (verde, ámbar, azul). Esto da un aire sobrio y editorial, y
+evita la estética de "plataforma de IA en la nube" (azul noche, morado y degradados).
+
+## 3. Logo
+
+**Tres hilos y dos pasadas de trama.** Un telar en su forma más simple. La trama pasa por encima y
+por debajo de los hilos, y una "costura" del color del fondo separa lo que va por encima.
 
 | Versión | Cuándo |
 |---|---|
-| Logo horizontal (símbolo + "Mosaico Telar", Nunito 900) | Encabezados, documentos, pie |
-| Símbolo solo | Ícono, favicon, riel |
-| Sobre fondo oscuro | Colores claros (`#6FD08C`, `#F0B85A`, `#B9A6FF`) y trama blanca |
+| **Negro** sobre fondo claro | La principal |
+| **Blanco** sobre fondo oscuro | El riel, el pie sobre oscuro |
+| **A color** (verde, ámbar, azul) | Solo cuando hay que identificar a los tres proyectos: el favicon y piezas de comunicación |
 
+- **Logo horizontal:** símbolo + "Mosaico Telar" en Nunito 900.
 - **Espacio libre:** el ancho de un hilo, por todos los lados.
-- **Tamaño mínimo:** 24 px el símbolo; 96 px el logo horizontal.
-- **No:** estirarlo, girarlo, cambiar el color o el orden de un hilo, ponerle sombras, degradados
-  o fichas.
-- **Archivo:** `assets/logo.svg` (favicon, con trama oscura). En la página se dibuja desde
-  `js/ui.js`, con variables, para que cambie con el tema.
+- **Tamaño mínimo:** 32 px el símbolo; 110 px el logo horizontal. **Por debajo de 32 px la trama se
+  vuelve una mancha**: se usa el favicon a color.
+- **No:** estirarlo, girarlo, cambiar el color o el orden de un hilo, ponerle sombras, degradados o fichas.
+- **Archivos:** `assets/logo.svg` (a color, para favicon). En la página se dibuja desde `js/ui.js`
+  con variables, y cambia solo entre negro y blanco.
+- **Limitación conocida:** en tamaño grande se lee como un tejido; es un símbolo reticular y puede
+  recordar a un "#". Si el equipo prefiere un trazo menos denso, es lo primero a explorar.
 
-## 3. Color
+## 4. Color
 
-Tres colores de hilo, que **ya existían en los proyectos**, y tres neutros.
+Un color principal, dos funcionales y tres neutros. Todo en [PALETA.md](PALETA.md).
 
-| Color | Hex | Origen | Uso | Texto encima |
-|---|---|---|---|---|
-| Verde bosque | `#1B7F56` | Kinesis, su color de marca. Wisfox usa la misma familia (`#3D9960`, `#2E7D4F`) | Color principal; hilo del aula | Blanco (5,0:1) |
-| Ámbar | `#E8A13C` | Wisfox: su acento y el zorro. Kinesis: avisos y PIAR | Hilo del estudiante; avisos. **Nunca rojo**: un PIAR no es un error | Tinta (7,3:1). El blanco no pasa |
-| Uva | `#6B4FC8` | Uno de los colores del menú de apariencia de Kinesis | Hilo de la guía (ValerIA) | Blanco (5,9:1) |
-| Tinta | `#23202E` | Texto y trama del logo | Texto principal | Blanco |
-| Papel | `#FAF6EF` | Entre el menta de Wisfox y el claro de Kinesis | Fondo de las páginas del colectivo | Tinta |
-| Hilo | `#E4DAC6` | Los hilos neutros del telar | Trama y patrones | Tinta |
-
-**Cada espacio conserva su paleta y su tema oscuro:** Kinesis, verde bosque y oscuro por defecto
-(un verde casi negro, cercano a `#07130E`); Wisfox, menta claro (`#F6F8F4`) con ámbar; ValerIA, uva sobre lavanda. Los componentes solo
-leen variables genéricas (`--papel`, `--superficie`, `--e-fuerte`...), así un espacio nuevo
-cambia variables, no componentes.
+| Color | Hex | Papel |
+|---|---|---|
+| Tinta | `#1A1714` | Texto, estructura, logo, íconos |
+| Papel / Lino | `#FFFFFF` / `#F6F2EA` | Superficies |
+| **Verde bosque** | `#1B7F56` | **Principal: la acción.** El mismo verde que ya compartían Kinesis y Wisfox |
+| Ámbar | `#E8A13C` | Hilo de Wisfox y avisos. Nunca lleva texto |
+| Azul tinta | `#2B4FA3` | Hilo de ValerIA |
 
 **El color nunca va solo:** todo estado lleva también texto ("Aprobado", "Pendiente", "Simulado").
+**Nunca rojo** para un PIAR o un estudiante.
 
-## 4. Tipografía
+## 5. Tipografía
 
-**Nunito**, para todo: la que Kinesis y Wisfox ya usaban. Terminaciones redondeadas, amable en
-pesos altos. Se aloja en `fonts/`, sin depender de internet (licencia SIL OFL).
+**Newsreader** para los títulos (tono editorial y sereno) y **Nunito** para la interfaz, la voz que
+Kinesis y Wisfox ya compartían. Ambas se alojan en `fonts/`, sin depender de internet (licencia SIL OFL).
 
-| Uso | Peso | Tamaño |
+| Uso | Familia y peso | Tamaño |
 |---|---|---|
-| Título | 900 | 32 a 46 px |
-| Subtítulo | 800 | 24 px |
-| Texto | 400 y 600 | 16 px, interlineado 1,6 |
-| Datos y códigos | 700, monoespaciada del sistema | 14 px |
+| Título | Newsreader 700 | 34 a 50 px |
+| Subtítulo y botones | Nunito 800 | 22 y 16 px |
+| Texto | Nunito 400 y 600 | 16 px, interlineado 1,6 |
+| Datos y códigos | Monoespaciada del sistema | 14 px |
 
 Todo está en `rem`; el menú de apariencia sube la base al 112,5 %.
 
-## 5. Formas
+## 6. Formas e íconos
 
-Un mosaico se arma con teselas. **Cada hilo tiene la suya:**
+Un mosaico se arma con teselas. **Cada hilo tiene la suya, en una sola tinta:**
 
 | Hilo | Forma | Origen |
 |---|---|---|
-| Kinesis | Cuadrado redondeado, con una "K" en movimiento: su brazo superior termina en un punto, el estudiante que avanza | Su identidad original |
+| Kinesis | Cuadrado redondeado con la "K" en movimiento: su brazo superior termina en un punto, el estudiante que avanza | Su identidad original |
 | Wisfox | Hexágono con una "W" | Su identidad original |
-| IA ValerIA | Círculo con una chispa de cuatro puntas, la guía que ilumina | Nueva, para completar la familia |
+| ValerIA | Círculo con una "V" sencilla | Nueva. Sin chispas ni destellos: la guía es acompañamiento, no magia |
 
-Esquinas muy redondeadas (18 a 30 px) y sombras suaves, como ya hacían ambos proyectos.
+**Íconos:** de línea, un solo trazo redondeado de 2 px, en una sola tinta, como los que ya usaban Kinesis y Wisfox.
 
-## 6. Recursos gráficos
+## 7. Recursos gráficos
 
-El telar y el mosaico dan para más que un logo. Estos recursos salen de los dos símbolos y se usan
-con medida: dan identidad sin cargar la pantalla. Todos están en `css/vistas.css`.
+El telar y el mosaico dan para más que un logo. Se usan con medida: dan identidad sin cargar la pantalla.
 
 | Recurso | Clase | Dónde |
 |---|---|---|
-| Patrón de trama | `.patron-telar` | Portadas y estados vacíos. Nunca detrás de texto largo |
-| Patrón de teselas | `.patron-mosaico` | Fondos y piezas de comunicación |
-| Divisor de puntada | `.puntada` | Separa secciones como una costura |
+| Patrón de trama | `.patron-telar` | Estados vacíos y piezas. Nunca detrás de texto largo |
+| Patrón de teselas | `.patron-mosaico` | Una de las pocas veces en que los tres colores aparecen juntos |
+| Divisor de puntada | `.puntada` | Separa secciones como una costura, en tinta |
 | Barra de hilo | `.medidor--hilo` | Progreso: tres colores avanzando juntos |
 | Cargador de trama | `.cargador-trama` | Espera. Se detiene si la persona pide menos movimiento |
-| Ficha de logro | las tres teselas | Logros y rangos |
+| Mapa interactivo | `/#/mapa` | Cómo se conecta todo: módulos, flechas y roles |
 
-## 7. Estructura de la interfaz
+## 8. Estructura de la interfaz
 
-Dos niveles de navegación, como en Slack o Google Workspace:
+1. **El riel** (izquierda, siempre igual, en tinta con íconos blancos): Mapa, Kinesis, Wisfox, ValerIA,
+   Demo y Roles. En celular baja a una barra inferior.
+2. **Los proyectos reales, incrustados e intactos:** Kinesis y Wisfox se muestran con su propia cara,
+   animaciones y recursos, dentro de un marco con su nombre, un selector de rol y el enlace a su código.
+3. **La demostración** (`/#/demo`): el ajuste de punta a punta, con una barra lateral por rol.
+4. **ValerIA**, con su propio espacio y un panel fijo que se abre desde cualquier pantalla.
 
-1. **El riel** (izquierda, siempre igual): el colectivo. Lleva a Kinesis, Wisfox y ValerIA. En
-   celular baja a una barra inferior.
-2. **La barra lateral de cada espacio:** lo propio de cada proyecto, tal como la tenía.
+Esquinas moderadas (14 px), filete fino y casi sin sombra. Sin degradados.
 
-Bajo la barra lateral, **la hoja**: contenido en tarjetas. Kinesis agrega su encabezado con
-degradado y el panel de cifras montado encima; Wisfox, su saludo con puntos y su órbita.
-
-**ValerIA tiene un lugar fijo:** su propio espacio y un panel que se abre desde el botón "Hablar con
-ValerIA" en cualquier pantalla. Hoy dice "Simulada"; al conectarse un modelo dirá "En vivo".
-
-## 8. Voz
+## 9. Voz
 
 Hablamos como una persona que te cuenta algo con respeto: claro, concreto, sin tecnicismos. Siempre de tú.
 
@@ -129,7 +128,7 @@ Hablamos como una persona que te cuenta algo con respeto: claro, concreto, sin t
 | "Hoy responde con textos de ejemplo." | Mencionar diagnósticos o etiquetas |
 | "Cuando la actividad esté lista te contaremos qué cambió y por qué." | Hablar de "casos" o "problemas" de un estudiante |
 
-## 9. Accesibilidad (reglas, no sugerencias)
+## 10. Accesibilidad (reglas, no sugerencias)
 
 - Contraste de texto de al menos 4,5:1 (3:1 en texto grande), en claro y en oscuro.
 - Controles de al menos 24 px de alto; los botones, de 44 px.
@@ -138,9 +137,9 @@ Hablamos como una persona que te cuenta algo con respeto: claro, concreto, sin t
 - Respeta "menos movimiento" y el tamaño de texto del sistema.
 - Se comprueba con `python herramientas/auditar.py` antes de cada publicación.
 
-## 10. Cómo agregar un espacio nuevo
+## 11. Cómo agregar un espacio nuevo
 
-1. En `css/tokens.css`, un bloque `[data-espacio="nuevo"]` con su paleta clara y oscura.
-2. Una vista en `js/vistas/` que use `espacio()` de `comun.js`.
-3. Una línea en la lista del riel, en `js/main.js`.
+1. Una vista en `js/vistas/` que use `espacio()` de `comun.js`, o un proyecto en `embed.js`.
+2. Una línea en la lista del riel, en `js/main.js`.
+3. Si tiene módulos, agregarlos al mapa en `js/vistas/mapa.js`.
 4. Pasar la auditoría.

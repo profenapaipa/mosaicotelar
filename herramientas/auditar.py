@@ -33,6 +33,7 @@ import subprocess
 import sys
 import tempfile
 import threading
+import time
 import urllib.request
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
@@ -82,8 +83,20 @@ def puerto_libre():
 
 
 class Silencioso(SimpleHTTPRequestHandler):
+    resultado = None  # lo llena el arnés al terminar
+
     def log_message(self, *args):  # sin ruido en la consola
         pass
+
+    def do_POST(self):
+        # El arnés entrega aquí su informe cuando termina.
+        if self.path == '/__resultado':
+            largo = int(self.headers.get('Content-Length', 0))
+            Silencioso.resultado = json.loads(self.rfile.read(largo).decode('utf-8'))
+            self.send_response(204)
+        else:
+            self.send_response(404)
+        self.end_headers()
 
 
 def servir():
@@ -94,15 +107,25 @@ def servir():
 
 
 def correr_arnes(navegador, puerto):
+    """Abre el arnés en Chrome y espera a que entregue su informe. Corre en tiempo real: la página incrusta
+    proyectos que cargan desde internet, y el modo de tiempo virtual de Chrome se detiene con eso."""
     perfil = tempfile.mkdtemp(prefix='mt_audit_')  # perfil limpio: sin extensiones ni caché
+    Silencioso.resultado = None
     url = f'http://127.0.0.1:{puerto}/herramientas/arnes.html'
-    cmd = [navegador, '--headless=new', '--disable-gpu', '--hide-scrollbars', f'--user-data-dir={perfil}',
-           '--virtual-time-budget=180000', '--dump-dom', url]
-    r = subprocess.run(cmd, capture_output=True, text=True, encoding='utf-8', errors='replace', timeout=240)
-    m = re.search(r'<pre id="resultado"[^>]*>(.*?)</pre>', r.stdout, re.S)
-    if not m or not m.group(1).strip():
-        raise RuntimeError('El arnés no devolvió resultados.\n' + r.stderr[-500:])
-    return json.loads(html.unescape(m.group(1)))
+    proc = subprocess.Popen([navegador, '--headless=new', '--disable-gpu', '--hide-scrollbars', f'--user-data-dir={perfil}', url],
+                            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    try:
+        limite = time.time() + 600
+        while Silencioso.resultado is None and time.time() < limite:
+            time.sleep(1)
+    finally:
+        if os.name == 'nt':
+            subprocess.run(['taskkill', '/F', '/T', '/PID', str(proc.pid)], capture_output=True)
+        else:
+            proc.terminate()
+    if Silencioso.resultado is None:
+        raise RuntimeError('El arnés no devolvió resultados en 10 minutos.')
+    return Silencioso.resultado
 
 
 def comprobar_enlaces():

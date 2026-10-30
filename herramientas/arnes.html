@@ -9,7 +9,7 @@
 <iframe id="f" style="border:0;display:block;background:#fff"></iframe>
 <pre id="resultado" style="position:fixed;top:0;left:0;max-width:100%;background:#fff;color:#000;font:11px monospace;white-space:pre-wrap"></pre>
 <script>
-const RUTAS = ['#/', '#/kinesis/docente', '#/kinesis/orientacion', '#/kinesis/familia', '#/wisfox/inicio', '#/wisfox/leccion', '#/wisfox/juego', '#/wisfox/logros', '#/valeria/chat', '#/valeria/conexion', '#/recorrido/camino', '#/recorrido/roles', '#/recorrido/datos', '#/estado', '#/identidad'];
+const RUTAS = ['#/', '#/mapa/conexiones', '#/mapa/comparar', '#/kinesis/docente', '#/kinesis/coordinacion', '#/wisfox', '#/demo/docente', '#/demo/orientacion', '#/demo/familia', '#/demo/coordinacion', '#/demo/estudiante', '#/valeria/chat', '#/valeria/conexion', '#/recorrido/camino', '#/recorrido/roles', '#/recorrido/datos', '#/estado', '#/identidad'];
 const ANCHOS = [390, 1280];
 const TEMAS = ['claro', 'oscuro'];
 const espera = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -94,6 +94,9 @@ function medirCaso(ruta, ancho, tema) {
   // Una tarjeta aplastada (un estilo en línea que gana al diseño de celular) no desborda, pero no se puede usar.
   const aplastadas = [...d.querySelectorAll('main .tarjeta, main .chat')].filter((x) => { const r = x.getBoundingClientRect(); return x.getClientRects().length && r.width < 150; });
   if (aplastadas.length) fallos.push(`${aplastadas.length} tarjetas aplastadas (menos de 150 px de ancho)`);
+  // La barra de navegación debe verse completa: en celular, todos sus íconos dentro de la pantalla.
+  const riel = [...d.querySelectorAll('.riel-items a')].filter((x) => { const r = x.getBoundingClientRect(); return r.width && (r.right > e.clientWidth + 1 || r.left < -1); });
+  if (riel.length) fallos.push(`${riel.length} íconos del riel quedan fuera de la pantalla`);
   const c = medirContraste();
   if (c.total) fallos.push(`${c.total} textos sin contraste suficiente: ` + c.malos.join(' ; '));
   return { ruta, ancho, tema, fallos, contraste: { medidos: c.medidos, omitidos: c.omitidos } };
@@ -111,13 +114,13 @@ async function flujo() {
   // Entrada por rol: lo primero que ve cualquier persona es "¿quién eres?" y de ahí sale todo.
   await cargar('#/', 1280); await espera(400);
   afirmar('el inicio pregunta quién eres', textoPagina().includes('¿Quién eres?'));
-  afirmar('hay una tarjeta por rol (4)', doc().querySelectorAll('.rol-tarjeta').length === 4);
+  afirmar('hay una tarjeta por rol (5)', doc().querySelectorAll('.rol-tarjeta').length === 5);
   await pulsar('Soy docente');
-  afirmar('elegir docente lleva a Kinesis docente', ventana().location.hash === '#/kinesis/docente');
+  afirmar('elegir docente lleva a la demostración del docente', ventana().location.hash === '#/demo/docente');
   afirmar('la franja dice con qué rol se mira', doc().getElementById('rol-actual').textContent.includes('Docente'));
-  afirmar('Kinesis conserva su cara: barra lateral, encabezado y panel de cifras', !!doc().querySelector('.lateral .lockup') && !!doc().querySelector('.hero') && !!doc().querySelector('.panel-cifras'));
-  afirmar('el riel de la plataforma lleva a los tres hilos', ['kinesis', 'wisfox', 'valeria'].every((id) => doc().querySelector(`.riel a[data-ruta="${id}"]`)));
-  await cargar('#/kinesis/docente', 1280); await espera(400);
+  afirmar('la demostración tiene barra lateral por rol, encabezado y panel de cifras', !!doc().querySelector('.lateral .lockup') && !!doc().querySelector('.hero') && !!doc().querySelector('.panel-cifras'));
+  afirmar('el riel de la plataforma lleva a los tres hilos', ['mapa', 'kinesis', 'wisfox', 'valeria', 'demo', 'recorrido'].every((id) => doc().querySelector(`.riel a[data-ruta="${id}"]`)));
+  await cargar('#/demo/docente', 1280); await espera(400);
   const sel = doc().querySelector('.roster button[aria-pressed="true"]');
   afirmar('Kinesis muestra a P-03 seleccionado', sel && sel.textContent.includes('P-03'));
   // Términos clínicos que nunca deben aparecer en una vista de docente o de familia.
@@ -125,15 +128,15 @@ async function flujo() {
   afirmar('el perfil muestra apoyos y no diagnóstico', textoPagina().includes('Apoyos que le sirven') && !CLINICOS.test(textoPagina()));
   await pulsar('Ajustar al perfil de P-03');
   afirmar('el ajuste queda pendiente de orientación', textoPagina().includes('Pendiente de orientación'));
-  await ir('#/kinesis/orientacion');
+  await ir('#/demo/orientacion');
   afirmar('orientación recibe el ajuste', !!hallar('Aprobar el ajuste'));
   await pulsar('Aprobar el ajuste');
   afirmar('el ajuste queda aprobado', textoPagina().includes('Aprobado a las'));
-  await ir('#/kinesis/familia');
+  await ir('#/demo/familia');
   afirmar('la familia ve la aprobación', textoPagina().includes('Orientación aprobó'));
   afirmar('la familia no ve diagnóstico', !CLINICOS.test(textoPagina()));
-  await ir('#/wisfox/leccion');
-  afirmar('Wisfox recibe la actividad a su medida', textoPagina().includes('Versión a tu medida'));
+  await ir('#/demo/estudiante');
+  afirmar('el estudiante recibe la actividad a su medida', textoPagina().includes('Versión a tu medida'));
   await pulsar('Marcar la lección');
   await pulsar('Empezar el quiz');
   for (let i = 0; i < 4; i++) {
@@ -141,12 +144,6 @@ async function flujo() {
     await pulsar(i < 3 ? 'Siguiente' : 'Ver resultado');
   }
   afirmar('el quiz termina con resultado', textoPagina().includes('Quiz terminado'));
-  await ir('#/wisfox/juego');
-  for (const w of ['She', 'eats', 'breakfast', 'at', 'seven']) { const b = [...doc().querySelectorAll('.fichas:not(.fichas--respuesta) .ficha')].find((x) => x.textContent === w); if (b) { b.click(); await espera(80); } }
-  await pulsar('Comprobar');
-  afirmar('el juego reconoce la frase correcta', textoPagina().includes('Ganaste 15 XP'));
-  await ir('#/wisfox/logros');
-  afirmar('Wisfox muestra logros ganados', /Conseguido/.test(textoPagina()));
   await ir('#/valeria/chat');
   doc().getElementById('btn-ia').click(); await espera(300); // el botón de la barra, no el enlace del menú
   const panel = doc().getElementById('slot-ia');
@@ -157,6 +154,28 @@ async function flujo() {
   afirmar('ValerIA dice que es una respuesta de ejemplo', /ejemplo|En vivo|respaldo/i.test(panel.innerText));
   panel.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); await espera(100);
   afirmar('Escape cierra el panel', panel.hidden);
+  // Coordinación: el quinto rol, con mínimo privilegio.
+  await ir('#/demo/coordinacion');
+  afirmar('coordinación ve cifras y no contenido clínico', textoPagina().includes('Mínimo privilegio') && !CLINICOS.test(textoPagina()));
+  // Mapa interactivo
+  await ir('#/mapa/conexiones');
+  await espera(300);
+  afirmar('el mapa muestra los módulos reales de los tres proyectos', doc().querySelectorAll('.modulo').length === 13);
+  afirmar('el mapa dibuja las flechas entre módulos', doc().querySelectorAll('.mapa-svg path[marker-end]').length === 12);
+  const mod = [...doc().querySelectorAll('.modulo')].find((b) => b.textContent.includes('Aprobación'));
+  mod.click(); await espera(200);
+  afirmar('tocar un módulo explica qué hace y qué recibe y entrega', /Quién lo usa/.test(textoPagina()) && /Recibe/.test(textoPagina()) && doc().querySelectorAll('.mapa-svg path.activa').length >= 2);
+  const chip = [...doc().querySelectorAll('.chip-rol')].find((b) => b.textContent === 'Estudiante'); chip.click(); await espera(200);
+  afirmar('elegir un rol atenúa lo que no le toca', doc().querySelectorAll('.modulo.atenuado').length > 5);
+  await ir('#/mapa/comparar');
+  afirmar('la comparación nombra a PIARPLUS y dice dónde vamos atrás', textoPagina().includes('PIARPLUS') && /vamos atrás/i.test(textoPagina()));
+  // Proyectos reales, incrustados
+  await ir('#/wisfox'); await espera(800);
+  const mw = doc().querySelector('iframe.embed-marco');
+  afirmar('Wisfox real se incrusta desde su propia dirección', !!mw && mw.getAttribute('src').includes('profenapaipa.github.io/wisfox'));
+  await ir('#/kinesis/docente'); await espera(500);
+  const mk = doc().querySelector('iframe.embed-marco');
+  afirmar('Kinesis real se incrusta con su propia dirección', !!mk && mk.getAttribute('src').includes('profenapaipa.github.io/Kinesis'));
   await ir('#/recorrido/camino');
   afirmar('el recorrido marca los seis pasos', textoPagina().includes('6 de 6 pasos'), textoPagina().match(/\d de 6 pasos/));
   await ir('#/recorrido/roles');
@@ -184,5 +203,7 @@ async function flujo() {
   } catch (e) { salida.fatal = (salida.fatal ? salida.fatal + ' | ' : '') + 'recorrido: ' + String(e && e.stack || e); }
   document.getElementById('resultado').textContent = JSON.stringify(salida);
   document.title = 'listo';
+  // auditar.py escucha en /__resultado: así no hace falta ninguna espera fija.
+  try { await fetch('/__resultado', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(salida) }); } catch (e) { /* abierto a mano, sin auditar.py */ }
 })();
 </script>

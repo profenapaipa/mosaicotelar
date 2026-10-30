@@ -7,20 +7,9 @@
 (function (MT) {
   'use strict';
   const { h } = MT.ui;
-  const { espacio, hero, panelCifras, hora } = MT.comun;
+  const { hero, panelCifras, hora } = MT.comun;
   const st = MT.store;
   const D = MT.datos;
-
-  const TABS = [
-    { id: 'docente', etiqueta: 'Docente', icono: 'docente' },
-    { id: 'orientacion', etiqueta: 'Orientación', icono: 'orientacion' },
-    { id: 'familia', etiqueta: 'Familia', icono: 'familia' },
-  ];
-  const USUARIOS = {
-    docente: { iniciales: 'DC', nombre: 'Docente', rol: 'Vista de demostración' },
-    orientacion: { iniciales: 'OR', nombre: 'Equipo de orientación', rol: 'Vista de demostración' },
-    familia: { iniciales: 'AC', nombre: 'Acudiente', rol: 'Vista de demostración' },
-  };
 
   const selloAjuste = (a) => ({
     ninguno: h('span', { class: 'sello sello--e' }, 'Sin ajuste'),
@@ -45,7 +34,7 @@
       ? { titulo: dua < 3 ? `Completa el DUA de “${s.plan.tema}”` : 'Ajusta la actividad al perfil', texto: dua < 3 ? `Tienes ${dua} de 3 principios escritos. Con el diseño universal completo, los ajustes individuales se reducen a lo que de verdad hace falta.` : 'Ya cubriste los tres principios. Ahora ajusta lo que el diseño universal no alcanza.', boton: { texto: 'Abrir la planeación', onclick: irA('planeacion') } }
       : aj.estado === 'propuesto' ? { titulo: 'Tu ajuste espera a orientación', texto: 'Mientras tanto puedes planear otra clase o pedirle ideas a ValerIA.', boton: { texto: 'Hablar con ValerIA', onclick: () => MT.ia.panel.abrir() } }
       : aj.estado === 'devuelto' ? { titulo: 'Orientación devolvió tu ajuste', texto: aj.nota || 'Revísalo y vuelve a enviarlo.', boton: { texto: 'Ver el ajuste', onclick: irA('estado-ajuste') } }
-      : { titulo: 'Tu ajuste ya llegó al estudiante', texto: 'Está aprobado y disponible en Wisfox.', boton: { texto: 'Verlo en Wisfox', onclick: () => { window.location.hash = '#/wisfox/leccion'; } } };
+      : { titulo: 'Tu ajuste ya llegó al estudiante', texto: 'Está aprobado y disponible en Wisfox.', boton: { texto: 'Verlo en Wisfox', onclick: () => { window.location.hash = '#/demo/estudiante'; } } };
 
     c.append(
       hero({ rol: 'Docente', titulo: 'Hola, docente', texto: 'Diseña tu clase una vez para todo el curso y deja los ajustes individuales para lo que el diseño universal no alcanza a cubrir.', siguiente }),
@@ -139,7 +128,7 @@
       ]));
 
     if (aj.estado === 'ninguno') {
-      c.append(h('div', { class: 'bloque vacio' }, h('p', null, 'No hay ajustes pendientes.'), h('a', { class: 'btn', href: '#/kinesis/docente' }, 'Ver cómo lo propone el docente')));
+      c.append(h('div', { class: 'bloque vacio' }, h('p', null, 'No hay ajustes pendientes.'), h('a', { class: 'btn', href: '#/demo/docente' }, 'Ver cómo lo propone el docente')));
       return;
     }
     const nota = h('textarea', { id: 'o-nota', maxlength: '200', 'aria-label': 'Nota para el docente (opcional)' }, aj.nota);
@@ -199,12 +188,36 @@
         h('p', { class: 'suave' }, 'Aquí nunca aparece un diagnóstico: solo lo que se hace en el aula para que aprenda a su manera.'))));
   }
 
-  MT.router.registrar({
-    id: 'kinesis', titulo: 'Kinesis', espacio: 'kinesis', subs: TABS,
-    render(main, { sub }) {
-      if (st.obtener().rol !== sub) st.cambiar((x) => { x.rol = sub; });
-      const c = espacio(main, { marca: 'kinesis', nombre: 'Kinesis', descripcion: 'PIAR · DUA · Aula', ruta: 'kinesis', tabs: TABS, sub, usuario: USUARIOS[sub] });
-      ({ docente, orientacion, familia })[sub](c);
-    },
-  });
+  /* Coordinación = el administrador de Kinesis. Administra la estructura (usuarios, cursos, periodos,
+     categorías de apoyo, vínculos con familias) y ve CUÁNTOS ajustes hay, nunca de quién ni qué dicen:
+     por mínimo privilegio no tiene acceso al diagnóstico ni al PIAR completo. */
+  function coordinacion(c) {
+    const aj = st.obtener().ajuste;
+    const cuenta = (e) => (aj.estado === e ? '1' : '0');
+    c.append(
+      hero({ rol: 'Coordinación', titulo: 'Hola, coordinación', texto: 'Deja la estructura del colegio lista: cursos, usuarios, periodos y vínculos con las familias. El contenido pedagógico es de docentes y orientación.',
+        siguiente: { titulo: 'Revisa que cada estudiante tenga curso y familia', texto: 'Mientras no tengan curso, ningún docente los ve en su lista ni puede planear para ellos.', boton: { texto: 'Abrir la administración real', onclick: () => { window.location.hash = '#/kinesis/coordinacion'; } } } }),
+      panelCifras([
+        { valor: String(D.estudiantes.length), etiqueta: 'Estudiantes', detalle: 'Matriculados' },
+        { valor: '1', etiqueta: 'Cursos', detalle: D.curso },
+        { valor: cuenta('propuesto'), etiqueta: 'Ajustes por revisar', detalle: 'Sin ver de quién' },
+        { valor: cuenta('aprobado'), etiqueta: 'Ajustes aprobados', detalle: 'Sin ver su contenido' },
+      ]));
+    c.append(h('div', { class: 'bloque rejilla rejilla--2' },
+      h('div', { class: 'tarjeta tarjeta--borde' },
+        h('p', { class: 'etiqueta' }, 'Gestión'), h('h2', null, 'Lo que coordinación administra'),
+        h('ul', { class: 'lista' }, [
+          ['Usuarios', 'Crear y editar docentes, orientación, familias y estudiantes.'],
+          ['Cursos y periodos', 'Armar los cursos y los periodos académicos, y asignar docentes.'],
+          ['Categorías de apoyo', 'Definir la lista de apoyos que usa el colegio.'],
+          ['Vínculos con familias', 'Conectar a cada acudiente con su estudiante.'],
+        ].map(([t, d]) => h('li', null, h('strong', null, t), h('br'), h('span', { class: 'suave' }, d)))),
+        h('div', { class: 'acciones' }, h('a', { class: 'btn', href: '#/kinesis/coordinacion' }, 'Abrir la administración real'))),
+      h('div', { class: 'tarjeta' },
+        h('p', { class: 'etiqueta' }, 'Lo que no ve'), h('h2', null, 'Mínimo privilegio'),
+        h('p', null, 'La administración no tiene acceso al diagnóstico ni al PIAR completo, y no existe un atajo de “el administrador ve todo”. Solo orientación tiene acceso institucional, porque es su función.'),
+        h('p', { class: 'suave' }, 'Por eso aquí ves cantidades, no contenidos: cuántos ajustes hay por revisar, no de quién ni qué dicen.'))));
+  }
+
+  MT.demoKinesis = { docente, orientacion, familia, coordinacion };
 })(window.MT = window.MT || {});

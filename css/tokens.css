@@ -1,120 +1,102 @@
 /* tokens.css: la identidad de Mosaico Telar, en un solo lugar.
 
-   Cómo se organiza (y por qué):
-   - Capa 1, la marca del colectivo: el riel, los tres colores de hilo y la tipografía.
-   - Capa 2, cada espacio conserva la paleta de su proyecto original. Kinesis es verde bosque y
-     oscuro por defecto; Wisfox es menta claro con ámbar; ValerIA, índigo. Así no se toca lo que ya
-     tenía identidad: se le pone un marco común encima.
-   - Los componentes solo leen variables genéricas (--papel, --superficie, --e-fuerte...). Un espacio
-     nuevo cambia variables, no componentes.
+   Principio: BLANCO Y NEGRO PRIMERO, COLOR DONDE HAGA FALTA.
+   La estructura, el logo, los íconos y casi todo el texto son tinta sobre papel. El color aparece
+   solo para dos cosas: acción (el color principal) e identificación de cada hilo.
 
-   Tres colores de hilo, que son los del logo: verde esmeralda (Kinesis, el aula), ámbar de zorro
-   (Wisfox, el estudiante) e índigo (ValerIA, la guía). El ámbar también es el color de avisos
-   y del PIAR en Kinesis. Nunca rojo: un PIAR no es un error. */
+   El color principal es el VERDE BOSQUE, y se eligió por continuidad: es el color de marca de
+   Kinesis (#1B7F56) y está en la misma familia que el verde de Wisfox (#3D9960 y #2E7D4F). Los dos
+   proyectos ya eran verdes, así que la plataforma no les cambia el tono: lo comparte.
+
+   Los dos colores secundarios también salen de las aplicaciones:
+   - Ámbar #E8A13C: el acento de Wisfox (y el zorro) y los avisos de Kinesis. Nunca rojo: un PIAR no es un error.
+   - Azul tinta #2B4FA3: el "Océano" que Kinesis ofrece en su menú de apariencia (#1D6FB8), llevado un
+     paso más oscuro. Identifica a ValerIA. El océano original se confundía con el verde en tritanopía
+     (ΔE 3,5); este pasa (ΔE 8,7) y da 7,6:1 de contraste con blanco.
+
+   Se validaron juntos con la herramienta de paletas (docs/PALETA.md, herramientas/paleta.py):
+   separación para daltonismo, contraste del texto y luminosidad. Un terracota, que parecía más cálido,
+   se descartó porque con este verde es indistinguible para protanopía (ΔE 1). */
 
 :root {
-  /* Marca del colectivo */
-  --hilo-kinesis: #1B7F56;   /* verde bosque de Kinesis */
-  --hilo-wisfox: #E8A13C;    /* ámbar de Wisfox y de los avisos de Kinesis */
-  --hilo-valeria: #6B4FC8;   /* "Uva" de los colores de Kinesis */
-  --hilo: #E4DAC6;  --hilo-sombra: #CFC3AB;          /* los hilos neutros del telar */
-  --logo-1: #1B7F56;  --logo-2: #E8A13C;  --logo-3: #6B4FC8;   /* versión del logo para fondo claro */
-  --trama-fondo: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28'%3E%3Crect x='3' width='6' height='28' fill='%231B7F56' fill-opacity='.2'/%3E%3Crect x='11' width='6' height='28' fill='%23E8A13C' fill-opacity='.2'/%3E%3Crect x='19' width='6' height='28' fill='%236B4FC8' fill-opacity='.2'/%3E%3Crect y='6' width='28' height='4' fill='%23E4DAC6'/%3E%3Crect y='18' width='28' height='4' fill='%23E4DAC6'/%3E%3C/svg%3E");   /* patrón de trama: tres hilos y dos pasadas */
-  --logo-fondo: #FAF6EF;   /* color detrás del logo: la "costura" se pinta de este color */
+  /* Monocromo */
+  --tinta: #1A1714;
+  --tinta-suave: #57514A;
+  --papel: #FFFFFF;
+  --lino: #F6F2EA;
+  --hundido: #EFE9DD;
+  --linea: #E3DDD0;
+  --linea-fuerte: #1A1714;
+
+  /* Color principal: verde bosque */
+  --verde: #1B7F56;
+  --verde-texto: #166A47;   /* el mismo verde, un paso más profundo, para texto sobre lino (5,9:1) */
+  --verde-suave: #E3F1EA;
+  --sobre-verde: #FFFFFF;
+
+  /* Funcionales: solo para identificar un hilo o dar un aviso */
+  --ambar: #E8A13C;  --ambar-texto: #7A4E0E;  --ambar-suave: #FBEFD8;
+  --azul: #2B4FA3;  --azul-suave: #E6ECF8;
+  --ok-texto: #1D4A35;  --ok-suave: #E3F1EA;
+
+  --hilo-kinesis: var(--verde);
+  --hilo-wisfox: var(--ambar);
+  --hilo-valeria: var(--azul);
+
   --riel-ancho: 84px;
-  --riel-bg: #1A1726;  --riel-texto: #CFC8DD;  --riel-fuerte: #FFFFFF;  --riel-linea: #2E2A40;
+  --riel-bg: #1A1714;  --riel-texto: #D8D2C6;  --riel-fuerte: #FFFFFF;
+  --panel: #1A1714;  --sobre-panel: #F6F2EA;  --sobre-panel-suave: #CFC8BA;
+  --foco: #1B7F56;
 
-  --papel: #FAF6EF;  --superficie: #FFFFFF;  --hundido: #F2EBDD;
-  --tinta: #23202E;  --tinta-suave: #54505F;  --linea: #E2DACB;
-  --aviso: #E8A13C;  --aviso-texto: #7A4E0E;  --aviso-suave: #FBEFD8;
-  --ok-texto: #1D4A35;  --ok-suave: #E0F0E7;
-  --sobre-fuerte: #FFFFFF;
-  --panel: #23202E;  --sobre-panel: #F1ECE2;  --sobre-panel-suave: #C9C2D6;
-  --foco: #C98A2B;
-
-  --radio: 20px;  --radio-chico: 12px;
-  --sombra: 0 6px 22px rgba(35, 32, 46, .09);
+  --radio: 14px;  --radio-chico: 10px;
+  --sombra: 0 1px 2px rgba(26, 23, 20, .06), 0 6px 20px rgba(26, 23, 20, .06);
   --fuente: "Nunito", system-ui, "Segoe UI", Roboto, sans-serif;
+  --fuente-titulo: "Newsreader", Georgia, "Times New Roman", serif;
 
-  /* Paletas de cada espacio, claro. */
-  --k-papel: #EDF4EF;  --k-superficie: #FFFFFF;  --k-hundido: #E1ECE5;  --k-linea: #D2E2D8;  --k-tinta: #0D1F16;  --k-suave: #46604F;
-  --k-vivo: #1B7F56;  --k-fuerte: #1B7F56;  --k-texto: #166A47;  --k-tinte: #DDEFE5;  --k-sobre: #FFFFFF;
-  --k-hero-a: #0A3F2C;  --k-hero-b: #0F7A52;  --k-hero-c: #4FB07A;
+  /* El logo es monocromo por defecto; la versión a color se pide con la clase .logo--color */
+  --logo-1: currentColor;  --logo-2: currentColor;  --logo-3: currentColor;
+  --logo-fondo: #FFFFFF;
 
-  --w-papel: #F6F8F4;  --w-superficie: #FFFFFF;  --w-hundido: #E8F3EC;  --w-linea: #E1EAE4;  --w-tinta: #26352B;  --w-suave: #56665B;
-  --w-vivo: #3D9960;  --w-fuerte: #2E7D4F;  --w-texto: #2A7348;  --w-tinte: #E8F3EC;  --w-sobre: #FFFFFF;
-  --w-acento: #E8A13C;  --w-acento-texto: #8A5A12;  --w-acento-suave: #FDF0DC;
+  /* Alias que usan los componentes: el acento de interfaz es siempre el verde */
+  --e-vivo: var(--verde);  --e-fuerte: var(--verde);  --e-texto: var(--verde-texto);  --e-suave: var(--verde-suave);
+  --sobre-fuerte: var(--sobre-verde);
 
-  --v-papel: #F6F4FC;  --v-superficie: #FFFFFF;  --v-hundido: #ECE7FA;  --v-linea: #DDD5F3;  --v-tinta: #1E1838;  --v-suave: #5A5280;
-  --v-vivo: #6B4FC8;  --v-fuerte: #6B4FC8;  --v-texto: #5B3FB8;  --v-tinte: #ECE7FA;  --v-sobre: #FFFFFF;
-
-  /* Espacio activo. Por defecto, la marca del colectivo: el verde que comparten Kinesis y Wisfox. */
-  --e-vivo: #1B7F56;  --e-fuerte: #1B7F56;  --e-texto: #166A47;  --e-suave: #DDEFE5;
+  --trama-fondo: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Crect x='3' width='4' height='24' fill='%231A1714' fill-opacity='.07'/%3E%3Crect x='11' width='4' height='24' fill='%231A1714' fill-opacity='.07'/%3E%3Crect x='19' width='4' height='24' fill='%231A1714' fill-opacity='.07'/%3E%3Crect y='5' width='24' height='3' fill='%231A1714' fill-opacity='.05'/%3E%3Crect y='15' width='24' height='3' fill='%231A1714' fill-opacity='.05'/%3E%3C/svg%3E");
 }
 
-[data-espacio="kinesis"] {
-  --papel: var(--k-papel);  --superficie: var(--k-superficie);  --hundido: var(--k-hundido);  --linea: var(--k-linea);
-  --tinta: var(--k-tinta);  --tinta-suave: var(--k-suave);
-  --e-vivo: var(--k-vivo);  --e-fuerte: var(--k-fuerte);  --e-texto: var(--k-texto);  --e-suave: var(--k-tinte);  --sobre-fuerte: var(--k-sobre);
-}
-[data-espacio="wisfox"] {
-  --papel: var(--w-papel);  --superficie: var(--w-superficie);  --hundido: var(--w-hundido);  --linea: var(--w-linea);
-  --tinta: var(--w-tinta);  --tinta-suave: var(--w-suave);
-  --e-vivo: var(--w-vivo);  --e-fuerte: var(--w-fuerte);  --e-texto: var(--w-texto);  --e-suave: var(--w-tinte);  --sobre-fuerte: var(--w-sobre);
-  --aviso: var(--w-acento);  --aviso-texto: var(--w-acento-texto);  --aviso-suave: var(--w-acento-suave);
-}
-[data-espacio="valeria"] {
-  --papel: var(--v-papel);  --superficie: var(--v-superficie);  --hundido: var(--v-hundido);  --linea: var(--v-linea);
-  --tinta: var(--v-tinta);  --tinta-suave: var(--v-suave);
-  --e-vivo: var(--v-vivo);  --e-fuerte: var(--v-fuerte);  --e-texto: var(--v-texto);  --e-suave: var(--v-tinte);  --sobre-fuerte: var(--v-sobre);
-}
+/* Un espacio solo cambia el color de su "hilo" (puntos, marcas, bordes finos), nunca el de la acción. */
+[data-espacio="kinesis"] { --e-vivo: var(--hilo-kinesis); }
+[data-espacio="wisfox"] { --e-vivo: var(--hilo-wisfox); }
+[data-espacio="valeria"] { --e-vivo: var(--hilo-valeria); }
 
-/* Tema oscuro: por preferencia del sistema, salvo que la persona fuerce el claro.
-   Kinesis ya era oscuro por defecto; Wisfox y ValerIA tienen su versión oscura. */
+/* Tema oscuro: tinta invertida. El verde, el ámbar y el océano suben de luminosidad para mantener contraste. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-tema="claro"]) {
-    --papel: #17151F;  --superficie: #211E2B;  --hundido: #1D1A26;
-    --tinta: #F1ECE2;  --tinta-suave: #B9B3C6;  --linea: #342F42;
-    --aviso-texto: #E8B968;  --aviso-suave: #3A2D16;
-    --ok-texto: #A8DCC1;  --ok-suave: #1B3228;
-    --sobre-fuerte: #14121B;
-    --panel: #0F0D15;
-    --hilo: #3A3548;  --hilo-sombra: #2C2838;
-    --trama-fondo: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28'%3E%3Crect x='3' width='6' height='28' fill='%231B7F56' fill-opacity='.35'/%3E%3Crect x='11' width='6' height='28' fill='%23E8A13C' fill-opacity='.35'/%3E%3Crect x='19' width='6' height='28' fill='%236B4FC8' fill-opacity='.35'/%3E%3Crect y='6' width='28' height='4' fill='%233A3548'/%3E%3Crect y='18' width='28' height='4' fill='%233A3548'/%3E%3C/svg%3E");
-    --logo-1: #6FD08C;  --logo-2: #F0B85A;  --logo-3: #B9A6FF;
-    --sombra: 0 6px 22px rgba(0, 0, 0, .35);
-
-    --k-papel: #07130E;  --k-superficie: #101E17;  --k-hundido: #0B1812;  --k-linea: #1F362B;  --k-tinta: #E7F3EB;  --k-suave: #A5BBAD;
-    --k-vivo: #6FD08C;  --k-fuerte: #6FD08C;  --k-texto: #6FD08C;  --k-tinte: #143024;  --k-sobre: #05231A;
-    --w-papel: #0F1612;  --w-superficie: #17211B;  --w-hundido: #1C2A21;  --w-linea: #2B3B31;  --w-tinta: #E8F1EA;  --w-suave: #A9BBAE;
-    --w-vivo: #5CC184;  --w-fuerte: #5CC184;  --w-texto: #7BD39B;  --w-tinte: #1E3328;  --w-sobre: #07130C;
-    --w-acento-texto: #F0BE6C;  --w-acento-suave: #382B14;
-    --v-papel: #120F20;  --v-superficie: #1B1730;  --v-hundido: #16122A;  --v-linea: #302A52;  --v-tinta: #EEEAFB;  --v-suave: #B8B0D8;
-    --v-vivo: #B9A6FF;  --v-fuerte: #B9A6FF;  --v-texto: #B9A6FF;  --v-tinte: #2B2450;  --v-sobre: #1B1238;
-    --e-vivo: #6FD08C;  --e-fuerte: #6FD08C;  --e-texto: #6FD08C;  --e-suave: #143024;
+    --tinta: #F4F0E8;  --tinta-suave: #BDB6A8;  --papel: #141210;  --lino: #1B1814;  --hundido: #221E19;  --linea: #3A342C;  --linea-fuerte: #F4F0E8;
+    --verde: #5CC08A;  --verde-texto: #5CC08A;  --verde-suave: #173326;  --sobre-verde: #08140E;
+    --ambar-texto: #F0BE6C;  --ambar-suave: #382B14;
+    --azul: #6F8FE8;  --azul-suave: #1B2442;
+    --ok-texto: #A8DCC1;  --ok-suave: #173326;
+    --riel-bg: #0C0B09;  --panel: #0C0B09;
+    --logo-fondo: #141210;
+    --sombra: 0 1px 2px rgba(0, 0, 0, .4), 0 6px 20px rgba(0, 0, 0, .3);
+    --trama-fondo: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Crect x='3' width='4' height='24' fill='%23F4F0E8' fill-opacity='.06'/%3E%3Crect x='11' width='4' height='24' fill='%23F4F0E8' fill-opacity='.06'/%3E%3Crect x='19' width='4' height='24' fill='%23F4F0E8' fill-opacity='.06'/%3E%3Crect y='5' width='24' height='3' fill='%23F4F0E8' fill-opacity='.04'/%3E%3Crect y='15' width='24' height='3' fill='%23F4F0E8' fill-opacity='.04'/%3E%3C/svg%3E");
   }
 }
 :root[data-tema="oscuro"] {
-  --papel: #17151F;  --superficie: #211E2B;  --hundido: #1D1A26;
-  --tinta: #F1ECE2;  --tinta-suave: #B9B3C6;  --linea: #342F42;
-  --aviso-texto: #E8B968;  --aviso-suave: #3A2D16;
-  --ok-texto: #A8DCC1;  --ok-suave: #1B3228;
-  --sobre-fuerte: #14121B;
-  --panel: #0F0D15;
-  --hilo: #3A3548;  --hilo-sombra: #2C2838;
-  --trama-fondo: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28'%3E%3Crect x='3' width='6' height='28' fill='%231B7F56' fill-opacity='.35'/%3E%3Crect x='11' width='6' height='28' fill='%23E8A13C' fill-opacity='.35'/%3E%3Crect x='19' width='6' height='28' fill='%236B4FC8' fill-opacity='.35'/%3E%3Crect y='6' width='28' height='4' fill='%233A3548'/%3E%3Crect y='18' width='28' height='4' fill='%233A3548'/%3E%3C/svg%3E");
-  --logo-1: #6FD08C;  --logo-2: #F0B85A;  --logo-3: #B9A6FF;
-  --sombra: 0 6px 22px rgba(0, 0, 0, .35);
-
-  --k-papel: #07130E;  --k-superficie: #101E17;  --k-hundido: #0B1812;  --k-linea: #1F362B;  --k-tinta: #E7F3EB;  --k-suave: #A5BBAD;
-  --k-vivo: #6FD08C;  --k-fuerte: #6FD08C;  --k-texto: #6FD08C;  --k-tinte: #143024;  --k-sobre: #05231A;
-  --w-papel: #0F1612;  --w-superficie: #17211B;  --w-hundido: #1C2A21;  --w-linea: #2B3B31;  --w-tinta: #E8F1EA;  --w-suave: #A9BBAE;
-  --w-vivo: #5CC184;  --w-fuerte: #5CC184;  --w-texto: #7BD39B;  --w-tinte: #1E3328;  --w-sobre: #07130C;
-  --w-acento-texto: #F0BE6C;  --w-acento-suave: #382B14;
-  --v-papel: #120F20;  --v-superficie: #1B1730;  --v-hundido: #16122A;  --v-linea: #302A52;  --v-tinta: #EEEAFB;  --v-suave: #B8B0D8;
-  --v-vivo: #B9A6FF;  --v-fuerte: #B9A6FF;  --v-texto: #B9A6FF;  --v-tinte: #2B2450;  --v-sobre: #1B1238;
-  --e-vivo: #6FD08C;  --e-fuerte: #6FD08C;  --e-texto: #6FD08C;  --e-suave: #143024;
+  --tinta: #F4F0E8;  --tinta-suave: #BDB6A8;  --papel: #141210;  --lino: #1B1814;  --hundido: #221E19;  --linea: #3A342C;  --linea-fuerte: #F4F0E8;
+  --verde: #5CC08A;  --verde-texto: #5CC08A;  --verde-suave: #173326;  --sobre-verde: #08140E;
+  --ambar-texto: #F0BE6C;  --ambar-suave: #382B14;
+  --azul: #6F8FE8;  --azul-suave: #1B2442;
+  --ok-texto: #A8DCC1;  --ok-suave: #173326;
+  --riel-bg: #0C0B09;  --panel: #0C0B09;
+  --logo-fondo: #141210;
+  --sombra: 0 1px 2px rgba(0, 0, 0, .4), 0 6px 20px rgba(0, 0, 0, .3);
+  --trama-fondo: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Crect x='3' width='4' height='24' fill='%23F4F0E8' fill-opacity='.06'/%3E%3Crect x='11' width='4' height='24' fill='%23F4F0E8' fill-opacity='.06'/%3E%3Crect x='19' width='4' height='24' fill='%23F4F0E8' fill-opacity='.06'/%3E%3Crect y='5' width='24' height='3' fill='%23F4F0E8' fill-opacity='.04'/%3E%3Crect y='15' width='24' height='3' fill='%23F4F0E8' fill-opacity='.04'/%3E%3C/svg%3E");
 }
 
-/* Texto grande: sube la base al 112,5 %, como en Kinesis. Todo está en rem. */
+/* Texto grande: sube la base al 112,5 %. Todo está en rem. */
 html[data-texto="grande"] { font-size: 112.5%; }
+
+/* Logo a color: los tres hilos con los colores de los tres proyectos. */
+.logo--color { --logo-1: var(--hilo-kinesis); --logo-2: var(--hilo-wisfox); --logo-3: var(--hilo-valeria); }
