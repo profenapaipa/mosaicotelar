@@ -164,6 +164,13 @@
     cont.querySelector('[data-hilo="valeria"]').style.alignSelf = 'center';
 
     const leyenda = h('div', { class: 'mapa-leyenda' }, Object.entries(ESTADOS).map(([k, [t]]) => h('span', null, h('i', { class: 'punto punto--' + k }), t)));
+    c.append(h('div', { class: 'tarjeta tarjeta--plana', style: 'margin-bottom:1rem' }, h('h2', null, 'Cómo leer este mapa'),
+      h('ol', { class: 'como-leer' },
+        h('li', null, h('strong', null, 'Tres columnas, tres portales. '), 'Kinesis (el aula), ValerIA (la guía) y Wisfox (el estudiante) trabajan en paralelo. Cada recuadro es una función.'),
+        h('li', null, h('strong', null, 'Las flechas son trabajo que pasa de una función a otra. '), 'Por ejemplo: el docente ajusta (Ajustes) y eso viaja a Aprobación; al aprobarse, viaja a la Familia y a las Rutas del estudiante.'),
+        h('li', null, h('strong', null, 'Toca un recuadro '), 'para ver qué hace, quién lo usa y qué recibe y entrega, y ábrelo en la plataforma.'),
+        h('li', null, h('strong', null, 'Elige un rol arriba '), 'y se atenúa lo que no usa: es la manera más rápida de ver tu parte.')),
+      h('p', { class: 'suave' }, '¿Prefieres una lista paso a paso? Mira ', h('a', { href: '#/portales' }, 'los tres portales en paralelo'), ' o tu ', h('a', { href: '#/guia' }, 'guía de inicio rápido'), '.')));
     c.append(chips, cont, leyenda, detalle);
     pintarDetalle();
     requestAnimationFrame(dibujar);

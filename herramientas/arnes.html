@@ -10,7 +10,7 @@
 <pre id="resultado" style="position:fixed;top:0;left:0;max-width:100%;background:#fff;color:#000;font:11px monospace;white-space:pre-wrap"></pre>
 <script>
 const SECC = { docente: ['resumen', 'estudiantes', 'actividades', 'ajustes', 'notas', 'archivos'], orientacion: ['resumen', 'ajustes', 'estudiantes', 'notas', 'archivos'], familia: ['resumen', 'archivos'], coordinacion: ['resumen', 'estudiantes', 'cursos', 'categorias'], estudiante: ['resumen', 'ruta', 'logros', 'archivos'] };
-const RUTAS = [[null, '#/'], [null, '#/mi'], [null, '#/mapa/conexiones'], [null, '#/mapa/comparar'], [null, '#/valeria/chat'], [null, '#/valeria/conexion'], [null, '#/recorrido/camino'], [null, '#/recorrido/roles'], [null, '#/recorrido/datos'], [null, '#/hoja'], [null, '#/piloto'], [null, '#/identidad'],
+const RUTAS = [[null, '#/'], [null, '#/mi'], [null, '#/mapa/conexiones'], [null, '#/mapa/comparar'], [null, '#/valeria/chat'], [null, '#/valeria/conexion'], [null, '#/recorrido/camino'], [null, '#/recorrido/roles'], [null, '#/recorrido/datos'], [null, '#/portales'], [null, '#/guia/docente'], [null, '#/guia/estudiante'], [null, '#/hoja/propuesta'], [null, '#/hoja/arquitectura'], [null, '#/hoja/etapas'], [null, '#/piloto'], [null, '#/identidad'],
   ...Object.entries(SECC).flatMap(([rol, l]) => l.map((x) => [rol, '#/mi/' + x]))];
 const ANCHOS = [390, 1280];
 const TEMAS = ['claro', 'oscuro'];
@@ -133,10 +133,25 @@ async function flujo() {
   await cargar('#/', 1280); await espera(400);
   afirmar('el inicio pregunta quién eres', textoPagina().includes('¿Quién eres?'));
   afirmar('hay una tarjeta por rol (5)', doc().querySelectorAll('.rol-tarjeta').length === 5);
-  afirmar('el riel lleva a mi espacio, mapa, ValerIA y roles', ['mi', 'mapa', 'valeria', 'recorrido', 'hoja', 'identidad'].every((id) => doc().querySelector(`.riel a[data-ruta="${id}"]`)));
+  afirmar('el riel lleva a mi espacio, mapa, ValerIA y roles', ['mi', 'portales', 'mapa', 'valeria', 'recorrido', 'hoja', 'identidad'].every((id) => doc().querySelector(`.riel a[data-ruta="${id}"]`)));
   await pulsar('Soy docente');
-  afirmar('elegir docente lleva a su espacio', ventana().location.hash === '#/mi');
+  afirmar('elegir docente lleva a su guía de inicio rápido', ventana().location.hash === '#/guia/docente');
   afirmar('la franja dice con qué rol se mira', doc().getElementById('rol-actual').textContent.includes('Docente'));
+  afirmar('la guía tiene pasos, cada uno con su portal', doc().querySelectorAll('.guia-paso').length === 5 && /en kinesis/i.test(textoPagina()) && /en valeria/i.test(textoPagina()) && /en wisfox/i.test(textoPagina()));
+  // Los portales se abren en otra pestaña: se intercepta window.open para comprobar a dónde irían.
+  const abiertas = []; ventana().open = (u) => { abiertas.push(u); return null; };
+  await pulsar('Abrir Kinesis'); await pulsar('Abrir Wisfox');
+  afirmar('Abrir Kinesis y Abrir Wisfox llevan a sus direcciones públicas', abiertas.length >= 2 && abiertas[0] === ventana().MT.config.portales.kinesis && abiertas[1] === ventana().MT.config.portales.wisfox, abiertas.join(' '));
+  await pulsar('Hablar con ValerIA');
+  afirmar('Hablar con ValerIA abre su panel dentro de la plataforma', !doc().getElementById('slot-ia').hidden);
+  doc().getElementById('slot-ia').dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); await espera(100);
+  await pulsar('Trabajar en Mi espacio');
+  afirmar('Trabajar en Mi espacio lleva al espacio del rol', ventana().location.hash === '#/mi/resumen');
+  await ir('#/guia/estudiante'); ventana().MT.router.recargar();
+  afirmar('la guía del estudiante apunta a Wisfox como portal principal', /Tu portal principal es Wisfox/.test(textoPagina()));
+  await ir('#/portales');
+  afirmar('los tres portales se muestran en paralelo con su flujo', doc().querySelectorAll('.portal').length === 3 && doc().querySelectorAll('.carril-paso').length === 9);
+  await comoRol('docente', '#/mi');
   afirmar('el espacio tiene barra lateral, encabezado y cifras', !!doc().querySelector('.lateral .lockup') && !!doc().querySelector('.hero') && !!doc().querySelector('.panel-cifras'));
 
   try { traza.push('paso 2: ' + ventana().MT.db.lista('actividades').length + '/' + (localStorage.getItem('mosaicotelar.v2') || '').length); } catch (e) { /* aún sin app */ }
@@ -285,6 +300,7 @@ async function flujo() {
   try { traza.push('paso 12: ' + ventana().MT.db.lista('actividades').length + '/' + (localStorage.getItem('mosaicotelar.v2') || '').length); } catch (e) { /* aún sin app */ }
   // 12. Mapa y páginas del colectivo
   await ir('#/mapa/conexiones'); await espera(300);
+  afirmar('el mapa explica cómo se lee', /Cómo leer este mapa/.test(textoPagina()));
   afirmar('el mapa muestra los 13 módulos', doc().querySelectorAll('.modulo').length === 13);
   afirmar('el mapa dibuja las 12 flechas', doc().querySelectorAll('.mapa-svg path[marker-end]').length === 12);
   [...doc().querySelectorAll('.modulo')].find((b) => b.textContent.includes('Aprobación')).click(); await espera(200);
@@ -301,13 +317,14 @@ async function flujo() {
   afirmar('el flujo de datos muestra lo que nunca sale de su lugar', textoPagina().includes('Nunca sale de su lugar'));
   await ir('#/piloto');
   afirmar('la página de piloto explica las fases', /Requisitos de protección de datos/.test(textoPagina()));
-  await ir('#/hoja');
+  await ir('#/hoja/propuesta');
+  afirmar('la hoja de ruta trae objetivo, riesgos y qué necesitamos', /objetivo/i.test(textoPagina()) && /riesgos/i.test(textoPagina()) && /qué necesitamos/i.test(textoPagina()));
   afirmar('el foco llega al título al cambiar de pantalla', doc().activeElement && doc().activeElement.tagName === 'H1');
 
   try { traza.push('paso 13: ' + ventana().MT.db.lista('actividades').length + '/' + (localStorage.getItem('mosaicotelar.v2') || '').length); } catch (e) { /* aún sin app */ }
   // 13. Nada de código ni de repositorio a la vista, en ninguna pantalla
   let enlacesRepo = 0; let textoCodigo = 0;
-  for (const r of ['#/', '#/mi', '#/mapa/conexiones', '#/mapa/comparar', '#/recorrido/roles', '#/valeria/conexion', '#/hoja', '#/piloto', '#/identidad']) {
+  for (const r of ['#/', '#/mi', '#/portales', '#/guia/docente', '#/hoja/propuesta', '#/hoja/arquitectura', '#/mapa/conexiones', '#/mapa/comparar', '#/recorrido/roles', '#/valeria/conexion', '#/hoja', '#/piloto', '#/identidad']) {
     await ir(r); await espera(150);
     enlacesRepo += doc().querySelectorAll('a[href*="github.com"], a[href*="githubusercontent"], iframe').length;
     if (/\bGitHub\b|repositorio|código fuente|Código público/i.test(doc().body.innerText)) textoCodigo += 1;

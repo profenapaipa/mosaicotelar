@@ -283,3 +283,35 @@ input[type="file"] { width: 100%; font: 400 1rem var(--fuente); color: var(--tin
 .pasos-piloto li { border-left: 4px solid var(--tinta); padding: .2rem 0 .2rem 1rem; }
 .pasos-piloto p { margin: 0; }
 @media (max-width: 860px) { .dialogo__cuerpo { max-height: calc(100vh - 14rem); } }
+
+/* ---- Portales en paralelo, carriles y guía de inicio rápido ---- */
+.portal { border-top: 5px solid var(--e-vivo); display: flex; flex-direction: column; gap: .3rem; }
+.portal h2 { font-size: 1.5rem; margin: 0; }
+.portal ul { margin: 0 0 .6rem; padding-left: 1.2rem; }
+.portal .sello { align-self: flex-start; }
+.portal__entrega { font-weight: 700; border-left: 4px solid var(--e-vivo); padding-left: .7rem; margin: .4rem 0; }
+.portal .acciones { margin-top: auto; padding-top: .6rem; }
+.carriles-cab, .carril-paso { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .8rem; }
+.carriles-cab > div { display: flex; align-items: center; gap: .6rem; justify-content: center; padding: .6rem; border-bottom: 4px solid var(--e-vivo); font-size: 1.1rem; }
+.carril-marca { width: 30px; height: 30px; color: var(--tinta); }
+.carriles { list-style: none; padding: 0; margin: 0; display: grid; gap: .6rem; padding-top: .8rem; }
+.carril-celda { min-height: 1px; position: relative; }
+.carril-celda::before { content: ""; position: absolute; left: 50%; top: -.6rem; bottom: -.6rem; width: 2px; background: var(--linea); transform: translateX(-1px); }
+.carril-celda--activa { background: var(--papel); border: 1px solid var(--linea); border-left: 5px solid var(--e-vivo); border-radius: var(--radio-chico); padding: .7rem .9rem .8rem 3rem; z-index: 1; }
+.carril-celda--activa::before { display: none; }
+.carril-celda--activa p { margin: 0; }
+.carril-n { position: absolute; left: .7rem; top: .7rem; width: 1.8rem; height: 1.8rem; border-radius: 50%; background: var(--tinta); color: var(--papel); display: grid; place-items: center; font: 800 .9rem var(--fuente); }
+.guia-pasos { list-style: none; padding: 0; margin: 1rem 0; display: grid; gap: .8rem; }
+.guia-paso { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 1rem; align-items: center; border-left: 6px solid var(--e-vivo); }
+.guia-paso .n { width: 2.2rem; height: 2.2rem; border-radius: 50%; background: var(--tinta); color: var(--papel); display: grid; place-items: center; font: 800 1rem var(--fuente); }
+.guia-paso h3 { margin: 0 0 .2rem; }
+.guia-paso p { margin: 0; }
+.guia-paso .acciones { margin: 0; justify-content: flex-end; }
+.como-leer { padding-left: 1.2rem; display: grid; gap: .4rem; }
+@media (max-width: 860px) {
+  .carriles-cab { display: none; }
+  .carril-paso { grid-template-columns: 1fr; }
+  .carril-celda:not(.carril-celda--activa) { display: none; }
+  .guia-paso { grid-template-columns: auto minmax(0, 1fr); }
+  .guia-paso .acciones { grid-column: 1 / -1; justify-content: flex-start; }
+}

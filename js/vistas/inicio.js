@@ -13,7 +13,7 @@
     return h('article', { class: 'tarjeta rol-tarjeta' },
       h('span', { class: 'rol-icono' }, MT.ui.icono(r.icono)),
       h('h3', null, r.nombre), h('p', { class: 'rol-lema' }, r.lema),
-      h('button', { class: 'btn', type: 'button', onclick: () => { st.cambiar((s) => { s.rol = r.id; }); location.hash = '#/mi'; } }, r.boton));
+      h('button', { class: 'btn', type: 'button', onclick: () => { st.cambiar((s) => { s.rol = r.id; }); location.hash = '#/guia/' + r.id; } }, r.boton));
   }
 
   function componente(id, nombre, rotulo, texto) {
@@ -44,14 +44,14 @@
         const r = MT.roles.por(s.rol);
         c.append(h('section', { class: 'siguiente-banner', 'aria-label': 'Continuar' },
           h('div', null, h('p', { class: 'etiqueta' }, 'Estás como ' + r.nombre.toLowerCase()), h('h2', null, 'Continúa donde lo dejaste')),
-          h('a', { class: 'btn', href: '#/mi' }, 'Ir a mi espacio')));
+          h('a', { class: 'btn', href: '#/guia' }, 'Ver mi guía de inicio')));
       }
 
       c.append(h('section', { class: 'seccion', id: 'roles', 'aria-labelledby': 'h-roles' },
         h('h2', { id: 'h-roles' }, '¿Quién eres? Empieza por aquí'),
-        h('p', { class: 'bajada' }, 'Elige tu rol y entras a tu espacio. Cada persona ve solo lo que necesita, y puedes cambiar de rol cuando quieras para ver el camino completo.'),
+        h('p', { class: 'bajada' }, 'Elige tu rol y te mostramos por dónde empezar: qué portal te toca, en qué orden y qué hace cada uno. Puedes cambiar de rol cuando quieras.'),
         h('div', { class: 'rejilla rejilla--5' }, MT.roles.lista.map(tarjetaRol)),
-        h('p', { class: 'suave', style: 'margin-top:1rem' }, 'Si solo quieres conocerla, ', h('a', { href: '#/mapa/conexiones' }, 'empieza por el mapa'), ' o ', h('a', { href: '#/recorrido/roles' }, 'mira qué ve cada rol'), '.')));
+        h('p', { class: 'suave', style: 'margin-top:1rem' }, 'Si solo quieres conocerla, ', h('a', { href: '#/portales' }, 'mira los tres portales'), ', ', h('a', { href: '#/mapa/conexiones' }, 'el mapa'), ' o ', h('a', { href: '#/recorrido/roles' }, 'qué ve cada rol'), '.')));
 
       c.append(h('section', { class: 'seccion', 'aria-labelledby': 'h-como' },
         h('h2', { id: 'h-como' }, 'Así viaja una clase inclusiva'),
@@ -71,7 +71,7 @@
         h('p', { style: 'margin-top:1rem' }, h('a', { href: '#/mapa/comparar' }, 'Ver la comparación con PIARPLUS, incluido dónde vamos atrás'))));
 
       c.append(h('section', { class: 'seccion', 'aria-labelledby': 'h-proy' },
-        h('h2', { id: 'h-proy' }, 'Tres piezas, una sola plataforma'),
+        h('h2', { id: 'h-proy' }, 'Tres portales, una sola plataforma'),
         h('p', { class: 'bajada' }, 'Cada pieza nació como un proyecto de estudiantes y hoy trabajan juntas, con una misma identidad y los mismos datos.'),
         h('div', { class: 'rejilla rejilla--3' },
           componente('kinesis', 'Kinesis', 'El aula', 'Planeación inclusiva con PIAR y DUA para docentes, orientación, familias y coordinación. La información clínica queda aislada.'),
@@ -101,7 +101,7 @@
       c.append(h('section', { class: 'seccion', 'aria-labelledby': 'h-participa' },
         h('h2', { id: 'h-participa' }, 'Llévala a tu colegio'),
         h('p', { class: 'bajada' }, 'Buscamos colegios que quieran un piloto acompañado y aliados que quieran sumarse: pedagogía, datos, seguridad y financiación.'),
-        h('div', { class: 'acciones' }, h('a', { class: 'btn', href: '#/piloto' }, 'Solicitar un piloto'), h('a', { class: 'btn btn--suave', href: '#/hoja' }, 'Ver la hoja de ruta'))));
+        h('div', { class: 'acciones' }, h('a', { class: 'btn', href: '#/piloto' }, 'Solicitar un piloto'), h('a', { class: 'btn btn--suave', href: '#/hoja/propuesta' }, 'Ver la propuesta'))));
 
       main.append(c);
     },
