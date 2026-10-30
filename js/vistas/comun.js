@@ -11,8 +11,10 @@
 
   function espacio(main, { marca: nombreMarca, nombre, descripcion, ruta, tabs, sub, usuario }) {
     const nav = h('nav', { class: 'nav-lateral', 'aria-label': 'Secciones de ' + nombre },
-      tabs.map((t) => h('a', { href: t.href || `#/${ruta}/${t.id}`, 'aria-current': t.id === sub ? 'page' : null },
-        icono(t.icono), t.etiqueta, t.nuevo ? h('span', { class: 'nuevo' }, t.nuevo) : null)));
+      tabs.map((t) => (t.pro
+        ? h('button', { class: 'nav-pro', type: 'button', 'aria-label': `${t.etiqueta}: función Pro, bloqueada`, onclick: () => MT.plan.abrirPro(t.pro) }, icono(t.icono), t.etiqueta, MT.plan.candadoSvg(), MT.plan.etiquetaPro())
+        : h('a', { href: t.href || `#/${ruta}/${t.id}`, 'aria-current': t.id === sub ? 'page' : null },
+          icono(t.icono), t.etiqueta, t.nuevo ? h('span', { class: 'nuevo' }, t.nuevo) : null))));
     const lateral = h('aside', { class: 'lateral' }, h('div', { class: 'lateral-panel' },
       h('a', { class: 'lockup', href: '#/' + ruta, 'aria-label': nombre + ', inicio' }, marca(nombreMarca),
         h('span', null, h('b', null, nombre), h('small', null, descripcion))),

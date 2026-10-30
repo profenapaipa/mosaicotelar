@@ -42,6 +42,7 @@
   --hilo-kinesis: var(--verde);
   --hilo-wisfox: var(--ambar);
   --hilo-valeria: var(--azul);
+  --hilo-mosaico: #E0527E;   /* el cuarto hilo: la plataforma que une los tres portales */
 
   --riel-ancho: 84px;
   --riel-bg: #1A1714;  --riel-texto: #D8D2C6;  --riel-fuerte: #FFFFFF;
@@ -68,6 +69,7 @@
 [data-espacio="kinesis"] { --e-vivo: var(--hilo-kinesis); }
 [data-espacio="wisfox"] { --e-vivo: var(--hilo-wisfox); }
 [data-espacio="valeria"] { --e-vivo: var(--hilo-valeria); }
+[data-espacio="mosaico"] { --e-vivo: var(--hilo-mosaico); }
 
 /* Tema oscuro: tinta invertida. El verde, el ámbar y el océano suben de luminosidad para mantener contraste. */
 @media (prefers-color-scheme: dark) {

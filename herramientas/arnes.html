@@ -10,7 +10,7 @@
 <pre id="resultado" style="position:fixed;top:0;left:0;max-width:100%;background:#fff;color:#000;font:11px monospace;white-space:pre-wrap"></pre>
 <script>
 const SECC = { docente: ['resumen', 'estudiantes', 'actividades', 'ajustes', 'notas', 'archivos'], orientacion: ['resumen', 'ajustes', 'estudiantes', 'notas', 'archivos'], familia: ['resumen', 'archivos'], coordinacion: ['resumen', 'estudiantes', 'cursos', 'categorias'], estudiante: ['resumen', 'ruta', 'logros', 'archivos'] };
-const RUTAS = [[null, '#/'], [null, '#/mi'], [null, '#/mapa/conexiones'], [null, '#/mapa/comparar'], [null, '#/valeria/chat'], [null, '#/valeria/conexion'], [null, '#/recorrido/camino'], [null, '#/recorrido/roles'], [null, '#/recorrido/datos'], [null, '#/portales'], [null, '#/portales/kinesis'], [null, '#/portales/wisfox'], [null, '#/portales/valeria'], [null, '#/glosario'], [null, '#/guia/docente'], [null, '#/guia/estudiante'], [null, '#/hoja/propuesta'], [null, '#/hoja/arquitectura'], [null, '#/hoja/etapas'], [null, '#/piloto'], [null, '#/identidad'],
+const RUTAS = [[null, '#/'], [null, '#/mi'], [null, '#/mapa/conexiones'], [null, '#/mapa/comparar'], [null, '#/valeria/chat'], [null, '#/valeria/conexion'], [null, '#/recorrido/camino'], [null, '#/recorrido/roles'], [null, '#/recorrido/datos'], [null, '#/portales'], [null, '#/portales/kinesis'], [null, '#/portales/wisfox'], [null, '#/portales/valeria'], [null, '#/glosario'], [null, '#/planes/planes'], [null, '#/planes/servicios'], [null, '#/registro/gratis'], [null, '#/registro/prueba'], [null, '#/guia/docente'], [null, '#/guia/estudiante'], [null, '#/hoja/propuesta'], [null, '#/hoja/arquitectura'], [null, '#/hoja/etapas'], [null, '#/piloto'], [null, '#/identidad'],
   ...Object.entries(SECC).flatMap(([rol, l]) => l.map((x) => [rol, '#/mi/' + x]))];
 const ANCHOS = [390, 1280];
 const TEMAS = ['claro', 'oscuro'];
@@ -133,7 +133,7 @@ async function flujo() {
   await cargar('#/', 1280); await espera(400);
   afirmar('el inicio pregunta quién eres', textoPagina().includes('¿Quién eres?'));
   afirmar('hay una tarjeta por rol (5)', doc().querySelectorAll('.rol-tarjeta').length === 5);
-  afirmar('el riel lleva a mi espacio, mapa, ValerIA y roles', ['mi', 'mapa', 'recorrido', 'hoja', 'identidad'].every((id) => doc().querySelector(`.riel a[data-ruta="${id}"]`)));
+  afirmar('el riel lleva a mi espacio, mapa, ValerIA y roles', ['mi', 'mapa', 'recorrido', 'planes', 'hoja', 'identidad'].every((id) => doc().querySelector(`.riel a[data-ruta="${id}"]`)));
   await pulsar('Soy docente');
   afirmar('elegir docente lleva a su guía de inicio rápido', ventana().location.hash === '#/guia/docente');
   afirmar('la franja dice con qué rol se mira', doc().getElementById('rol-actual').textContent.includes('Docente'));
@@ -397,6 +397,54 @@ async function flujo() {
   await ir('#/mi/archivos'); await espera(300);
   const u = await ventana().MT.archivos.url(ventana().MT.db.lista('archivos')[0].id);
   afirmar('el contenido del archivo sigue guardado al recargar', !!u);
+  // 15. Planes, funciones Pro bloqueadas y registro
+  await ir('#/planes'); ventana().MT.router.recargar(); await espera(300);
+  afirmar('los planes muestran Demo, Gratis, Pro y Colegio', ['Demo', 'Gratis', 'Pro', 'Colegio'].every((n) => [...doc().querySelectorAll('.plan-tarjeta .etiqueta')].some((e) => e.textContent === n)) && doc().querySelectorAll('.plan-tarjeta').length === 4);
+  afirmar('la tabla distingue lo incluido hoy de lo bloqueado en desarrollo', /Incluido/.test(textoPagina()) && /Pro · en desarrollo/.test(textoPagina()) && /Servicio/.test(textoPagina()));
+  afirmar('no se publican precios inventados', !/\$\s?\d|COP|USD|\d+\s?€/.test(textoPagina()) && /se define con los primeros colegios/i.test(textoPagina()));
+  await ir('#/planes/servicios'); ventana().MT.router.recargar(); await espera(250);
+  afirmar('hay siete servicios y tres paquetes', doc().querySelectorAll('.servicio').length === 7 && doc().querySelectorAll('#app .plan-tarjeta').length === 3);
+  afirmar('implementación, asesoría y acompañamiento figuran entre los servicios', ['Implementación', 'Asesoría pedagógica', 'Acompañamiento del piloto', 'Capacitación'].every((t) => textoPagina().includes(t)));
+  // Las funciones Pro se ven con candado y solo explican
+  await comoRol('coordinacion', '#/mi'); await espera(250);
+  const pros = [...doc().querySelectorAll('.nav-pro')];
+  afirmar('coordinación ve funciones Pro bloqueadas en su menú', pros.length === 3 && pros.every((b) => /Pro/.test(b.textContent)), String(pros.length));
+  afirmar('lo que ya funciona sigue desbloqueado: sus secciones siguen siendo enlaces', doc().querySelectorAll('.nav-lateral a').length === 4);
+  pros[0].click(); await espera(250);
+  afirmar('una función Pro explica qué es, dice que está en desarrollo y ofrece la prueba gratuita', /En desarrollo/.test(doc().querySelector('dialog[open]') ? doc().querySelector('dialog[open]').innerText : '') && !!enDialogo('Solicitar prueba gratuita'));
+  doc().querySelector('dialog[open]').close(); await espera(150);
+  await comoRol('docente', '#/mi/ajustes'); await espera(250);
+  afirmar('el docente ve el botón de exportar PIAR con candado', [...doc().querySelectorAll('.pro-candado')].some((b) => /PIAR/.test(b.textContent)));
+  // Registro: validación y cuenta gratuita
+  await ir('#/registro/gratis'); ventana().MT.router.recargar(); await espera(250);
+  const formR = () => doc().querySelector('form.formulario--registro');
+  poner(doc().getElementById('cmp-correo') || formR().querySelector('[name="correo"]'), 'no-es-un-correo');
+  formR().querySelector('button[type=submit]').click(); await espera(250);
+  afirmar('un correo mal escrito se rechaza con un mensaje claro', /correo válido/.test(textoPagina()));
+  poner(formR().querySelector('[name="correo"]'), 'docente@colegio.edu.co');
+  formR().querySelector('button[type=submit]').click(); await espera(250);
+  afirmar('sin autorizar el tratamiento del correo no se registra', /aceptar el tratamiento/.test(textoPagina()) && !ventana().MT.store.obtener().cuenta);
+  formR().querySelector('#consentimiento').click();
+  formR().querySelector('button[type=submit]').click(); await espera(400);
+  afirmar('con correo válido y autorización, la cuenta gratuita queda reservada', !!doc().querySelector('.registro-exito') && ventana().MT.store.obtener().cuenta && ventana().MT.store.obtener().cuenta.plan === 'gratis' && /Cuenta gratuita/.test(doc().getElementById('plan-chip').textContent));
+  afirmar('el registro solo guarda lo mínimo: correo, rol, institución y plan (sin nombres)', Object.keys(ventana().MT.store.obtener().cuenta).sort().join() === 'correo,fecha,institucion,plan,rol,via');
+  await ir('#/registro/prueba'); ventana().MT.router.recargar(); await espera(250);
+  formR().querySelector('#consentimiento').click();
+  formR().querySelector('button[type=submit]').click(); await espera(400);
+  afirmar('la prueba gratuita de Pro se solicita y el chip lo dice', ventana().MT.store.obtener().cuenta.plan === 'prueba' && /Prueba Pro/.test(doc().getElementById('plan-chip').textContent));
+  doc().getElementById('rol-actual').click(); await espera(150);
+  [...doc().querySelectorAll('#menu-rol button')].find((b) => /Empezar de nuevo/.test(b.textContent)).click(); await espera(250);
+  enDialogo('Sí, empezar de nuevo').click(); await espera(500);
+  afirmar('empezar de nuevo borra el trabajo pero conserva la cuenta', ventana().MT.store.obtener().cuenta && ventana().MT.store.obtener().cuenta.correo === 'docente@colegio.edu.co');
+  // El logo: cuatro hilos de colores distintos y sin costuras al terminar
+  await ir('#/'); ventana().MT.router.recargar(); await espera(4200);
+  const hilosColor = [...doc().querySelectorAll('.logo-tejido .hilo')].map((r) => ventana().getComputedStyle(r).fill);
+  afirmar('el logo trae cuatro hilos de cuatro colores distintos', hilosColor.length === 4 && new Set(hilosColor).size === 4, hilosColor.join(' | '));
+  const lg = doc().querySelector('.marca-hero .logo-tejido');
+  afirmar('al terminar la animación el logo pasa a una sola forma, sin las aristas de las piezas', !lg.classList.contains('tejiendo') && ventana().getComputedStyle(lg.querySelector('.piezas')).display === 'none' && ventana().getComputedStyle(lg.querySelector('.tela-unica')).display !== 'none');
+  doc().querySelectorAll('.marca-hero__controles button')[1].click(); await espera(900);
+  afirmar('el logo pasa de color a blanco y negro y vuelve', lg.classList.contains('mono') && ventana().getComputedStyle(lg.querySelector('.hilos')).opacity === '0');
+  afirmar('al cambiar de pantalla corre la barra de cuatro hilos', !!doc().getElementById('progreso-hilos') && doc().querySelectorAll('#progreso-hilos span').length === 4);
   const csp = doc().querySelector('meta[http-equiv="Content-Security-Policy"]');
   afirmar('la página trae una política de seguridad de contenido restrictiva', !!csp && /script-src 'self'/.test(csp.content) && /object-src 'none'/.test(csp.content) && /frame-src https:\/\/profenapaipa\.github\.io/.test(csp.content) && !/unsafe-eval/.test(csp.content));
   afirmar('no hay scripts en línea (la política los bloquearía)', ![...doc().querySelectorAll('script')].some((x) => !x.src && x.textContent.trim()));

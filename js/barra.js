@@ -126,6 +126,7 @@
     });
   }
 
-  function construir() { construirBarra(); construirRol(); actualizar(); }
+  function pintarPlan() { const a = document.getElementById('plan-chip'); if (a) a.textContent = MT.plan.etiquetaPro ? MT.plan.etiquetaPlan() : ''; }
+  function construir() { construirBarra(); construirRol(); pintarPlan(); st.suscribir(pintarPlan); actualizar(); }
   MT.barra = { construir, actualizar, cerrar };
 })(window.MT = window.MT || {});

@@ -12,6 +12,7 @@
   function inicial() {
     return Object.assign({
       rol: '',
+      cuenta: null,           // el registro de esta persona (correo, rol, plan); sobrevive a "empezar de nuevo"
       vinculo: 'P-03',        // el estudiante con quien se identifica la familia y el propio estudiante
       contador: {},
       actividad: '',          // el último texto que propuso ValerIA al docente
@@ -40,7 +41,7 @@
     obtener: () => estado,
     cambiar(fn) { fn(estado); guardar(); avisar(); },
     suscribir(f) { oyentes.add(f); return () => oyentes.delete(f); },
-    reiniciar() { estado = inicial(); guardar(); avisar(); },
+    reiniciar() { const c = estado.cuenta; estado = inicial(); estado.cuenta = c; guardar(); avisar(); },
     persistente: () => guardado,
     // Anota algo en la historia. Solo lo marcado para la familia aparece en su vista.
     evento(texto, paraFamilia, estudiante) {

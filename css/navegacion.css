@@ -76,7 +76,7 @@
 .vivo-panel__nombre svg { width: 22px; height: 22px; }
 .vivo-marcos--2 .vivo-panel__nombre { display: flex; }
 .vivo-panel .tarjeta--chat { height: calc(100vh - 17rem); min-height: 420px; }
-.vivo-estado { position: absolute; z-index: 1; top: 3.2rem; left: 50%; transform: translateX(-50%); background: var(--papel); border: 1px solid var(--linea); border-radius: 999px; padding: .4rem 1rem; font-weight: 700; margin: 0; box-shadow: var(--sombra); }
+.vivo-estado { display: flex; align-items: center; gap: .6rem; position: absolute; z-index: 1; top: 3.2rem; left: 50%; transform: translateX(-50%); background: var(--papel); border: 1px solid var(--linea); border-radius: 999px; padding: .4rem 1rem; font-weight: 700; margin: 0; box-shadow: var(--sombra); }
 .vivo-estado--tarda { background: var(--ambar-suave); color: var(--ambar-texto); border-color: var(--ambar-texto); }
 .vivos .portal-marco { height: calc(100vh - 17rem); min-height: 520px; }
 
@@ -100,3 +100,6 @@
   .tarjeta { box-shadow: none; break-inside: avoid; border-color: #999; }
   a { color: #000; text-decoration: none; }
 }
+
+.vivo-estado .logo-cargador { width: 30px; height: 30px; flex: none; }
+.marca-hero__controles { display: flex; gap: .4rem; flex-wrap: wrap; }

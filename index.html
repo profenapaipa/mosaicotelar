@@ -19,6 +19,8 @@
 <link rel="stylesheet" href="css/layout.css">
 <link rel="stylesheet" href="css/vistas.css">
 <link rel="stylesheet" href="css/navegacion.css">
+<link rel="stylesheet" href="css/animacion.css">
+<link rel="stylesheet" href="css/planes.css">
 </head>
 <body>
 <a class="saltar" href="#app">Saltar al contenido</a>
@@ -34,6 +36,7 @@
   <header class="franja">
     <p>Versión de demostración: los datos son de ejemplo y lo que creas se guarda solo en este dispositivo.</p>
     <div class="franja-acciones">
+      <a class="btn btn--chico plan-chip" id="plan-chip" href="#/planes">Demo · Probar gratis</a>
       <button class="btn btn--chico btn--suave rol-actual" id="rol-actual" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="menu-rol">Elegir mi rol</button>
       <div class="menu-rol" id="menu-rol" hidden></div>
       <button class="btn btn--chico btn--suave" id="btn-ia" type="button" aria-expanded="false" aria-controls="slot-ia">Hablar con ValerIA</button>
@@ -52,7 +55,7 @@
     <div>
       <p><strong>Mosaico Telar</strong> · Tejemos caminos para aprender.</p>
       <p>Semillero Maker de Tecnología con Sentido. Representante legal: Néstor Andrés Paipa.</p>
-      <p><a href="#/mapa">Mapa</a> · <a href="#/recorrido">Roles y datos</a> · <a href="#/hoja">Hoja de ruta</a> · <a href="#/glosario">Glosario</a> · <a href="#/piloto">Solicitar un piloto</a> · <a href="#/identidad">Identidad de marca</a></p>
+      <p><a href="#/mapa">Mapa</a> · <a href="#/recorrido">Roles y datos</a> · <a href="#/planes">Planes y servicios</a> · <a href="#/hoja">Hoja de ruta</a> · <a href="#/glosario">Glosario</a> · <a href="#/piloto">Solicitar un piloto</a> · <a href="#/identidad">Identidad de marca</a></p>
     </div>
   </footer>
 </div>
@@ -68,6 +71,7 @@
 <script src="js/archivos.js"></script>
 <script src="js/guias.js"></script>
 <script src="js/roles.js"></script>
+<script src="js/plan.js"></script>
 <script src="js/dialogos.js"></script>
 <script src="js/biblioteca.js"></script>
 <script src="js/vivos.js"></script>
@@ -85,6 +89,7 @@
 <script src="js/vistas/estado.js"></script>
 <script src="js/vistas/piloto.js"></script>
 <script src="js/vistas/glosario.js"></script>
+<script src="js/vistas/planes.js"></script>
 <script src="js/vistas/identidad.js"></script>
 <script src="js/main.js"></script>
 </body>

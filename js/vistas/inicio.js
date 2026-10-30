@@ -33,13 +33,15 @@
         h('div', null,
           h('p', { class: 'descriptor' }, 'Colectivo de educación inclusiva con tecnología'),
           h('div', { class: 'marca-hero' },
-            h('div', { class: 'marca-hero__logo' }, tejido.el, h('button', { class: 'btn btn--chico btn--suave', type: 'button', onclick: tejido.repetir }, 'Ver otra vez')),
+            h('div', { class: 'marca-hero__logo' }, tejido.el, h('div', { class: 'marca-hero__controles' },
+              h('button', { class: 'btn btn--chico btn--suave', type: 'button', onclick: tejido.repetir }, 'Ver otra vez'),
+              h('button', { class: 'btn btn--chico btn--suave', type: 'button', 'aria-pressed': 'false', onclick: (e) => { e.currentTarget.setAttribute('aria-pressed', String(tejido.alternar())); } }, 'Blanco y negro'))),
             h('div', null, h('h1', null, 'Mosaico Telar'), h('p', { class: 'marca-hero__lema' }, 'Tejemos caminos para aprender.'))),
           h('p', { class: 'intro' }, 'La plataforma donde el docente planea una clase inclusiva, orientación la valida, la familia la ve y cada estudiante la recibe a su medida.'),
-          h('ul', { class: 'hilos-leyenda', 'aria-label': 'Sus tres portales' }, [['kinesis', 'Kinesis', 'el aula'], ['wisfox', 'Wisfox', 'el estudiante'], ['valeria', 'ValerIA', 'la guía']].map(([id, n, r]) => h('li', { 'data-espacio': id }, h('i', { 'aria-hidden': 'true' }), h('strong', null, n), ' ' + r))),
+          h('ul', { class: 'hilos-leyenda', 'aria-label': 'Sus tres portales' }, [['kinesis', 'Kinesis', 'el aula'], ['valeria', 'ValerIA', 'la guía'], ['wisfox', 'Wisfox', 'el estudiante'], ['mosaico', 'Mosaico Telar', 'la plataforma que los une']].map(([id, n, r]) => h('li', { 'data-espacio': id }, h('i', { 'aria-hidden': 'true' }), h('strong', null, n), ' ' + r))),
           h('div', { class: 'acciones' },
             h('a', { class: 'btn', href: '#roles', onclick: (e) => { e.preventDefault(); const el = document.getElementById('roles'); if (el) el.scrollIntoView({ behavior: 'smooth' }); } }, 'Entrar con mi rol'),
-            h('a', { class: 'btn btn--suave', href: '#/piloto' }, 'Solicitar un piloto')),
+            h('a', { class: 'btn btn--suave', href: '#/registro/gratis' }, 'Probar gratis')),
           h('ul', { class: 'confianza' }, ['Pensado desde el Decreto 1421 y el DUA', 'Información clínica aislada', 'Funciona sin instalar nada'].map((t) => h('li', null, t)))),
         h('div', { class: 'vitrina' },
           h('div', { class: 'dispositivo dispositivo--a' }, h('img', { src: 'assets/capturas/docente.jpg', alt: 'El espacio del docente: sus estudiantes, el siguiente paso y las actividades planeadas con DUA', width: '1280', height: '800' }), h('span', { class: 'dispositivo-rotulo' }, 'Espacio del docente')),
@@ -112,8 +114,8 @@
 
       c.append(h('section', { class: 'seccion', 'aria-labelledby': 'h-participa' },
         h('h2', { id: 'h-participa' }, 'Llévala a tu colegio'),
-        h('p', { class: 'bajada' }, 'Buscamos colegios que quieran un piloto acompañado y aliados que quieran sumarse: pedagogía, datos, seguridad y financiación.'),
-        h('div', { class: 'acciones' }, h('a', { class: 'btn', href: '#/piloto' }, 'Solicitar un piloto'), h('a', { class: 'btn btn--suave', href: '#/hoja/propuesta' }, 'Ver la propuesta'))));
+        h('p', { class: 'bajada' }, 'Empieza gratis con la demo o con una cuenta. Cuando quieras implementarla bien, ofrecemos implementación, asesoría, capacitación y acompañamiento.'),
+        h('div', { class: 'acciones' }, h('a', { class: 'btn', href: '#/registro/gratis' }, 'Crear cuenta gratis'), h('a', { class: 'btn btn--suave', href: '#/registro/prueba' }, 'Solicitar prueba gratuita de Pro'), h('a', { class: 'btn btn--suave', href: '#/planes' }, 'Ver planes y servicios'), h('a', { class: 'btn btn--suave', href: '#/hoja/propuesta' }, 'Ver la propuesta'))));
 
       main.append(c);
     },

@@ -37,6 +37,7 @@
     const y = window.scrollY;
     limpiezas.forEach((f) => { try { f(); } catch (e) { /* ya no importa */ } });
     limpiezas = [];
+    if (MT.tejido) MT.tejido.progreso();
     main.dataset.espacio = (typeof def.espacio === 'function' ? def.espacio(sub) : def.espacio) || '';
     // Los portales vivos (iframes y chat) son persistentes: se les quita de vista pero no del documento, o se recargarían.
     [...main.children].forEach((x) => { if (!x.hasAttribute('data-persistente')) x.remove(); });
@@ -52,6 +53,7 @@
     document.title = (def.titulo === 'Inicio' ? 'Mosaico Telar' : def.titulo + ' · Mosaico Telar');
     marcarNavegacion(id);
     if (MT.glosario) MT.glosario.marcar(main);
+    if (MT.tejido) MT.tejido.revelar(main);
     if (MT.barra) MT.barra.actualizar();
     if (op.foco) {
       window.scrollTo(0, 0);

@@ -28,14 +28,14 @@
     const el = h('div', { class: 'vivo-panel', 'data-espacio': id, hidden: true, 'data-portal': id });
     if (id === 'valeria') {
       const caja = h('div', { class: 'tarjeta tarjeta--chat' });
-      el.append(h('p', { class: 'vivo-panel__nombre' }, marca(id), 'ValerIA · la guía'), caja);
+      el.append(h('p', { class: 'vivo-panel__nombre' }, marca(id), 'ValerIA · la guía'), h('p', { class: 'pro-fila' }, h('span', null, 'Hoy responde con ejemplos preparados. '), MT.plan.candado('valeria', 'Modelo de lenguaje real')), caja);
       MT.ia.montarChat(caja, MT.ia.panel.sugerenciasPara()); // vive mientras la página: su conversación no se pierde al cambiar de pestaña
     } else {
       const url = (MT.config.portales || {})[id];
-      const estado = h('p', { class: 'vivo-estado', role: 'status' }, `Cargando ${p.nombre}…`);
+      const estado = h('p', { class: 'vivo-estado', role: 'status' }, MT.tejido.cargador(), `Cargando ${p.nombre}…`);
       const marco = h('iframe', { class: 'portal-marco', src: url, title: `${p.nombre}, ${p.rotulo.toLowerCase()}`, referrerpolicy: 'no-referrer',
         allow: 'clipboard-write', sandbox: 'allow-scripts allow-same-origin allow-forms allow-popups allow-downloads' });
-      const espera = setTimeout(() => { estado.textContent = `${p.nombre} está tardando. Revisa tu conexión o ábrelo en una pestaña aparte con el enlace de arriba.`; estado.classList.add('vivo-estado--tarda'); }, TARDA);
+      const espera = setTimeout(() => { estado.replaceChildren(`${p.nombre} está tardando. Revisa tu conexión o ábrelo en una pestaña aparte con el enlace de arriba.`); estado.classList.add('vivo-estado--tarda'); }, TARDA);
       marco.addEventListener('load', () => { clearTimeout(espera); estado.remove(); });
       el.append(h('p', { class: 'vivo-panel__nombre' }, marca(id), `${p.nombre} · ${p.rotulo.toLowerCase()}`), estado, marco);
     }

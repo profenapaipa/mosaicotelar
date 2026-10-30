@@ -1,0 +1,48 @@
+/* planes.css: planes, servicios, registro y todo lo que lleva candado Pro. */
+
+/* ---- Candados Pro: se ven, se entienden y no hacen nada más que explicar ---- */
+.pro-etiqueta { display: inline-block; margin-left: .35rem; padding: 0 .45rem; border-radius: 999px; font: 800 .68rem/1.5 var(--fuente); letter-spacing: .06em; text-transform: uppercase; background: var(--ambar-suave); color: var(--ambar-texto); border: 1px solid var(--ambar-texto); }
+.pro-candado { display: inline-flex; align-items: center; gap: .4rem; opacity: .95; border-style: dashed; }
+.pro-candado svg { width: 16px; height: 16px; flex: none; }
+.nav-pro { width: 100%; display: flex; align-items: center; gap: .7rem; text-align: left; font: 700 1rem var(--fuente); color: var(--tinta-suave); background: none; border: 2px dashed var(--linea); border-radius: var(--radio-chico); padding: .55rem .8rem; min-height: 44px; cursor: pointer; margin-top: .2rem; }
+.nav-pro svg:first-child { width: 22px; height: 22px; flex: none; }
+.nav-pro svg:nth-last-child(2) { width: 15px; height: 15px; flex: none; margin-left: auto; }
+.nav-pro:hover { border-color: var(--tinta); color: var(--tinta); }
+.pro-fila { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; margin: 0 0 .5rem; font-size: .9rem; }
+.plan-chip { background: var(--ambar-suave) !important; color: var(--ambar-texto) !important; border-color: var(--ambar-texto) !important; font-weight: 800; }
+.plan-chip:hover { background: var(--ambar-texto) !important; color: var(--papel) !important; }
+
+/* ---- Planes ---- */
+.planes { align-items: stretch; }
+.plan-tarjeta { display: flex; flex-direction: column; gap: .3rem; border-top: 5px solid var(--tinta); }
+.plan-tarjeta--pro { border-top-color: var(--hilo-mosaico); }
+.plan-tarjeta h3 { margin: 0; }
+.plan-precio { font: 700 1.7rem/1.1 var(--fuente-titulo); margin: 0; }
+.plan-sub { margin: 0 0 .4rem; font-size: .88rem; }
+.plan-lista { padding-left: 1.2rem; margin: .4rem 0 1rem; display: grid; gap: .3rem; flex: 1; }
+.plan-tarjeta .btn { align-self: flex-start; }
+.tabla-planes th, .tabla-planes td { text-align: center; }
+.tabla-planes th[scope="row"] { text-align: left; font-weight: 700; min-width: 15rem; }
+.tabla-planes .celda-ok { color: var(--ok-texto); font-weight: 800; }
+.tabla-planes .celda-pro { color: var(--ambar-texto); font-weight: 700; }
+.tabla-planes .celda-serv { color: var(--azul); font-weight: 700; }
+.tabla-planes .celda-no { color: var(--tinta-suave); }
+.tabla-planes .celda-texto { display: block; font-size: .72rem; font-weight: 600; }
+.servicio { border-top: 5px solid var(--e-vivo, var(--tinta)); }
+.servicio h2 { font-size: 1.35rem; margin: 0 0 .2rem; }
+.servicio ul { padding-left: 1.2rem; display: grid; gap: .3rem; }
+
+/* ---- Registro ---- */
+.formulario--registro { max-width: 36rem; }
+.campo--plan { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; }
+.campo--plan .campo__etiqueta { width: 100%; margin: 0; }
+.chip-plan { padding: .4rem 1rem; border: 2px solid var(--linea); border-radius: 999px; font-weight: 800; text-decoration: none; color: var(--tinta); min-height: 40px; display: inline-flex; align-items: center; }
+.chip-plan--on { border-color: var(--tinta); background: var(--tinta); color: var(--papel); }
+.casilla--consent { align-items: flex-start; font-weight: 600; font-size: .92rem; margin: .8rem 0; }
+.casilla--consent input { width: 24px; height: 24px; margin-top: 0; flex: none; }
+.registro-exito { display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 1.4rem; align-items: center; max-width: 40rem; }
+.registro-exito h2 { margin-top: 0; }
+@media (max-width: 520px) { .registro-exito { grid-template-columns: 1fr; } .registro-exito__logo { max-width: 110px; } }
+
+/* Los textos solo para lectores de pantalla se posicionan de forma absoluta: sin un contenedor posicionado desbordaban la página. */
+.tabla-scroll { position: relative; }

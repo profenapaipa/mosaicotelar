@@ -255,7 +255,7 @@
     const pintar = () => {
       const l = db.lista('ajustes').slice().reverse();
       const pend = l.filter((a) => a.estado === 'propuesto').length;
-      c.replaceChildren(caja(cab(rol === 'orientacion' ? 'Ajustes por revisar' : 'Mis ajustes', rol === 'docente' ? botonNuevo('Nuevo ajuste', () => proponerAjuste()) : null), MT.guias.notaAjuste(),
+      c.replaceChildren(caja(cab(rol === 'orientacion' ? 'Ajustes por revisar' : 'Mis ajustes', rol === 'docente' ? h('span', { class: 'acciones' }, botonNuevo('Nuevo ajuste', () => proponerAjuste()), MT.plan.candado('piar', 'Exportar PIAR')) : (rol === 'orientacion' ? MT.plan.candado('piar', 'Exportar PIAR') : null)), MT.guias.notaAjuste(),
         h('p', { class: 'suave' }, rol === 'orientacion' ? `${pend} ${pend === 1 ? 'espera' : 'esperan'} tu decisión. Nada llega al estudiante sin tu aprobación.` : 'Cada apoyo del perfil se convierte en un cambio concreto, con su razón. Orientación lo revisa antes de que llegue al estudiante.'),
         l.length ? h('div', { class: 'rejilla' }, l.map((a) => tarjetaAjuste(a, rol))) : sinFoco(rol === 'orientacion' ? 'No hay ajustes por revisar.' : 'Aún no has propuesto ajustes.')));
     };
@@ -451,7 +451,7 @@
       const rol = S().rol;
       if (!rol) return elegirRol(main);
       const r = MT.roles.por(rol);
-      const contenido = MT.comun.espacio(main, { marca: 'mosaico', nombre: 'Mi espacio', descripcion: r.nombre, ruta: 'mi', tabs: SECCIONES[rol], sub,
+      const contenido = MT.comun.espacio(main, { marca: 'mosaico', nombre: 'Mi espacio', descripcion: r.nombre, ruta: 'mi', tabs: SECCIONES[rol].concat(MT.plan.PRO_NAV[rol] || []), sub,
         usuario: { iniciales: r.nombre.slice(0, 2).toUpperCase(), nombre: r.nombre, rol: rol === 'familia' || rol === 'estudiante' ? S().vinculo : 'Cambiar de rol en la franja superior' } });
       const franja = MT.guias.franjaDe(rol, sub); if (franja) contenido.append(franja);
       const c = h('div', { class: 'espacio-cuerpo' }); contenido.append(c);

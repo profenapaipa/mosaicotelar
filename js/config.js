@@ -8,6 +8,8 @@
   'use strict';
   MT.config = {
     contacto: '',
+    // Dirección del servidor (por ejemplo https://api.ejemplo.co). Vacía: el registro se reserva en este dispositivo.
+    api: '',        // al configurarla, agrega su dirección a connect-src en la política de seguridad de index.html
     portales: {
       kinesis: 'https://profenapaipa.github.io/Kinesis/',
       wisfox: 'https://profenapaipa.github.io/wisfox/',
