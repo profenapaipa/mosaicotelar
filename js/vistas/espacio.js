@@ -39,6 +39,7 @@
       { id: 'logros', etiqueta: 'Mis logros', icono: 'logros' }, { id: 'archivos', etiqueta: 'Material', icono: 'mapa' },
     ],
   };
+  MT.secciones = SECCIONES; // la barra de portales y la guía las usan para listar dónde se trabaja cada cosa
   const ROL_ESP = { docente: 'kinesis', orientacion: 'kinesis', familia: 'kinesis', coordinacion: 'kinesis', estudiante: 'wisfox' };
 
   const caja = (...hijos) => h('div', { class: 'tarjeta' }, ...hijos);
@@ -130,10 +131,10 @@
       ...(a ? [] : [desde]),
       { id: 'titulo', etiqueta: 'Título', valor: a ? a.titulo : '', requerido: true, max: 80 },
       { id: 'asignatura', etiqueta: 'Asignatura', tipo: 'select', opciones: MT.datos.asignaturas.map((x) => ({ valor: x, texto: x })), valor: a ? a.asignatura : 'Inglés' },
-      { id: 'tema', etiqueta: 'Tema', valor: a ? a.tema : '', max: 80 },
+      { id: 'tema', etiqueta: 'Tema', valor: a ? a.tema : '', max: 80, ayuda: 'Lo que se aprende, en pocas palabras. Por ejemplo: Present simple.' },
       { id: 'descripcion', etiqueta: 'Descripción para el docente', tipo: 'area', valor: a ? a.descripcion : '', filas: 3, requerido: true },
-      { id: 'pasos', etiqueta: 'Pasos para el estudiante (uno por línea)', tipo: 'area', valor: a ? a.pasos.join('\n') : '', filas: 3 },
-      ...MT.datos.dua.map((d) => ({ id: d.id, etiqueta: d.titulo, tipo: 'checks', opciones: d.opciones, valor: a ? a.dua[d.id] : [] })),
+      { id: 'pasos', etiqueta: 'Pasos para el estudiante (uno por línea)', tipo: 'area', valor: a ? a.pasos.join('\n') : '', filas: 3, ayuda: 'Instrucciones cortas, una por línea. Si son pasos pequeños y numerados, ya son un apoyo para quien necesita ir despacio.' },
+      ...MT.datos.dua.map((d) => ({ id: d.id, etiqueta: d.titulo, tipo: 'checks', opciones: d.opciones, valor: a ? a.dua[d.id] : [], ayuda: d.principio + '. Marca las formas que vas a ofrecer: así la clase sirve a todos desde el diseño, antes de cualquier ajuste individual.' })),
       { id: 'estado', etiqueta: 'Estado', tipo: 'select', opciones: [{ valor: 'publicada', texto: 'Publicada: los estudiantes la ven' }, { valor: 'borrador', texto: 'Borrador: solo tú' }], valor: a ? a.estado : 'publicada' },
     ];
     const ctl = dlg.formulario({ titulo: a ? 'Editar actividad' : 'Nueva actividad', campos, ancho: '40rem', textoGuardar: a ? 'Guardar cambios' : 'Crear actividad',
@@ -254,7 +255,7 @@
     const pintar = () => {
       const l = db.lista('ajustes').slice().reverse();
       const pend = l.filter((a) => a.estado === 'propuesto').length;
-      c.replaceChildren(caja(cab(rol === 'orientacion' ? 'Ajustes por revisar' : 'Mis ajustes', rol === 'docente' ? botonNuevo('Nuevo ajuste', () => proponerAjuste()) : null),
+      c.replaceChildren(caja(cab(rol === 'orientacion' ? 'Ajustes por revisar' : 'Mis ajustes', rol === 'docente' ? botonNuevo('Nuevo ajuste', () => proponerAjuste()) : null), MT.guias.notaAjuste(),
         h('p', { class: 'suave' }, rol === 'orientacion' ? `${pend} ${pend === 1 ? 'espera' : 'esperan'} tu decisión. Nada llega al estudiante sin tu aprobación.` : 'Cada apoyo del perfil se convierte en un cambio concreto, con su razón. Orientación lo revisa antes de que llegue al estudiante.'),
         l.length ? h('div', { class: 'rejilla' }, l.map((a) => tarjetaAjuste(a, rol))) : sinFoco(rol === 'orientacion' ? 'No hay ajustes por revisar.' : 'Aún no has propuesto ajustes.')));
     };
@@ -335,11 +336,11 @@
     const notas = s.notas.filter((n) => n.estudiante === id && n.paraFamilia).slice().reverse();
     const est = db.estudiante(id);
     c.append(MT.comun.hero({ rol: 'Familia', titulo: 'Así acompañamos a tu estudiante', texto: 'Ves lo que el colegio ya aprobó. No ves información clínica ni puedes cambiar ajustes.' }),
-      caja(h('div', { class: 'campo' }, h('label', { for: 'vinculo' }, 'Estudiante que acompañas (en el piloto lo define coordinación)'),
+      caja(h('div', { class: 'campo' }, h('label', { for: 'vinculo' }, 'Estudiante que acompañas'), h('p', { class: 'suave campo__ayuda' }, 'En el piloto coordinación vincula tu cuenta con tu estudiante. Aquí puedes elegir para ver cómo se ve cada caso.'),
         h('select', { id: 'vinculo', onchange: (e) => { MT.store.cambiar((x) => { x.vinculo = e.target.value; }); MT.router.recargar(); } }, s.estudiantes.map((e) => h('option', { value: e.id, selected: e.id === id }, e.id))))),
       caja(h('h2', null, 'Apoyos en clase'), est && est.apoyos.length ? h('ul', null, est.apoyos.map((a) => h('li', null, a))) : sinFoco('Todavía no hay apoyos registrados.'),
         est && est.fortalezas.length ? h('div', null, h('p', { class: 'etiqueta' }, 'Fortalezas'), h('ul', null, est.fortalezas.map((a) => h('li', null, a)))) : null),
-      caja(h('h2', null, 'Ajustes aprobados'), aprobados.length ? h('div', { class: 'rejilla' }, aprobados.map((a) => h('article', { class: 'tarjeta tarjeta--plana' }, h('h3', null, (db.obtener('actividades', a.actividad) || { titulo: 'Actividad' }).titulo),
+      caja(h('h2', null, 'Ajustes aprobados'), MT.guias.notaAjuste(), aprobados.length ? h('div', { class: 'rejilla' }, aprobados.map((a) => h('article', { class: 'tarjeta tarjeta--plana' }, h('h3', null, (db.obtener('actividades', a.actividad) || { titulo: 'Actividad' }).titulo),
         h('ul', { class: 'lista' }, a.items.map((i) => h('li', null, h('strong', null, i.cambio), h('br'), h('span', { class: 'suave' }, i.porque))))))) : sinFoco('Cuando orientación apruebe un ajuste, lo verás aquí con su explicación.')),
       caja(h('h2', null, 'Mensajes del equipo'), notas.length ? h('ul', { class: 'lista' }, notas.map((n) => h('li', null, h('small', { class: 'suave' }, fecha(n.fecha) + ' · '), n.texto))) : sinFoco('No hay mensajes todavía.')),
       caja(h('h2', null, 'Novedades'), novedades.length ? h('ul', { class: 'lista' }, novedades.slice(0, 8).map((e) => h('li', null, h('small', { class: 'suave' }, fecha(e.t) + ' · '), e.texto))) : sinFoco('Sin novedades por ahora.')));
@@ -376,7 +377,7 @@
       const acts = db.lista('actividades').filter((a) => a.estado === 'publicada');
       c.append(MT.comun.hero({ rol: 'Estudiante', titulo: 'Tu actividad de hoy', texto: 'Aprende a tu ritmo. Si orientación aprobó un ajuste para ti, la actividad ya viene a tu medida.' }),
         MT.comun.panelCifras([{ valor: xp, etiqueta: 'puntos', detalle: 'nivel ' + nivel }, { valor: p.logros.length, etiqueta: 'logros', detalle: 'de ' + MT.datos.logros.length }, { valor: Object.keys(p.quiz).length, etiqueta: 'quizes hechos', detalle: '' }]),
-        caja(h('div', { class: 'campo' }, h('label', { for: 'yo' }, 'Soy'), h('select', { id: 'yo', onchange: (e) => { MT.store.cambiar((x) => { x.vinculo = e.target.value; }); MT.router.recargar(); } }, s.estudiantes.map((e) => h('option', { value: e.id, selected: e.id === id }, e.id))))));
+        caja(h('div', { class: 'campo' }, h('label', { for: 'yo' }, 'Quién soy'), h('p', { class: 'suave campo__ayuda' }, 'En el piloto tu cuenta ya viene vinculada a un estudiante. Aquí puedes elegir para ver cómo se ve cada caso.'), h('select', { id: 'yo', onchange: (e) => { MT.store.cambiar((x) => { x.vinculo = e.target.value; }); MT.router.recargar(); } }, s.estudiantes.map((e) => h('option', { value: e.id, selected: e.id === id }, e.id))))));
       if (!acts.length) c.append(caja(sinFoco('Tu docente todavía no publicó actividades.')));
       acts.forEach((a) => {
         const aj = db.lista('ajustes').filter((x) => x.actividad === a.id && x.estudiante === id && x.estado === 'aprobado').pop();
@@ -450,8 +451,10 @@
       const rol = S().rol;
       if (!rol) return elegirRol(main);
       const r = MT.roles.por(rol);
-      const c = MT.comun.espacio(main, { marca: 'mosaico', nombre: 'Mi espacio', descripcion: r.nombre, ruta: 'mi', tabs: SECCIONES[rol], sub,
+      const contenido = MT.comun.espacio(main, { marca: 'mosaico', nombre: 'Mi espacio', descripcion: r.nombre, ruta: 'mi', tabs: SECCIONES[rol], sub,
         usuario: { iniciales: r.nombre.slice(0, 2).toUpperCase(), nombre: r.nombre, rol: rol === 'familia' || rol === 'estudiante' ? S().vinculo : 'Cambiar de rol en la franja superior' } });
+      const franja = MT.guias.franjaDe(rol, sub); if (franja) contenido.append(franja);
+      const c = h('div', { class: 'espacio-cuerpo' }); contenido.append(c);
       const permitido = SECCIONES[rol].some((x) => x.id === sub);
       if (!permitido) { c.append(caja(h('p', { class: 'aviso' }, 'Esta sección no es de tu rol.'))); return; }
       if (rol === 'estudiante') return vistaEstudiante(c, sub);

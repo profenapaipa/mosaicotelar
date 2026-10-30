@@ -41,7 +41,6 @@
 .franja-acciones { display: flex; gap: .4rem; align-items: center; position: relative; flex-wrap: wrap; }
 .franja .btn { min-height: 30px; padding: .1rem .8rem; font-size: .8rem; color: var(--papel); border-color: color-mix(in srgb, var(--papel) 60%, transparent); background: transparent; }
 .franja .btn:hover { background: var(--papel); color: var(--tinta); }
-.rol-actual { color: var(--papel); font-weight: 800; text-underline-offset: 3px; }
 .menu-apariencia {
   position: absolute; right: 0; top: calc(100% + .4rem); z-index: 60; width: 17rem; text-align: left;
   background: var(--papel); color: var(--tinta); border: 1px solid var(--linea); border-radius: var(--radio);

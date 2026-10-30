@@ -8,12 +8,12 @@
   // Errores de ejecución a la vista de herramientas/auditar.py. No se envía nada a ningún sitio.
   window.__errores = window.__errores || [];
   window.addEventListener('error', (e) => window.__errores.push(e.message));
+  document.addEventListener('securitypolicyviolation', (e) => window.__errores.push('CSP: ' + e.violatedDirective + ' ' + e.blockedURI));
   window.addEventListener('unhandledrejection', (e) => window.__errores.push('promesa: ' + ((e.reason && e.reason.message) || e.reason)));
 
   // La lista única del riel. "abajo" son las páginas de la plataforma; el resto es donde se trabaja.
   const ESPACIOS = [
     { id: 'mi', hash: '#/mi', etiqueta: 'Mi espacio', cls: 'e-marca', icono: () => icono('inicio') },
-    { id: 'portales', hash: '#/portales', etiqueta: 'Portales', cls: 'e-marca', icono: () => icono('recorrido') },
     { id: 'mapa', hash: '#/mapa', etiqueta: 'Mapa', cls: 'e-marca', icono: () => icono('mapa') },
     { id: 'recorrido', hash: '#/recorrido', etiqueta: 'Roles', cls: 'e-marca', icono: () => icono('docente') },
     { id: 'hoja', hash: '#/hoja', etiqueta: 'Hoja de ruta', cls: 'e-marca', icono: () => icono('estado'), abajo: true },
@@ -58,18 +58,10 @@
     document.addEventListener('click', (e) => { if (!menu.hidden && !menu.contains(e.target) && !boton.contains(e.target)) cerrar(); });
   }
 
-  // La franja siempre dice con qué rol se está mirando, y deja cambiarlo en un clic.
-  function pintarRol() {
-    const r = MT.roles.por(MT.store.obtener().rol);
-    const el = document.getElementById('rol-actual');
-    el.textContent = r ? 'Rol: ' + r.nombre + ' · cambiar' : 'Elegir mi rol';
-    el.setAttribute('href', '#/');
-  }
-  MT.store.suscribir(pintarRol);
-
   construirNavegacion();
-  pintarRol();
   construirApariencia();
+  MT.vivos.iniciar(document.getElementById('app'));
+  MT.barra.construir();
   document.getElementById('btn-ia').addEventListener('click', () => MT.ia.panel.alternar());
   MT.ia.detectar();
   MT.router.iniciar();

@@ -10,7 +10,7 @@
 <pre id="resultado" style="position:fixed;top:0;left:0;max-width:100%;background:#fff;color:#000;font:11px monospace;white-space:pre-wrap"></pre>
 <script>
 const SECC = { docente: ['resumen', 'estudiantes', 'actividades', 'ajustes', 'notas', 'archivos'], orientacion: ['resumen', 'ajustes', 'estudiantes', 'notas', 'archivos'], familia: ['resumen', 'archivos'], coordinacion: ['resumen', 'estudiantes', 'cursos', 'categorias'], estudiante: ['resumen', 'ruta', 'logros', 'archivos'] };
-const RUTAS = [[null, '#/'], [null, '#/mi'], [null, '#/mapa/conexiones'], [null, '#/mapa/comparar'], [null, '#/valeria/chat'], [null, '#/valeria/conexion'], [null, '#/recorrido/camino'], [null, '#/recorrido/roles'], [null, '#/recorrido/datos'], [null, '#/portales'], [null, '#/portales/kinesis'], [null, '#/portales/wisfox'], [null, '#/portales/valeria'], [null, '#/guia/docente'], [null, '#/guia/estudiante'], [null, '#/hoja/propuesta'], [null, '#/hoja/arquitectura'], [null, '#/hoja/etapas'], [null, '#/piloto'], [null, '#/identidad'],
+const RUTAS = [[null, '#/'], [null, '#/mi'], [null, '#/mapa/conexiones'], [null, '#/mapa/comparar'], [null, '#/valeria/chat'], [null, '#/valeria/conexion'], [null, '#/recorrido/camino'], [null, '#/recorrido/roles'], [null, '#/recorrido/datos'], [null, '#/portales'], [null, '#/portales/kinesis'], [null, '#/portales/wisfox'], [null, '#/portales/valeria'], [null, '#/glosario'], [null, '#/guia/docente'], [null, '#/guia/estudiante'], [null, '#/hoja/propuesta'], [null, '#/hoja/arquitectura'], [null, '#/hoja/etapas'], [null, '#/piloto'], [null, '#/identidad'],
   ...Object.entries(SECC).flatMap(([rol, l]) => l.map((x) => [rol, '#/mi/' + x]))];
 const ANCHOS = [390, 1280];
 const TEMAS = ['claro', 'oscuro'];
@@ -83,7 +83,7 @@ function medirCaso(ruta, ancho, tema) {
   const fuera = [...d.querySelectorAll('main *')].filter((x) => { const r = x.getBoundingClientRect(); return r.width && (r.right > e.clientWidth + 1 || r.left < -1) && !enScroll(x); }).slice(0, 3).map((x) => x.tagName.toLowerCase() + '.' + (x.className || ''));
   if (fuera.length) fallos.push('elementos fuera de pantalla: ' + fuera.join(', '));
   if (w.__errores && w.__errores.length) fallos.push('errores: ' + w.__errores.join(' | '));
-  const h1 = d.querySelectorAll('main h1').length;
+  const h1 = d.querySelectorAll('main h1').length + [...d.querySelectorAll('main [role="heading"][aria-level="1"]')].filter((x) => x.getClientRects().length).length;
   if (h1 !== 1) fallos.push(`hay ${h1} títulos h1 (debe haber 1)`);
   ['header', 'main', 'footer'].forEach((t) => { if (!d.querySelector(t)) fallos.push('falta <' + t + '>'); });
   const sinNombre = [...d.querySelectorAll('button, a, input, select, textarea')].filter((x) => x.getClientRects().length && !(x.textContent.trim() || x.getAttribute('aria-label') || (x.labels && x.labels.length) || x.getAttribute('aria-labelledby')));
@@ -133,22 +133,74 @@ async function flujo() {
   await cargar('#/', 1280); await espera(400);
   afirmar('el inicio pregunta quién eres', textoPagina().includes('¿Quién eres?'));
   afirmar('hay una tarjeta por rol (5)', doc().querySelectorAll('.rol-tarjeta').length === 5);
-  afirmar('el riel lleva a mi espacio, mapa, ValerIA y roles', ['mi', 'portales', 'mapa', 'recorrido', 'hoja', 'identidad'].every((id) => doc().querySelector(`.riel a[data-ruta="${id}"]`)));
+  afirmar('el riel lleva a mi espacio, mapa, ValerIA y roles', ['mi', 'mapa', 'recorrido', 'hoja', 'identidad'].every((id) => doc().querySelector(`.riel a[data-ruta="${id}"]`)));
   await pulsar('Soy docente');
   afirmar('elegir docente lleva a su guía de inicio rápido', ventana().location.hash === '#/guia/docente');
   afirmar('la franja dice con qué rol se mira', doc().getElementById('rol-actual').textContent.includes('Docente'));
   afirmar('la guía tiene pasos, cada uno con su portal', doc().querySelectorAll('.guia-paso').length === 5 && /en kinesis/i.test(textoPagina()) && /en valeria/i.test(textoPagina()) && /en wisfox/i.test(textoPagina()));
-  // Los portales se ven dentro de Mosaico Telar: nada se abre en otra pestaña.
+  // La barra de portales está siempre arriba: Mi espacio, Kinesis, ValerIA y Wisfox, en el orden del flujo.
+  const pestanas = () => [...doc().querySelectorAll('#barra-portales .pestana__ir')].map((a) => a.textContent.replace(/\s+/g, ' ').trim());
+  afirmar('la barra de portales muestra las cuatro pestañas en el orden del flujo', /Mi espacio/.test(pestanas()[0]) && /Kinesis/.test(pestanas()[1]) && /ValerIA/.test(pestanas()[2]) && /Wisfox/.test(pestanas()[3]), pestanas().join(' | '));
   const abiertas = []; ventana().open = (u) => { abiertas.push(u); return null; };
-  await pulsar('Ir a Kinesis'); await espera(500);
-  const marcoK = doc().querySelector('iframe.portal-marco');
+  await pulsar('Ir a Kinesis'); await espera(600);
+  const marcoK = doc().querySelector('.vivos iframe');
   afirmar('Ir a Kinesis lo muestra dentro de Mosaico Telar', ventana().location.hash === '#/portales/kinesis' && !!marcoK && marcoK.getAttribute('src') === ventana().MT.config.portales.kinesis && abiertas.length === 0, ventana().location.hash);
-  afirmar('el portal conserva las pestañas para viajar entre los tres', ['Vista general', 'Kinesis', 'Wisfox', 'ValerIA'].every((t) => [...doc().querySelectorAll('.pestanas-pagina a')].some((a) => a.textContent === t)));
-  [...doc().querySelectorAll('.pestanas-pagina a')].find((a) => a.textContent === 'Wisfox').click(); await espera(500);
-  const marcoW = doc().querySelector('iframe.portal-marco');
-  afirmar('la pestaña Wisfox cambia de portal sin salir', !!marcoW && marcoW.getAttribute('src') === ventana().MT.config.portales.wisfox && !!doc().querySelector('.riel'));
-  [...doc().querySelectorAll('.pestanas-pagina a')].find((a) => a.textContent === 'ValerIA').click(); await espera(500);
-  afirmar('la pestaña ValerIA trae el chat dentro de la plataforma', !!doc().querySelector('.chat') && !doc().querySelector('iframe.portal-marco'));
+  afirmar('la pestaña activa se marca y el portal queda como abierto', doc().querySelector('#barra-portales .pestana[data-portal="kinesis"] .pestana__ir').getAttribute('aria-current') === 'page' && doc().querySelector('#barra-portales .pestana[data-portal="kinesis"]').classList.contains('pestana--abierta'));
+  afirmar('el portal dice qué le toca hacer al rol', /Tu rol: Docente/.test(textoPagina()) && /te toca/.test(textoPagina()));
+  afirmar('el portal avisa que es una aplicación aparte con sus propios datos', /propios datos/.test(textoPagina()));
+  // Lista desplegable de cada portal: qué hace tu rol ahí y dónde trabajarlo
+  const caretWisfox = doc().querySelector('#barra-portales .pestana[data-portal="wisfox"] .pestana__abrir');
+  caretWisfox.click(); await espera(200);
+  const menuW = doc().getElementById('menu-portal-wisfox');
+  afirmar('la lista desplegable de un portal explica qué hace tu rol ahí', !menuW.hidden && /para tu rol: docente/i.test(menuW.innerText) && /Mira cómo la recibe/.test(menuW.innerText));
+  const rm = menuW.getBoundingClientRect(); const tocado = doc().elementFromPoint(rm.left + 24, rm.top + 24);
+  afirmar('la lista desplegable se VE completa (no queda recortada por la barra)', rm.width > 200 && rm.height > 100 && !!tocado && menuW.contains(tocado) && rm.bottom <= ventana().innerHeight, JSON.stringify([rm.width, rm.height, rm.bottom, ventana().innerHeight]));
+  afirmar('solo hay un menú abierto a la vez', doc().querySelectorAll('.menu-portal:not([hidden])').length === 1);
+  doc().dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); await espera(100);
+  afirmar('Escape cierra la lista y devuelve el foco al botón', menuW.hidden && doc().activeElement === caretWisfox);
+  caretWisfox.click(); await espera(150);
+  [...menuW.querySelectorAll('a')].find((a) => /Ir a Wisfox/.test(a.textContent)).click(); await espera(600);
+  const marcoW = doc().querySelector('.vivos iframe[src="' + ventana().MT.config.portales.wisfox + '"]');
+  afirmar('desde la lista se salta a otro portal sin salir de la plataforma', !!marcoW && ventana().location.hash === '#/portales/wisfox' && !!doc().querySelector('.riel'));
+  afirmar('Kinesis y Wisfox quedan abiertos a la vez', ['kinesis', 'wisfox'].every((p) => doc().querySelector('#barra-portales .pestana[data-portal="' + p + '"]').classList.contains('pestana--abierta')));
+  // Los portales son persistentes: volver a ellos no los recarga, y se ven dos a la vez
+  let cargas = 0; marcoK.addEventListener('load', () => cargas++); marcoW.addEventListener('load', () => cargas++);
+  doc().querySelector('#barra-portales .pestana[data-portal="kinesis"] .pestana__ir').click(); await espera(400);
+  await ir('#/mi'); await espera(300);
+  afirmar('al salir de los portales siguen en el documento, ocultos', marcoK.isConnected && marcoW.isConnected && marcoK.closest('[hidden]'));
+  doc().querySelector('#barra-portales .pestana[data-portal="kinesis"] .pestana__ir').click(); await espera(500);
+  afirmar('volver a un portal NO lo recarga: conserva lo que se estaba haciendo', cargas === 0 && marcoK.isConnected && !marcoK.closest('[hidden]'), 'cargas=' + cargas);
+  poner(doc().getElementById('dividir-con'), 'wisfox'); await espera(300);
+  afirmar('la vista dividida muestra dos portales lado a lado', [...doc().querySelectorAll('.vivo-panel')].filter((p) => !p.hidden).length === 2 && doc().querySelector('.vivo-marcos--2') && cargas === 0, 'cargas=' + cargas);
+  [...doc().querySelectorAll('.vivos button')].find((b) => /Quitar vista dividida/.test(b.textContent)).click(); await espera(250);
+  afirmar('se puede quitar la vista dividida', [...doc().querySelectorAll('.vivo-panel')].filter((p) => !p.hidden).length === 1);
+  doc().querySelector('#barra-portales .pestana[data-portal="valeria"] .pestana__ir').click(); await espera(500);
+  afirmar('la pestaña ValerIA trae el chat dentro de la plataforma', !!doc().querySelector('.vivo-panel[data-portal="valeria"]:not([hidden]) .chat') && !marcoK.closest('[hidden]') === false);
+  // Cambiar de rol sin perder el lugar
+  doc().getElementById('rol-actual').click(); await espera(200);
+  afirmar('el selector de rol lista los cinco roles', doc().querySelectorAll('#menu-rol .menu-rol__lista button').length === 5 && !doc().getElementById('menu-rol').hidden);
+  await ir('#/mi/ajustes'); ventana().MT.router.recargar();
+  doc().getElementById('rol-actual').click(); await espera(150);
+  [...doc().querySelectorAll('#menu-rol .menu-rol__lista button')].find((b) => /Orientación/.test(b.textContent)).click(); await espera(400);
+  afirmar('cambiar de rol deja en la misma sección si el nuevo rol la tiene', ventana().location.hash === '#/mi/ajustes' && /Ajustes por revisar/.test(textoPagina()) && /Rol: Orientación/.test(doc().getElementById('rol-actual').textContent));
+  doc().getElementById('rol-actual').click(); await espera(150);
+  [...doc().querySelectorAll('#menu-rol .menu-rol__lista button')].find((b) => /Docente/.test(b.textContent)).click(); await espera(400);
+  // La guía te acompaña dentro de Mi espacio
+  await ir('#/mi/actividades'); ventana().MT.router.recargar(); await espera(200);
+  afirmar('cada sección de Mi espacio dice en qué paso de la guía estás y qué sigue', /Paso 2 de 5 de tu guía/.test(textoPagina()) && !!hallar('Siguiente:') && !!hallar('Volver a mi guía'));
+  hallar('Siguiente:').click(); await espera(400);
+  afirmar('el botón Siguiente lleva al paso siguiente de la guía', /Paso 3 de 5|Pide ideas/.test(textoPagina()) || ventana().location.hash !== '#/mi/actividades');
+  await ir('#/mi/ajustes'); ventana().MT.router.recargar();
+  afirmar('donde se decide un ajuste se explica qué es un ajuste', /Qué es un ajuste/i.test(textoPagina()));
+  // Las siglas se explican al tocarlas
+  await ir('#/mi'); ventana().MT.router.recargar(); await espera(250);
+  const termino = doc().querySelector('#app .termino');
+  afirmar('la primera vez que aparece una sigla se vuelve un botón', !!termino && termino.tagName === 'BUTTON');
+  if (termino) { termino.click(); await espera(250); }
+  afirmar('tocar la sigla explica qué significa, sin pasar el cursor', /Diseño Universal para el Aprendizaje/.test(doc().querySelector('dialog[open]') ? doc().querySelector('dialog[open]').innerText : ''));
+  if (doc().querySelector('dialog[open]')) { doc().querySelector('dialog[open]').close(); await espera(150); }
+  await ir('#/glosario');
+  afirmar('el glosario explica PIAR, DUA, ajuste y mínimo privilegio', ['PIAR', 'DUA', 'Ajuste', 'Mínimo privilegio'].every((t) => textoPagina().includes(t)));
   await ir('#/guia/docente'); ventana().MT.router.recargar();
   await pulsar('Trabajar en Mi espacio');
   afirmar('Trabajar en Mi espacio lleva al espacio del rol', ventana().location.hash === '#/mi/resumen');
@@ -331,7 +383,7 @@ async function flujo() {
   let enlacesRepo = 0; let textoCodigo = 0;
   for (const r of ['#/', '#/mi', '#/portales', '#/guia/docente', '#/hoja/propuesta', '#/hoja/arquitectura', '#/mapa/conexiones', '#/mapa/comparar', '#/recorrido/roles', '#/valeria/conexion', '#/hoja', '#/piloto', '#/identidad']) {
     await ir(r); await espera(150);
-    enlacesRepo += doc().querySelectorAll('a[href*="github.com"], a[href*="githubusercontent"], iframe').length;
+    enlacesRepo += doc().querySelectorAll('a[href*="github.com"], a[href*="githubusercontent"]').length + [...doc().querySelectorAll('iframe')].filter((f) => !f.closest('.vivos') || !Object.values(ventana().MT.config.portales).includes(f.getAttribute('src'))).length;
     if (/\bGitHub\b|repositorio|código fuente|Código público/i.test(doc().body.innerText)) textoCodigo += 1;
   }
   afirmar('ninguna pantalla enlaza el repositorio ni incrusta sitios externos', enlacesRepo === 0, enlacesRepo + ' enlaces');
@@ -345,6 +397,10 @@ async function flujo() {
   await ir('#/mi/archivos'); await espera(300);
   const u = await ventana().MT.archivos.url(ventana().MT.db.lista('archivos')[0].id);
   afirmar('el contenido del archivo sigue guardado al recargar', !!u);
+  const csp = doc().querySelector('meta[http-equiv="Content-Security-Policy"]');
+  afirmar('la página trae una política de seguridad de contenido restrictiva', !!csp && /script-src 'self'/.test(csp.content) && /object-src 'none'/.test(csp.content) && /frame-src https:\/\/profenapaipa\.github\.io/.test(csp.content) && !/unsafe-eval/.test(csp.content));
+  afirmar('no hay scripts en línea (la política los bloquearía)', ![...doc().querySelectorAll('script')].some((x) => !x.src && x.textContent.trim()));
+  afirmar('todo iframe de los portales va aislado (sandbox)', [...doc().querySelectorAll('.vivos iframe')].every((f) => f.hasAttribute('sandbox') && f.getAttribute('referrerpolicy') === 'no-referrer'));
   afirmar('sin errores de ejecución en todo el recorrido', !(ventana().__errores && ventana().__errores.length), ventana().__errores && ventana().__errores.join(' | '));
 }
 

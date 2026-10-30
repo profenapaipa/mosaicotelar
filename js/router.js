@@ -38,19 +38,24 @@
     limpiezas.forEach((f) => { try { f(); } catch (e) { /* ya no importa */ } });
     limpiezas = [];
     main.dataset.espacio = (typeof def.espacio === 'function' ? def.espacio(sub) : def.espacio) || '';
-    main.replaceChildren();
+    // Los portales vivos (iframes y chat) son persistentes: se les quita de vista pero no del documento, o se recargarían.
+    [...main.children].forEach((x) => { if (!x.hasAttribute('data-persistente')) x.remove(); });
+    if (MT.vivos) MT.vivos.ocultar();
     try {
       def.render(main, { sub, subs });
     } catch (e) {
       (window.__errores = window.__errores || []).push('vista ' + id + ': ' + e.message);
       console.error(e);
-      main.replaceChildren(MT.ui.h('div', { class: 'contenedor' }, MT.ui.h('p', { class: 'aviso' }, 'Esta pantalla tuvo un problema. Vuelve al inicio e inténtalo otra vez.')));
+      [...main.children].forEach((x) => { if (!x.hasAttribute('data-persistente')) x.remove(); });
+      main.append(MT.ui.h('div', { class: 'contenedor' }, MT.ui.h('p', { class: 'aviso' }, 'Esta pantalla tuvo un problema. Vuelve al inicio e inténtalo otra vez.')));
     }
     document.title = (def.titulo === 'Inicio' ? 'Mosaico Telar' : def.titulo + ' · Mosaico Telar');
     marcarNavegacion(id);
+    if (MT.glosario) MT.glosario.marcar(main);
+    if (MT.barra) MT.barra.actualizar();
     if (op.foco) {
       window.scrollTo(0, 0);
-      const t = main.querySelector('h1');
+      const t = main.querySelector('h1') || main.querySelector('.vivos:not([hidden]) [role="heading"]');
       if (t) { t.setAttribute('tabindex', '-1'); t.focus({ preventScroll: true }); }
     } else {
       window.scrollTo(0, y);
