@@ -6,4 +6,4 @@ El docente planea una clase con el Diseño Universal para el Aprendizaje, orient
 
 Para verla, abre `index.html` o la página publicada. No necesita instalación ni servidor, y lo que se crea queda solo en el navegador de quien lo usa.
 
-Semillero Maker de Tecnología con Sentido. Representante legal: Néstor Andrés Paipa.
+Un proyecto en construcción del Semillero Maker de Tecnología con Sentido.

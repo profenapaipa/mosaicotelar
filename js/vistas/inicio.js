@@ -7,7 +7,6 @@
   const st = MT.store;
 
   const OAPE = 'https://oape.educacionbogota.edu.co/sites/default/files/2026-05/3.Marzo_2026_Boletin_Mensual_1.pdf';
-  const CORTE = 'https://www.diarioconstitucional.cl/2025/08/21/corte-constitucional-de-colombia-ampara-derecho-a-una-educacion-inclusiva-de-estudiante-neurodivergente/';
 
   function tarjetaRol(r) {
     return h('article', { class: 'tarjeta rol-tarjeta' },
@@ -42,7 +41,7 @@
           h('div', { class: 'acciones' },
             h('a', { class: 'btn', href: '#roles', onclick: (e) => { e.preventDefault(); const el = document.getElementById('roles'); if (el) el.scrollIntoView({ behavior: 'smooth' }); } }, 'Entrar con mi rol'),
             h('a', { class: 'btn btn--suave', href: '#/registro/gratis' }, 'Probar gratis')),
-          h('ul', { class: 'confianza' }, ['Pensado desde el Decreto 1421 y el DUA', 'Información clínica aislada', 'Funciona sin instalar nada'].map((t) => h('li', null, t)))),
+          h('ul', { class: 'confianza' }, ['Pensado desde la pedagogía inclusiva y el DUA', 'Información clínica aislada', 'Funciona sin instalar nada'].map((t) => h('li', null, t)))),
         h('div', { class: 'vitrina' },
           h('div', { class: 'dispositivo dispositivo--a' }, h('img', { src: 'assets/capturas/docente.jpg', alt: 'El espacio del docente: sus estudiantes, el siguiente paso y las actividades planeadas con DUA', width: '1280', height: '800' }), h('span', { class: 'dispositivo-rotulo' }, 'Espacio del docente')),
           h('div', { class: 'dispositivo dispositivo--b' }, h('img', { src: 'assets/capturas/estudiante.jpg', alt: 'El espacio del estudiante: su actividad del día con el quiz, sus puntos y sus logros', width: '1280', height: '800' }), h('span', { class: 'dispositivo-rotulo' }, 'Espacio del estudiante')))));
@@ -65,7 +64,8 @@
             componente('valeria', 'ValerIA', 'La guía', 'Una asistente de IA que propone y no decide. Ayuda al docente a diseñar y al estudiante a resolver dudas. Hoy responde con ejemplos.')),
           h('p', { class: 'plataforma__une' }, h('strong', null, 'Cómo se conectan: '), 'Kinesis le pasa a Wisfox la actividad ya aprobada, Wisfox le devuelve a Kinesis el progreso, y ValerIA ayuda a los dos.')),
         h('div', { class: 'objetivo' }, h('p', { class: 'etiqueta' }, 'Para qué existe'),
-          h('p', { class: 'objetivo__texto' }, 'Que cada estudiante que necesita ajustes los reciba en la clase de hoy, y no solo en un documento.')),
+          h('p', { class: 'objetivo__texto' }, 'Para que cada estudiante encuentre en el aula caminos para aprender a su manera, y para que la docencia tenga herramientas que le quiten peso al trámite y le devuelvan tiempo para lo que más importa: la diversidad de quienes aprenden.'),
+          h('p', { class: 'objetivo__sentido' }, 'Tecnología con sentido: el sentido humano va por encima de lo económico y de lo burocrático.')),
         h('div', { class: 'acciones' }, h('a', { class: 'btn', href: '#roles', onclick: (e) => { e.preventDefault(); const el = document.getElementById('roles'); if (el) el.scrollIntoView({ behavior: 'smooth' }); } }, 'Elegir mi rol'),
           h('a', { class: 'btn btn--suave', href: '#/portales' }, 'Ver los tres portales'))));
 
@@ -85,27 +85,26 @@
         h('div', { class: 'acciones' }, h('a', { class: 'btn', href: '#/recorrido/camino' }, 'Recorrerlo de punta a punta'), h('a', { class: 'btn btn--suave', href: '#/mapa/conexiones' }, 'Ver todo en el mapa'))));
 
       c.append(h('section', { class: 'seccion', 'aria-labelledby': 'h-dif' },
-        h('h2', { id: 'h-dif' }, 'Qué nos hace distintos'),
+        h('h2', { id: 'h-dif' }, 'Qué la hace distinta'),
         h('div', { class: 'rejilla rejilla--3 diferencial' },
-          h('div', { class: 'tarjeta tarjeta--borde' }, h('h3', null, 'Un flujo, no un documento'), h('p', null, 'No generamos un PIAR y ahí termina: el ajuste viaja entre cuatro roles y cada paso se ve.')),
+          h('div', { class: 'tarjeta tarjeta--borde' }, h('h3', null, 'Un camino compartido'), h('p', null, 'Docentes, orientación, familias y estudiantes ven el mismo proceso, cada uno con lo suyo, y cada paso se entiende.')),
           h('div', { class: 'tarjeta tarjeta--borde' }, h('h3', null, 'Para todos, no solo con diagnóstico'), h('p', null, 'El DUA es la base: la clase se piensa para todos y el ajuste cubre lo que el diseño no alcanza.')),
-          h('div', { class: 'tarjeta tarjeta--borde' }, h('h3', null, 'Protegido por diseño'), h('p', null, 'La información clínica queda aislada y la IA nunca la recibe.'))),
-        h('p', { style: 'margin-top:1rem' }, h('a', { href: '#/mapa/comparar' }, 'Ver la comparación con PIARPLUS, incluido dónde vamos atrás'))));
+          h('div', { class: 'tarjeta tarjeta--borde' }, h('h3', null, 'Protegida por diseño'), h('p', null, 'La información clínica queda aislada y la IA nunca la recibe.')))));
 
       c.append(h('section', { class: 'seccion', 'aria-labelledby': 'h-problema' },
-        h('h2', { id: 'h-problema' }, 'El plan existe en el papel. Falta que llegue al aula.'),
-        h('p', { class: 'bajada' }, 'Todo colegio debe elaborar un plan de ajustes razonables (PIAR) para cada estudiante con discapacidad. En la práctica, queda en una carpeta y el docente adapta la clase después de darla.'),
+        h('h2', { id: 'h-problema' }, 'Cada aula reúne muchas maneras de aprender'),
+        h('p', { class: 'bajada' }, 'Cada estudiante percibe y vive el mundo a su manera, y la docencia ya hace un esfuerzo enorme por atenderlo. Mosaico Telar nace para apoyar ese trabajo: que formatos y registros pasen a un segundo plano y el tiempo vuelva a la pedagogía.'),
         h('div', { class: 'rejilla rejilla--3' },
-          h('div', { class: 'tarjeta' }, h('span', { class: 'cifra' }, '22.803'), h('p', null, 'estudiantes con discapacidad en colegios oficiales de Bogotá, marzo de 2026 (3,38 % de la matrícula).'), h('a', { href: OAPE, rel: 'noopener' }, 'Boletín de la OAPE')),
-          h('div', { class: 'tarjeta' }, h('span', { class: 'cifra' }, 'Decreto 1421'), h('p', null, 'de 2017 obliga a diseñar el PIAR y a hacerle seguimiento. Un fallo reciente de la Corte Constitucional amparó a un estudiante cuyo colegio no lo hizo a tiempo.'), h('a', { href: CORTE, rel: 'noopener' }, 'Diario Constitucional')),
-          h('div', { class: 'tarjeta' }, h('span', { class: 'cifra' }, 'Todos'), h('p', null, 'Esas cifras miden discapacidad. Nuestra propuesta es más amplia: todos aprendemos distinto, y por eso todos somos parte del mosaico.')))));
+          h('div', { class: 'tarjeta' }, h('span', { class: 'cifra' }, '22.803'), h('p', null, 'estudiantes con discapacidad en colegios oficiales de Bogotá, marzo de 2026 (3,38 % de la matrícula): una parte de esa diversidad.'), h('a', { href: OAPE, rel: 'noopener' }, 'Boletín de la OAPE')),
+          h('div', { class: 'tarjeta' }, h('span', { class: 'cifra' }, 'Una mirada que evoluciona'), h('p', null, 'La normatividad de educación inclusiva y la reflexión pedagógica avanzan hacia una atención más humana y cercana. Mosaico Telar la toma como punto de partida, no como meta.')),
+          h('div', { class: 'tarjeta' }, h('span', { class: 'cifra' }, 'Todos'), h('p', null, 'Todos aprendemos distinto, y por eso todos somos parte del mosaico. La herramienta está para servir a esa diversidad, no para medirla.')))));
 
       c.append(h('section', { class: 'seccion', 'aria-labelledby': 'h-datos' },
         h('div', { class: 'garantias' },
           h('h2', { id: 'h-datos' }, 'Los datos de los estudiantes van primero'),
           h('p', null, 'Trabajamos con información de menores de edad. Por eso la regla es clara: los datos de partida son de ejemplo y lo que tú escribes se queda en tu navegador.'),
           h('div', { class: 'rejilla rejilla--2' },
-            [['Ningún dato real entra hasta cumplir los requisitos', 'Política de tratamiento de datos, autorización de las familias, contrato con el colegio, cifrado y una revisión de seguridad independiente.'],
+            [['Ningún dato real entra hasta que todo esté en regla', 'Política de tratamiento de datos, autorización de las familias, contrato con el colegio, cifrado y una revisión de seguridad independiente.'],
              ['La información clínica queda aislada', 'Solo la ve orientación. Ni docentes, ni familias, ni coordinación, ni la IA la reciben.'],
              ['La IA solo propone', 'Trabaja con perfiles ficticios y sin acceso a bases de datos. Sus respuestas son propuestas, nunca decisiones.'],
              ['Lo que subes se queda contigo', 'Los archivos se guardan solo en este navegador y no se envían a ningún servidor. Cada archivo lo ve únicamente quien tú elijas.']]
@@ -114,7 +113,7 @@
 
       c.append(h('section', { class: 'seccion', 'aria-labelledby': 'h-participa' },
         h('h2', { id: 'h-participa' }, 'Llévala a tu colegio'),
-        h('p', { class: 'bajada' }, 'Empieza gratis con la demo o con una cuenta. Cuando quieras implementarla bien, ofrecemos implementación, asesoría, capacitación y acompañamiento.'),
+        h('p', { class: 'bajada' }, 'Puedes recorrer la demostración completa sin registrarte. Estamos construyendo, con calma y con las autorizaciones necesarias, la forma de acompañar a cada colegio.'),
         h('div', { class: 'acciones' }, h('a', { class: 'btn', href: '#/registro/gratis' }, 'Crear cuenta gratis'), h('a', { class: 'btn btn--suave', href: '#/registro/prueba' }, 'Solicitar prueba gratuita de Pro'), h('a', { class: 'btn btn--suave', href: '#/planes' }, 'Ver planes y servicios'), h('a', { class: 'btn btn--suave', href: '#/hoja/propuesta' }, 'Ver la propuesta'))));
 
       main.append(c);

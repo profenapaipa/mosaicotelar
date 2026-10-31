@@ -3,7 +3,6 @@
    - Conexiones: tres columnas (los tres proyectos) con sus módulos, y flechas con lo que viaja
      entre ellos. Toca un módulo para ver qué hace, quién lo usa y qué recibe y entrega. Elige un rol
      para atenuar todo lo que ese rol no toca.
-   - Frente a otras plataformas: qué nos diferencia de PIARPLUS y dónde vamos atrás, con la fuente de cada afirmación.
 
    Cada módulo declara su estado con la misma regla que el resto del sitio: funciona, en integración,
    simulado o viene. Nada se pinta como terminado si no lo está. */
@@ -180,46 +179,12 @@
     MT.router.alSalir(() => window.removeEventListener('resize', alCambiar));
   }
 
-  const FILAS = [
-    ['Qué es', 'Un flujo que une al docente, a orientación, a la familia y al estudiante', 'Un generador de PIAR y de planes de clase con IA para docentes', null],
-    ['Documento PIAR en el formato oficial del MEN', 'Todavía no: es la fase 5 de Kinesis', 'Sí. Dice generarlo con IA, en el formato oficial (Decreto 1421 de 2017)', 'atras'],
-    ['Planeación con DUA', 'Sí', 'Sí: planes de clase alineados con el DUA, la malla curricular y el PEI', null],
-    ['Orientación aprueba antes de que llegue al estudiante y a la familia', 'Sí. Es el centro del flujo', 'No lo menciona', 'diferente'],
-    ['Vista para la familia', 'Sí: ve el proceso mientras ocurre', 'Tiene una página para familias que explica el PIAR', null],
-    ['Material para el estudiante', 'Rutas, quizes, logros y tutora', 'Menciona una actividad interactiva para el estudiante', null],
-    ['Pensado para todos, no solo para quien tiene un diagnóstico', 'Sí: el DUA es la base', 'No lo dice', 'diferente'],
-    ['Información clínica aislada y sin IA', 'Sí, por diseño. La IA nunca la recibe', 'No lo dice', 'diferente'],
-    ['Quién lo hace', 'Tres proyectos de estudiantes, unidos en una sola plataforma', 'Una empresa', null],
-    ['Alcance hoy', 'Plataforma funcional con datos de ejemplo, lista para un piloto', 'Dice usarse en 207 colegios de 29 departamentos (cifra de la propia empresa)', 'atras'],
-    ['Precio', 'Piloto sin costo; licencia por definir', 'Empieza gratis; tiene una página de precios que no revisamos', null],
-  ];
-
-  function comparar(c) {
-    c.append(h('div', { class: 'rejilla rejilla--3 diferencial' },
-      h('div', { class: 'tarjeta tarjeta--borde' }, h('h3', null, 'Un flujo, no un documento'), h('p', null, 'No generamos un PIAR y ahí termina: el ajuste viaja del docente a orientación, a la familia y al estudiante, y cada paso se ve.')),
-      h('div', { class: 'tarjeta tarjeta--borde' }, h('h3', null, 'Para todos, no solo con diagnóstico'), h('p', null, 'El Diseño Universal para el Aprendizaje es la base: la clase se piensa para todos, y el ajuste individual cubre lo que el diseño no alcanza.')),
-      h('div', { class: 'tarjeta tarjeta--borde' }, h('h3', null, 'Protegido por diseño'), h('p', null, 'La información clínica vive aislada, ningún rol de administración la ve y la IA nunca la recibe: solo un perfil anónimo.'))));
-    c.append(h('div', { class: 'tarjeta', style: 'margin-top:1rem' },
-      h('h2', null, 'Frente a PIARPLUS, lado a lado'),
-      h('p', { class: 'suave' }, 'Dejamos también donde vamos atrás: una comparación que solo muestra ventajas no se puede creer.'),
-      h('div', { class: 'tabla-scroll' }, h('table', { class: 'tabla tabla-comp' },
-        h('thead', null, h('tr', null, h('th', { scope: 'col' }, 'Aspecto'), h('th', { scope: 'col' }, 'Mosaico Telar'), h('th', { scope: 'col' }, 'PIARPLUS, según su sitio'))),
-        h('tbody', null, FILAS.map(([a, m, p, k]) => h('tr', null, h('th', { scope: 'row' }, a),
-          h('td', null, m, k ? h('small', { class: k }, k === 'diferente' ? 'Nos diferencia' : 'Vamos atrás') : null), h('td', null, p)))))),
-      h('p', { class: 'suave', style: 'margin-top:1rem' }, 'Fuente de la columna de PIARPLUS: ', h('a', { href: 'https://www.piarplus.co/', rel: 'noopener' }, 'piarplus.co'), ', consultada el 30 de octubre de 2026, y ',
-        h('a', { href: 'https://canaltrece.com.co/noticias/educacion-inclusiva-en-colombia-decreto-1421/', rel: 'noopener' }, 'Canal Trece'), ' para la cifra de colegios. Son afirmaciones de la empresa: no las verificamos ni probamos su producto. “No lo dice” significa que no lo encontramos en esa página, no que no exista.')));
-  }
-
-  const TABS = [{ id: 'conexiones', etiqueta: 'Cómo se conecta todo' }, { id: 'comparar', etiqueta: 'Frente a otras plataformas' }];
-
   MT.router.registrar({
-    id: 'mapa', titulo: 'Mapa', espacio: '', subs: TABS,
-    render(main, { sub }) {
-      const c = pagina(main, { etiqueta: 'Mapa interactivo', titulo: sub === 'comparar' ? 'Qué nos diferencia, y dónde vamos atrás' : 'Cómo se conecta todo',
-        descripcion: sub === 'comparar' ? 'Una comparación honesta con PIARPLUS, una plataforma de referencia en Colombia.' : 'Los tres proyectos de estudiantes, sus módulos y lo que viaja entre ellos. Toca cualquier módulo.' });
-      c.append(h('nav', { class: 'pestanas-pagina', 'aria-label': 'Secciones del mapa' },
-        TABS.map((t) => h('a', { href: '#/mapa/' + t.id, 'aria-current': t.id === sub ? 'page' : null }, t.etiqueta))));
-      (sub === 'comparar' ? comparar : conexiones)(c);
+    id: 'mapa', titulo: 'Mapa', espacio: '', subs: [{ id: 'conexiones' }],
+    render(main) {
+      const c = pagina(main, { etiqueta: 'Mapa interactivo', titulo: 'Cómo se conecta todo',
+        descripcion: 'Los tres proyectos de estudiantes, sus módulos y lo que viaja entre ellos. Toca cualquier módulo.' });
+      conexiones(c);
     },
   });
 })(window.MT = window.MT || {});

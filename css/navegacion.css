@@ -73,3 +73,7 @@
 }
 
 .marca-hero__controles { display: flex; gap: .4rem; flex-wrap: wrap; }
+
+/* Aviso de proyecto en construcción y principio que guía la plataforma */
+.aviso--construccion { background: var(--lino); color: var(--tinta); border: 1px solid var(--linea); border-left: 6px solid var(--ambar-texto); font-weight: 500; font-size: .92rem; margin: 0 0 1rem; }
+.objetivo__sentido { margin: .6rem 0 0; font-weight: 700; color: var(--tinta-suave); }

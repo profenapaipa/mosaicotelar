@@ -10,7 +10,7 @@
 <pre id="resultado" style="position:fixed;top:0;left:0;max-width:100%;background:#fff;color:#000;font:11px monospace;white-space:pre-wrap"></pre>
 <script>
 const SECC = { docente: ['resumen', 'estudiantes', 'actividades', 'ajustes', 'notas', 'archivos'], orientacion: ['resumen', 'ajustes', 'estudiantes', 'notas', 'archivos'], familia: ['resumen', 'archivos'], coordinacion: ['resumen', 'estudiantes', 'cursos', 'categorias'], estudiante: ['resumen', 'ruta', 'logros', 'archivos'] };
-const RUTAS = [[null, '#/'], [null, '#/mi'], [null, '#/mapa/conexiones'], [null, '#/mapa/comparar'], [null, '#/valeria/chat'], [null, '#/valeria/conexion'], [null, '#/recorrido/camino'], [null, '#/recorrido/roles'], [null, '#/recorrido/datos'], [null, '#/portales'], [null, '#/portales/kinesis'], [null, '#/portales/wisfox'], [null, '#/portales/valeria'], [null, '#/glosario'], [null, '#/planes/planes'], [null, '#/planes/servicios'], [null, '#/registro/gratis'], [null, '#/registro/prueba'], [null, '#/guia/docente'], [null, '#/guia/estudiante'], [null, '#/hoja/propuesta'], [null, '#/hoja/arquitectura'], [null, '#/hoja/etapas'], [null, '#/piloto'], [null, '#/identidad'],
+const RUTAS = [[null, '#/'], [null, '#/mi'], [null, '#/mapa/conexiones'], [null, '#/valeria/chat'], [null, '#/valeria/conexion'], [null, '#/recorrido/camino'], [null, '#/recorrido/roles'], [null, '#/recorrido/datos'], [null, '#/portales'], [null, '#/portales/kinesis'], [null, '#/portales/wisfox'], [null, '#/portales/valeria'], [null, '#/glosario'], [null, '#/planes/planes'], [null, '#/planes/servicios'], [null, '#/registro/gratis'], [null, '#/registro/prueba'], [null, '#/guia/docente'], [null, '#/guia/estudiante'], [null, '#/hoja/propuesta'], [null, '#/hoja/arquitectura'], [null, '#/hoja/etapas'], [null, '#/piloto'], [null, '#/identidad'],
   ...Object.entries(SECC).flatMap(([rol, l]) => l.map((x) => [rol, '#/mi/' + x]))];
 const ANCHOS = [390, 1280];
 const TEMAS = ['claro', 'oscuro'];
@@ -368,8 +368,17 @@ async function flujo() {
   afirmar('tocar un módulo explica y ofrece abrirlo en la plataforma', /Quién lo usa/.test(textoPagina()) && !!hallar('Abrir en la plataforma') && doc().querySelectorAll('.mapa-svg path.activa').length >= 2);
   hallar('Abrir en la plataforma').click(); await espera(300);
   afirmar('abrir un módulo lleva al espacio del rol que lo usa', ventana().location.hash === '#/mi/ajustes' && ventana().MT.store.obtener().rol === 'orientacion');
-  await ir('#/mapa/comparar');
-  afirmar('la comparación nombra a PIARPLUS y dice dónde vamos atrás', textoPagina().includes('PIARPLUS') && /vamos atrás/i.test(textoPagina()));
+  // El tono: el sentido humano y pedagógico primero, sin culpar a la docencia ni nombrar a otras empresas
+  await ir('#/'); await espera(300);
+  const inicioTxt = textoPagina();
+  afirmar('el inicio pone primero el sentido humano y pedagógico', /sentido humano va por encima de lo económico y de lo burocrático/i.test(inicioTxt) && /diversidad/i.test(inicioTxt));
+  afirmar('el inicio no culpa a la docencia del trámite', !/en la práctica, queda en una carpeta|por cumplir|solo por el papeleo|después de darla|no lo hizo a tiempo/i.test(inicioTxt));
+  await ir('#/hoja/propuesta');
+  afirmar('la propuesta parte del sentido pedagógico y no menciona a otras empresas', /nuestro sentido/i.test(textoPagina()) && !/PIARPLUS|piarplus|competencia/i.test(textoPagina()));
+  afirmar('el sitio ya no tiene la comparación con otra plataforma', !doc().querySelector('a[href*="comparar"]'));
+  await ir('#/planes'); ventana().MT.router.recargar();
+  afirmar('planes, registro y piloto avisan que el proyecto está en construcción y sin cobros', /Un proyecto en construcción/.test(textoPagina()) && /no hay cobros ni contratos/.test(textoPagina()));
+  afirmar('el pie no presenta un cargo legal mientras el modelo de empresa se coordina', !/Representante legal/i.test(doc().querySelector('footer').innerText));
   await ir('#/recorrido/camino');
   afirmar('el camino se marca solo con lo que ya se hizo', /[5-7] de 7 pasos/.test(textoPagina()), (textoPagina().match(/\d de 7 pasos/) || [''])[0]);
   await ir('#/recorrido/roles');
@@ -379,13 +388,13 @@ async function flujo() {
   await ir('#/piloto');
   afirmar('la página de piloto explica las fases', /Requisitos de protección de datos/.test(textoPagina()));
   await ir('#/hoja/propuesta');
-  afirmar('la hoja de ruta trae objetivo, riesgos y qué necesitamos', /objetivo/i.test(textoPagina()) && /riesgos/i.test(textoPagina()) && /qué necesitamos/i.test(textoPagina()));
+  afirmar('la hoja de ruta trae objetivo, riesgos y qué necesitamos', /nuestro sentido/i.test(textoPagina()) && /riesgos/i.test(textoPagina()) && /qué necesitamos/i.test(textoPagina()));
   afirmar('el foco llega al título al cambiar de pantalla', doc().activeElement && doc().activeElement.tagName === 'H1');
 
   try { traza.push('paso 13: ' + ventana().MT.db.lista('actividades').length + '/' + (localStorage.getItem('mosaicotelar.v2') || '').length); } catch (e) { /* aún sin app */ }
   // 13. Nada de código ni de repositorio a la vista, en ninguna pantalla
   let enlacesRepo = 0; let textoCodigo = 0;
-  for (const r of ['#/', '#/mi', '#/portales', '#/guia/docente', '#/hoja/propuesta', '#/hoja/arquitectura', '#/mapa/conexiones', '#/mapa/comparar', '#/recorrido/roles', '#/valeria/conexion', '#/hoja', '#/piloto', '#/identidad']) {
+  for (const r of ['#/', '#/mi', '#/portales', '#/guia/docente', '#/hoja/propuesta', '#/hoja/arquitectura', '#/mapa/conexiones', '#/recorrido/roles', '#/valeria/conexion', '#/hoja', '#/piloto', '#/identidad']) {
     await ir(r); await espera(150);
     enlacesRepo += doc().querySelectorAll('a[href*="github.com"], a[href*="githubusercontent"]').length + [...doc().querySelectorAll('iframe')].filter((f) => !f.closest('.vivos') || !Object.values(ventana().MT.config.portales).includes(f.getAttribute('src'))).length;
     if (/\bGitHub\b|repositorio|código fuente|Código público/i.test(doc().body.innerText)) textoCodigo += 1;

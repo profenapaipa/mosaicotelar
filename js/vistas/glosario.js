@@ -9,7 +9,7 @@
   const { pagina } = MT.comun;
 
   const TERMINOS = [
-    { sigla: 'PIAR', nombre: 'Plan Individual de Ajustes Razonables', que: 'El documento que cada colegio elabora para un estudiante con discapacidad. Dice qué ajustes necesita para aprender y participar en clase. Lo exige el Decreto 1421 de 2017.' },
+    { sigla: 'PIAR', nombre: 'Plan Individual de Ajustes Razonables', que: 'La herramienta con la que el colegio y la familia planean los ajustes que un estudiante con discapacidad necesita para aprender y participar. Lo contempla el Decreto 1421 de 2017.' },
     { sigla: 'DUA', nombre: 'Diseño Universal para el Aprendizaje', que: 'Una manera de planear la clase pensando desde el principio en que todos aprendemos distinto. Tiene tres principios: ofrecer varias formas de presentar la información (el qué), de expresarse (el cómo) y de motivarse (el por qué).' },
     { sigla: 'XP', nombre: 'Puntos de experiencia', que: 'Los puntos que ganas al hacer lecciones y quizes. Suben tu nivel. Son para ver tu propio avance, no para compararte con nadie.' },
     { sigla: 'OAPE', nombre: 'Oficina de la Secretaría de Educación de Bogotá', que: 'La dependencia que publica los boletines de cifras de matrícula. De ahí sale el dato de estudiantes con discapacidad en colegios oficiales.' },

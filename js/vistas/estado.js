@@ -15,26 +15,28 @@
   const lista = (l) => h('ul', null, l.map((x) => h('li', null, x)));
 
   function propuesta(c) {
-    c.append(h('section', { class: 'siguiente-banner' }, h('div', null, h('p', { class: 'etiqueta' }, 'Objetivo'),
-      h('h2', null, 'Que cada estudiante que necesita ajustes los reciba en la clase de hoy, y no solo en un documento.'),
-      h('p', null, 'Mosaico Telar acorta el camino entre el plan de ajustes (PIAR) y lo que ocurre en el aula, y deja a todos los involucrados viéndolo al mismo tiempo.'))));
+    c.append(MT.plan.avisoConstruccion());
+    c.append(h('section', { class: 'siguiente-banner' }, h('div', null, h('p', { class: 'etiqueta' }, 'Nuestro sentido'),
+      h('h2', null, 'Poner la tecnología al servicio de la diversidad de formas de aprender, y quitarle peso al trámite para que la docencia se dedique a lo que más importa.'),
+      h('p', null, 'Mosaico Telar reúne herramientas para que docentes, orientación, familias y estudiantes atiendan, juntos y con claridad, las distintas maneras de percibir y de vivir el mundo que hay en cada aula. Los formatos y los registros pasan a un segundo plano; el sentido humano va primero.'))));
     c.append(h('div', { class: 'rejilla rejilla--2', style: 'margin-top:1rem' },
-      tarjeta('El problema', h('p', null, 'Todo colegio debe elaborar un PIAR para cada estudiante con discapacidad (Decreto 1421 de 2017). En la práctica el plan queda en una carpeta y el docente adapta la clase después de darla, sin que orientación ni la familia lo vean.'),
-        h('p', null, 'En colegios oficiales de Bogotá hay 22.803 estudiantes con discapacidad (marzo de 2026). ', h('a', { href: OAPE, rel: 'noopener' }, 'Boletín de la OAPE'), '.')),
+      tarjeta('Lo que vemos en las aulas', h('p', null, 'Cada aula reúne estudiantes que aprenden, perciben y viven el mundo de maneras distintas. La docencia ya hace un esfuerzo enorme por atenderlas, y buena parte de su tiempo se va en formatos y registros que podrían apoyarla mejor.'),
+        h('p', null, 'En colegios oficiales de Bogotá hay 22.803 estudiantes con discapacidad (marzo de 2026), una parte de esa diversidad. ', h('a', { href: OAPE, rel: 'noopener' }, 'Boletín de la OAPE'), '.'),
+        h('p', { class: 'suave' }, 'La normatividad de educación inclusiva sigue evolucionando hacia una mirada más humana y empática. Mosaico Telar la toma como punto de partida, no como meta.')),
       tarjeta('Para quién es', h('p', null, h('strong', null, 'Quienes la usan: '), 'docentes, orientación, familias, coordinación y estudiantes.'),
-        h('p', null, h('strong', null, 'Quienes deciden: '), 'rectorías, coordinaciones académicas y secretarías de educación.'),
-        h('p', { class: 'suave' }, 'Quién paga y cuánto es una hipótesis por validar en el piloto.'))));
+        h('p', null, h('strong', null, 'Con quienes la construimos: '), 'rectorías, coordinaciones académicas y entidades del sector educativo.'),
+        h('p', { class: 'suave' }, 'El modelo de sostenibilidad está por definir con ellos.'))));
     c.append(h('div', { class: 'rejilla rejilla--3', style: 'margin-top:1rem' },
-      tarjeta('Valor para el colegio', lista(['Evidencia de que cada ajuste se pensó, se aprobó y se aplicó', 'Menos trabajo duplicado entre docente y orientación', 'Cumplimiento del Decreto 1421 con trazabilidad'])),
+      tarjeta('Valor para el colegio', lista(['Un registro claro del proceso, que acompaña al equipo en lugar de recargarlo', 'Menos trabajo duplicado entre docente y orientación: más tiempo para lo pedagógico', 'Un lenguaje común para hablar de los apoyos de cada estudiante'])),
       tarjeta('Valor para la familia', lista(['Ve el proceso mientras ocurre', 'Entiende qué cambió y por qué', 'Sabe cómo acompañar en casa'])),
-      tarjeta('Valor para un aliado', lista(['Un problema nacional con norma que obliga', 'Un producto probado por estudiantes y docentes', 'Datos de un piloto antes de escalar']))));
+      tarjeta('Valor para un aliado', lista(['Una necesidad real de las aulas, con respaldo en la normatividad', 'Un producto construido por estudiantes y docentes, con sentido pedagógico', 'Aprendizajes de un piloto antes de crecer']))));
     c.append(h('div', { class: 'rejilla rejilla--2', style: 'margin-top:1rem' },
-      tarjeta('Cómo se sostiene (hipótesis)', lista(['Piloto acompañado en un curso, sin costo', 'Luego, una licencia por colegio: el precio está por definir con los primeros colegios', 'Aliados que financien el servidor, la revisión de seguridad y el contenido'])),
-      tarjeta('Cómo sabremos que funciona', lista(['Tiempo entre el PIAR y la primera actividad ajustada', 'Porcentaje de ajustes propuestos que orientación aprueba', 'Uso semanal por rol (docentes, familias, estudiantes)', 'Percepción de docentes y familias, con una encuesta corta']))));
+      tarjeta('Cómo podría sostenerse (por definir)', lista(['El sentido pedagógico va primero; la sostenibilidad es lo que permite seguir', 'Un piloto acompañado en un curso, sin costo', 'Luego, un modelo que se definirá con los primeros colegios', 'Aliados que apoyen el servidor, la revisión de seguridad y el contenido'])),
+      tarjeta('Cómo sabremos que funciona', lista(['Cuánto tiempo se ahorra el equipo en trámites y se dedica a lo pedagógico', 'Porcentaje de ajustes propuestos que orientación aprueba', 'Uso por rol (docentes, familias, estudiantes)', 'Percepción de docentes, familias y estudiantes, con una encuesta corta']))));
     c.append(h('div', { class: 'rejilla rejilla--2', style: 'margin-top:1rem' },
-      tarjeta('Riesgos y cómo se manejan', lista(['Datos de menores: ningún dato real hasta cumplir los requisitos de protección de datos', 'La IA se equivoca: solo propone, decide quien enseña, y nunca ve información clínica', 'Que los docentes no la adopten: guía de inicio rápido por rol y un piloto con acompañamiento', 'Competencia: PIARPLUS genera documentos con IA; nosotros llevamos el ajuste al aula (ver la comparación en el mapa)'])),
-      tarjeta('Qué necesitamos', lista(['Un colegio piloto y un curso', 'Revisión legal de protección de datos (Ley 1581)', 'Un servidor y su mantenimiento', 'Financiación para el primer año']),
-        h('div', { class: 'acciones' }, h('a', { class: 'btn', href: '#/piloto' }, 'Solicitar un piloto'), h('a', { class: 'btn btn--suave', href: '#/mapa/comparar' }, 'Comparación con PIARPLUS')))));
+      tarjeta('Riesgos y cómo se manejan', lista(['Datos de menores: ningún dato real hasta que todo esté en regla', 'La IA se equivoca: solo propone, decide quien enseña, y nunca ve información clínica', 'Que se sienta como más trámite: se mide con el equipo y se corrige; la meta es quitar carga, no agregarla', 'Que no se adopte: guía de inicio rápido por rol y un piloto con acompañamiento'])),
+      tarjeta('Qué necesitamos', lista(['Un colegio piloto y un curso', 'Revisión legal de protección de datos (Ley 1581)', 'Las autorizaciones de familias, colegio y demás entidades', 'Definir el modelo de empresa', 'Un servidor y su mantenimiento']),
+        h('div', { class: 'acciones' }, h('a', { class: 'btn', href: '#/piloto' }, 'Conversar sobre un piloto')))));
   }
 
   const CAPAS = [
@@ -73,7 +75,7 @@
   MT.router.registrar({
     id: 'hoja', titulo: 'Hoja de ruta', espacio: '', subs: TABS,
     render(main, { sub }) {
-      const c = pagina(main, { etiqueta: 'Hoja de ruta', titulo: { propuesta: 'Para qué existe y cómo se sostiene', arquitectura: 'Cómo está construida y qué falta', etapas: 'Qué hay hoy y qué viene' }[sub],
+      const c = pagina(main, { etiqueta: 'Hoja de ruta', titulo: { propuesta: 'Nuestro sentido y cómo podría sostenerse', arquitectura: 'Cómo está construida y qué falta', etapas: 'Qué hay hoy y qué viene' }[sub],
         descripcion: 'La mirada de quien decide si probar, apoyar o llevarla a su colegio.' });
       c.append(h('nav', { class: 'pestanas-pagina', 'aria-label': 'Secciones de la hoja de ruta' }, TABS.map((t) => h('a', { href: '#/hoja/' + t.id, 'aria-current': t.id === sub ? 'page' : null }, t.etiqueta))));
       ({ propuesta, arquitectura, etapas })[sub](c);

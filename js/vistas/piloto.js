@@ -18,7 +18,7 @@
     const destino = MT.config && MT.config.contacto;
     if (!destino) {
       c.append(h('div', { class: 'tarjeta' }, h('h2', null, 'Hablemos'),
-        h('p', null, 'Para coordinar un piloto, escribe a Néstor Andrés Paipa, representante legal del Semillero Maker de Tecnología con Sentido, durante la Muestra de Emprendimiento.')));
+        h('p', null, 'El canal de contacto se abrirá cuando el modelo de empresa y las autorizaciones estén listos. Mientras tanto, la demostración completa está abierta.')));
       return;
     }
     const campos = [
@@ -46,6 +46,7 @@
       const c = pagina(main, { etiqueta: 'Piloto', titulo: 'Llévala a tu colegio', descripcion: 'Un piloto acompañado, paso a paso y sin datos reales hasta que todo esté en regla.' });
       c.append(h('div', { class: 'tarjeta' }, h('h2', null, 'Cómo trabajamos'),
         h('ol', { class: 'pasos-piloto' }, FASES.map(([t, d]) => h('li', null, h('strong', null, t), h('p', null, d))))), h('div', { style: 'margin-top:1rem' }));
+      c.append(MT.plan.avisoConstruccion());
       formulario(c);
     },
   });

@@ -66,7 +66,13 @@
     return { via, datos };
   }
 
+  /* Mientras el modelo de empresa y las autorizaciones (familias, colegios y demás entidades) se coordinan, las páginas que
+     hablan de planes, registro y pilotos lo dicen con claridad: no se promete ni se cobra nada que todavía no esté respaldado. */
+  const avisoConstruccion = () => h('p', { class: 'aviso aviso--construccion', role: 'note' },
+    h('strong', null, 'Un proyecto en construcción. '),
+    'Mosaico Telar es un proyecto del Semillero Maker de Tecnología con Sentido. Estamos coordinando el modelo de empresa y las autorizaciones de familias, colegios y demás entidades que hacen falta. Por eso hoy no hay cobros ni contratos, y lo que lees aquí describe hacia dónde vamos.');
+
   const etiquetaPlan = () => { const c = cuenta(); return c ? (c.plan === 'prueba' ? 'Prueba Pro solicitada' : 'Cuenta gratuita') : 'Demo · Probar gratis'; };
 
-  MT.plan = { PRO, PRO_NAV, abrirPro, candado, etiquetaPro, candadoSvg, cuenta, registrar, valido, etiquetaPlan };
+  MT.plan = { avisoConstruccion, PRO, PRO_NAV, abrirPro, candado, etiquetaPro, candadoSvg, cuenta, registrar, valido, etiquetaPlan };
 })(window.MT = window.MT || {});

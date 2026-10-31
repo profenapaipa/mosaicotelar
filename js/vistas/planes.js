@@ -68,6 +68,7 @@
   function vistaPlanes(main, sub) {
     const c = pagina(main, { etiqueta: 'Planes y servicios', titulo: sub === 'servicios' ? 'Servicios y paquetes' : 'Empieza gratis, crece con acompañamiento',
       descripcion: sub === 'servicios' ? 'Implementarla bien es tan importante como el software. Estos son los servicios que ofrecemos y cómo se agrupan en paquetes.' : 'La demo ya funciona completa. Con un registro reservas tu cuenta gratuita, y las funciones Pro se piden con una prueba gratuita.' });
+    c.append(MT.plan.avisoConstruccion());
     c.append(h('nav', { class: 'pestanas-pagina', 'aria-label': 'Planes y servicios' }, [['planes', 'Planes'], ['servicios', 'Servicios y paquetes']].map(([id, t]) => h('a', { href: '#/planes/' + id, 'aria-current': id === sub ? 'page' : null }, t))));
     if (sub === 'servicios') return servicios(c);
 
@@ -105,6 +106,7 @@
   function vistaRegistro(main, plan) {
     const c = pagina(main, { etiqueta: 'Registro', titulo: plan === 'prueba' ? 'Solicita tu prueba gratuita de Pro' : 'Crea tu cuenta gratuita',
       descripcion: plan === 'prueba' ? 'Cuéntanos quién eres y qué necesitas. Te avisamos cuando se active, sin tarjeta y sin compromiso.' : 'Solo te pedimos un correo. Reservas tu cuenta y sigues usando la demostración completa mientras abrimos el espacio en la nube.' });
+    c.append(MT.plan.avisoConstruccion());
     const correo = MT.dlg.campo({ id: 'correo', etiqueta: 'Tu correo', max: 120, valor: (MT.plan.cuenta() || {}).correo || '', ayuda: 'No pedimos tu nombre ni el de ningún estudiante.' });
     const rol = MT.dlg.campo({ id: 'rol', etiqueta: 'Tu rol', tipo: 'select', valor: st.obtener().rol || 'docente', opciones: [...MT.roles.lista.map((r) => ({ valor: r.id, texto: r.nombre })), { valor: 'directivo', texto: 'Rectoría o directivo' }, { valor: 'aliado', texto: 'Aliado, fundación o secretaría' }] });
     const inst = MT.dlg.campo({ id: 'institucion', etiqueta: 'Colegio u organización (opcional)', max: 100 });
