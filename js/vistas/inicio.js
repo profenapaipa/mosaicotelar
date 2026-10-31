@@ -40,7 +40,11 @@
           h('div', { class: 'acciones' },
             h('a', { class: 'btn', href: '#roles', onclick: (e) => { e.preventDefault(); const el = document.getElementById('roles'); if (el) el.scrollIntoView({ behavior: 'smooth' }); } }, 'Entrar con mi rol'),
             h('a', { class: 'btn btn--suave', href: '#/planes' }, 'Participar')),
-          h('ul', { class: 'confianza' }, ['Pensado desde la pedagogía inclusiva y el DUA', 'Información clínica aislada', 'Funciona sin instalar nada'].map((t) => h('li', null, t)))),
+          h('ul', { class: 'confianza' },
+            h('li', null, 'Pensado desde la pedagogía inclusiva, el DUA y el PIAR, y desde ',
+              h('button', { class: 'termino', type: 'button', 'aria-label': 'Marco normativo: las leyes que respaldan estas ideas', onclick: () => MT.glosario.abrirNombre('Marco normativo') }, 'las leyes que los respaldan'), '.'),
+            h('li', null, 'Privacidad en la información de cada persona: cada rol ve solo lo que le corresponde.'),
+            h('li', null, 'Funciona sin instalar nada'))),
         h('div', { class: 'vitrina' },
           h('div', { class: 'dispositivo dispositivo--a' }, h('img', { src: 'assets/capturas/docente.jpg', alt: 'El espacio del docente: sus estudiantes, el siguiente paso y las actividades planeadas con DUA', width: '1280', height: '800' }), h('span', { class: 'dispositivo-rotulo' }, 'Espacio del docente')),
           h('div', { class: 'dispositivo dispositivo--b' }, h('img', { src: 'assets/capturas/estudiante.jpg', alt: 'El espacio del estudiante: su actividad del día con el quiz, sus puntos y sus logros', width: '1280', height: '800' }), h('span', { class: 'dispositivo-rotulo' }, 'Espacio del estudiante')))));

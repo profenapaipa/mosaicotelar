@@ -376,6 +376,12 @@ async function flujo() {
   afirmar('la bienvenida nombra y explica los tres términos: neurodesarrollo, neurodivergencia y neurodiversidad', ['neurodesarrollo', 'neurodivergencia', 'neurodiversidad'].every((t) => new RegExp(t, 'i').test(inicioTxt)) && /Mosaico Telar acompaña esa variedad en el aula/.test(inicioTxt));
   afirmar('el eje es lo cognitivo y la personalización: sin la cifra de discapacidad en general', /realidad de vida diferentes/.test(inicioTxt) && !/22\.803/.test(inicioTxt));
   afirmar('cada término se explica al tocarlo', doc().querySelectorAll('#app .termino').length >= 1);
+  const confianza = doc().querySelector('.confianza');
+  afirmar('la bienvenida dice que se piensa desde la pedagogía inclusiva, el DUA y el PIAR, con cada término explicable', !!confianza && /pedagogía inclusiva, el DUA y el PIAR/.test(confianza.innerText) && [...confianza.querySelectorAll('.termino')].map((b) => b.textContent).join('|').includes('DUA') && [...confianza.querySelectorAll('.termino')].map((b) => b.textContent).join('|').includes('PIAR'));
+  afirmar('habla de privacidad de la información de cada persona y no de información clínica aislada', /Privacidad en la información de cada persona/.test(inicioTxt) && !/Información clínica aislada/i.test(inicioTxt));
+  const marco = [...confianza.querySelectorAll('.termino')].find((b) => /leyes que los respaldan/.test(b.textContent)); if (marco) { marco.click(); await espera(250); }
+  afirmar('las leyes que los respaldan abren el marco normativo explicado', !!marco && /Ley 115 de 1994/.test(doc().querySelector('dialog[open]') ? doc().querySelector('dialog[open]').innerText : '') && /Decreto 1421 de 2017/.test(doc().querySelector('dialog[open]') ? doc().querySelector('dialog[open]').innerText : ''));
+  if (doc().querySelector('dialog[open]')) { doc().querySelector('dialog[open]').close(); await espera(150); }
   await ir('#/glosario'); ventana().MT.router.recargar(); await espera(150);
   afirmar('el glosario define los tres términos del eje', ['Neurodiversidad', 'Neurodivergencia', 'Neurodesarrollo'].every((t) => textoPagina().includes(t)) && !/OAPE/.test(textoPagina()));
   await ir('#/hoja/propuesta');
