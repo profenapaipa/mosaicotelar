@@ -13,8 +13,8 @@
   --logo-fondo: var(--riel-bg);
 }
 .riel-logo { color: #FFFFFF; display: grid; place-items: center; width: 56px; height: 56px; border-radius: 14px; margin-bottom: .6rem; }
-.riel a.riel-logo svg { width: 46px; height: 46px; }   /* con "a" para ganarle a la regla de íconos del riel (28 px) */
-/* El riel es oscuro en cualquier tema: los hilos usan aquí sus versiones claras para no perder contraste sobre él. */
+.riel a.riel-logo svg { width: 46px; height: 46px; color: #8F887C; }   /* con "a" para ganarle a la regla de íconos del riel (28 px) */
+/* El riel es oscuro en cualquier tema: las piezas van en gris suave (opción elegida) y los hilos usan sus versiones claras para no perder contraste. */
 .riel-logo { --hilo-kinesis: #5CC08A; --hilo-valeria: #6F8FE8; --hilo-wisfox: #E8A13C; --hilo-mosaico: #E0527E; }
 .riel-items { display: flex; flex-direction: column; gap: .2rem; align-items: center; }
 .riel-abajo { margin-top: auto; display: flex; flex-direction: column; gap: .2rem; align-items: center; }

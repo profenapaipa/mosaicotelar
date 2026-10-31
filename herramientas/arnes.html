@@ -488,6 +488,60 @@ async function flujo() {
   doc().querySelectorAll('.marca-hero__controles button')[1].click(); await espera(900);
   afirmar('el logo pasa de color a blanco y negro y vuelve', lg.classList.contains('mono') && ventana().getComputedStyle(lg.querySelector('.hilos')).opacity === '0');
   afirmar('al cambiar de pantalla corre la barra de cuatro hilos', !!doc().getElementById('progreso-hilos') && doc().querySelectorAll('#progreso-hilos span').length === 4);
+  // ---- logo (agente de marca) ----
+  {
+    const W = ventana(); const T = W.MT.tejido;
+    // La forma final es la aprobada: se compara pixel a pixel con el dibujo original de ui.js (LOGO), a 256 px.
+    const trazo = (d) => { const c = doc().createElement('canvas'); c.width = c.height = 256; const x = c.getContext('2d'); x.scale(4, 4); x.fill(new W.Path2D(d)); return x.getImageData(0, 0, 256, 256).data; };
+    const original = W.MT.ui.marca('mosaico').querySelector('path').getAttribute('d');
+    const cierre = T.logo({ animar: false }).el;
+    const a = trazo(original); const b = trazo(cierre.querySelector('.tela-unica').getAttribute('d'));
+    let distintos = 0; for (let i = 3; i < a.length; i += 4) if (Math.abs(a[i] - b[i]) > 40) distintos++;
+    afirmar('el logo final es idéntico al aprobado (forma única, sin diferencias de silueta)', distintos < 30, 'píxeles distintos=' + distintos);
+    // Sin líneas claras entre piezas: se pintan las piezas de la animación (cuerpos y lengüetas, cada una por separado, como el navegador
+    // las compone) y se compara con la forma única. En el interior de la forma no puede haber ningún píxel que no sea opaco.
+    {
+      const N = 512; const lienzo = (rellenar) => { const c = doc().createElement('canvas'); c.width = c.height = N; const x = c.getContext('2d'); x.scale(N / 64, N / 64); rellenar(x); return x.getImageData(0, 0, N, N).data; };
+      for (const forma of ['escalon', 'curva']) {
+        const l = T.logo({ animar: true, forma }); doc().body.append(l.el); l.irA(1100);
+        const trazos = [...l.el.querySelectorAll('.pieza path')].map((p) => new W.Path2D(p.getAttribute('d')));
+        const unica = lienzo((x) => x.fill(new W.Path2D(l.el.querySelector('.tela-unica').getAttribute('d'))));
+        const suma = lienzo((x) => { x.fillStyle = '#000'; trazos.forEach((t) => x.fill(t)); });
+        let claros = 0;
+        for (let y = 3; y < N - 3; y++) for (let x = 3; x < N - 3; x++) {
+          let dentro = true;
+          for (let dy = -3; dy <= 3 && dentro; dy += 3) for (let dx = -3; dx <= 3; dx += 3) if (unica[((y + dy) * N + x + dx) * 4 + 3] < 255) { dentro = false; break; }
+          if (dentro && suma[(y * N + x) * 4 + 3] < 250) claros++;
+        }
+        afirmar(`animación (${forma}): sin líneas claras dentro de la forma al encajar (1,1 s, 1,7 s y 2,1 s comparten esta geometría)`, claros === 0, 'píxeles claros=' + claros);
+        l.irA(3300); l.el.remove();
+      }
+    }
+    // Las nueve piezas de la animación son todas distintas entre sí y las ocho lengüetas tienen su muesca.
+    for (const forma of ['escalon', 'curva']) {
+      const l = T.logo({ animar: true, forma });
+      doc().body.append(l.el); l.irA(600);
+      const piezas = [...l.el.querySelectorAll('.pieza')];
+      const formas = new Set(piezas.map((g) => [...g.querySelectorAll('path')].map((p) => p.getAttribute('d')).join('|')));
+      afirmar(`animación (${forma}): nueve piezas, ninguna igual a otra`, piezas.length === 9 && formas.size === 9, 'distintas=' + formas.size);
+      afirmar(`animación (${forma}): ocho lengüetas, una por puente`, l.el.querySelectorAll('.pieza path').length === 9 + 8, 'trazos=' + l.el.querySelectorAll('.pieza path').length);
+      afirmar(`animación (${forma}): a 0,6 s se ven las piezas y todavía no hay hilos`, ventana().getComputedStyle(l.el.querySelector('.piezas')).display !== 'none' && [...l.el.querySelectorAll('.hilo')].every((r) => ventana().getComputedStyle(r).transform.replace(/\s/g, '') === 'matrix(1,0,0,0,0,0)' || ventana().getComputedStyle(r).transform.replace(/\s/g, '') === 'matrix(0,0,0,1,0,0)'));
+      l.irA(3300); l.el.remove();
+    }
+    // Instante de 0,6 s en tema oscuro: las piezas toman la tinta clara y se distinguen del fondo.
+    doc().documentElement.dataset.tema = 'oscuro';
+    const lo = T.logo({ animar: true }); doc().body.append(lo.el); lo.irA(600);
+    const tinta = ventana().getComputedStyle(lo.el.querySelector('.pieza path')).fill; const fondo = ventana().getComputedStyle(doc().body).backgroundColor;
+    afirmar('animación en tema oscuro a 0,6 s: las piezas se distinguen del fondo', tinta !== fondo && tinta !== 'none', tinta + ' sobre ' + fondo);
+    lo.irA(3300); lo.el.remove(); delete doc().documentElement.dataset.tema;
+    // Movimiento calmado: solo un desvanecido, sin desplazamientos ni giros.
+    doc().documentElement.dataset.movimiento = 'calmado';
+    const lc = T.logo({ animar: true }); doc().body.append(lc.el);
+    const anims = lc.animaciones();
+    afirmar('movimiento calmado: el logo solo se desvanece (sin desplazar ni girar)', anims.length === 1 && anims[0].effect.getKeyframes().every((k) => !('translate' in k) && !('rotate' in k) && !('transform' in k)), 'animaciones=' + anims.length);
+    lc.el.remove(); delete doc().documentElement.dataset.movimiento;
+  }
+  // ---- fin logo (agente de marca) ----
   const csp = doc().querySelector('meta[http-equiv="Content-Security-Policy"]');
   afirmar('la página trae una política de seguridad de contenido restrictiva', !!csp && /script-src 'self'/.test(csp.content) && /object-src 'none'/.test(csp.content) && /frame-src https:\/\/profenapaipa\.github\.io/.test(csp.content) && !/unsafe-eval/.test(csp.content));
   afirmar('no hay scripts en línea (la política los bloquearía)', ![...doc().querySelectorAll('script')].some((x) => !x.src && x.textContent.trim()));

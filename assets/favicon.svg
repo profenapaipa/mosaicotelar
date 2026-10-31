@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Mosaico Telar"><style>
-/* Los hilos van detrás de las piezas y se meten 1 unidad debajo de ellas, como en el logo animado, para que el suavizado no deje líneas claras. Las piezas cambian de tinta según la pestaña del navegador, y los hilos toman su versión del tema oscuro. */
-.p{fill:#1A1714}.k{fill:#1B7F56}.v{fill:#2B4FA3}.w{fill:#E8A13C}.m{fill:#E0527E}
-@media (prefers-color-scheme:dark){.p{fill:#FFFFFF}.k{fill:#5CC08A}.v{fill:#6F8FE8}}
+/* Los hilos van detrás de las piezas y se meten 1 unidad debajo de ellas, como en el logo animado, para que el suavizado no deje líneas claras. Las piezas van en gris suave (el mismo del riel), que se lee sobre pestañas claras y oscuras; los hilos toman su versión del tema oscuro. */
+.p{fill:#8F887C}.k{fill:#1B7F56}.v{fill:#2B4FA3}.w{fill:#E8A13C}.m{fill:#E0527E}
+@media (prefers-color-scheme:dark){.k{fill:#5CC08A}.v{fill:#6F8FE8}}
 </style>
 <rect class="k" x="17" y="2" width="8" height="14"/><rect class="k" x="17" y="26" width="8" height="36"/>
 <rect class="w" x="39" y="2" width="8" height="36"/><rect class="w" x="39" y="48" width="8" height="14"/>
