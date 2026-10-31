@@ -25,7 +25,8 @@
 
   function construirNavegacion() {
     const enlace = (e) => h('a', { href: e.hash, class: e.cls, 'data-ruta': e.id }, e.icono(), e.etiqueta);
-    document.getElementById('riel-logo').append(marca('mosaico'));
+    // El botón de inicio es el único ícono del riel a color: los demás van en blanco y negro para que el logo tenga el protagonismo.
+    document.getElementById('riel-logo').append(MT.tejido.logoColor());
     document.getElementById('riel-items').append(...ESPACIOS.filter((e) => !e.abajo).map(enlace));
     document.getElementById('riel-abajo').append(...ESPACIOS.filter((e) => e.abajo).map(enlace));
     document.getElementById('logo-pie').replaceChildren(marca('mosaico'));
