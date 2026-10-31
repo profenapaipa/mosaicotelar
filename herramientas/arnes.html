@@ -10,7 +10,7 @@
 <pre id="resultado" style="position:fixed;top:0;left:0;max-width:100%;background:#fff;color:#000;font:11px monospace;white-space:pre-wrap"></pre>
 <script>
 const SECC = { docente: ['resumen', 'estudiantes', 'actividades', 'ajustes', 'notas', 'archivos'], orientacion: ['resumen', 'ajustes', 'estudiantes', 'notas', 'archivos'], familia: ['resumen', 'archivos'], coordinacion: ['resumen', 'estudiantes', 'cursos', 'categorias'], estudiante: ['resumen', 'ruta', 'logros', 'archivos'] };
-const RUTAS = [[null, '#/'], [null, '#/mi'], [null, '#/mapa/conexiones'], [null, '#/mapa/distingue'], [null, '#/valeria/chat'], [null, '#/valeria/conexion'], [null, '#/recorrido/camino'], [null, '#/recorrido/roles'], [null, '#/recorrido/datos'], [null, '#/portales'], [null, '#/portales/kinesis'], [null, '#/portales/wisfox'], [null, '#/portales/valeria'], [null, '#/glosario'], [null, '#/planes/planes'], [null, '#/planes/servicios'], [null, '#/registro/gratis'], [null, '#/registro/prueba'], [null, '#/guia/docente'], [null, '#/guia/estudiante'], [null, '#/hoja/propuesta'], [null, '#/hoja/arquitectura'], [null, '#/hoja/etapas'], [null, '#/piloto'], [null, '#/identidad'],
+const RUTAS = [[null, '#/'], [null, '#/mi'], [null, '#/mapa/conexiones'], [null, '#/mapa/distingue'], [null, '#/valeria/chat'], [null, '#/valeria/conexion'], [null, '#/recorrido/camino'], [null, '#/recorrido/roles'], [null, '#/recorrido/datos'], [null, '#/portales'], [null, '#/portales/kinesis'], [null, '#/portales/wisfox'], [null, '#/portales/valeria'], [null, '#/glosario'], [null, '#/planes/formas'], [null, '#/planes/acompanamiento'], [null, '#/registro/lista'], [null, '#/registro/conversar'], [null, '#/guia/docente'], [null, '#/guia/estudiante'], [null, '#/hoja/propuesta'], [null, '#/hoja/arquitectura'], [null, '#/hoja/etapas'], [null, '#/piloto'], [null, '#/identidad'],
   ...Object.entries(SECC).flatMap(([rol, l]) => l.map((x) => [rol, '#/mi/' + x]))];
 const ANCHOS = [390, 1280];
 const TEMAS = ['claro', 'oscuro'];
@@ -371,8 +371,8 @@ async function flujo() {
   // El tono: el sentido humano y pedagógico primero, sin culpar a la docencia ni nombrar a otras empresas
   await ir('#/'); await espera(300);
   const inicioTxt = textoPagina();
-  afirmar('el inicio pone primero el sentido humano y pedagógico', /sentido humano va por encima de lo económico y de lo burocrático/i.test(inicioTxt) && /diversidad/i.test(inicioTxt));
-  afirmar('el inicio no culpa a la docencia del trámite', !/en la práctica, queda en una carpeta|por cumplir|solo por el papeleo|después de darla|no lo hizo a tiempo/i.test(inicioTxt));
+  afirmar('el inicio pone primero el sentido humano y pedagógico', /humana, pedagógica, al servicio del encuentro/i.test(inicioTxt) && /diversidad/i.test(inicioTxt));
+  afirmar('el inicio no culpa a la docencia del trámite', !/en la práctica, queda en una carpeta|por cumplir|solo por el papeleo|después de darla|no lo hizo a tiempo|por encima de lo económico|segundo plano/i.test(inicioTxt));
   await ir('#/hoja/propuesta');
   afirmar('la propuesta parte del sentido pedagógico y no menciona a otras empresas', /nuestro sentido/i.test(textoPagina()) && !/PIARPLUS|piarplus|competencia/i.test(textoPagina()));
   afirmar('el sitio ya no tiene la comparación con otra plataforma', !doc().querySelector('a[href*="comparar"]'));
@@ -381,7 +381,7 @@ async function flujo() {
   await ir('#/'); ventana().MT.router.recargar(); await espera(250);
   afirmar('la bienvenida enlaza a la página de lo que nos distingue', !!doc().querySelector('a[href="#/mapa/distingue"]'));
   await ir('#/planes'); ventana().MT.router.recargar();
-  afirmar('planes, registro y piloto avisan que el proyecto está en construcción y sin cobros', /Un proyecto en construcción/.test(textoPagina()) && /no hay cobros ni contratos/.test(textoPagina()));
+  afirmar('las páginas de participar avisan, con calidez, que el proyecto crece con las comunidades', /Un proyecto que crece en comunidad/.test(textoPagina()) && /su autorización y su voz/.test(textoPagina()));
   afirmar('el pie no presenta un cargo legal mientras el modelo de empresa se coordina', !/Representante legal/i.test(doc().querySelector('footer').innerText));
   await ir('#/recorrido/camino');
   afirmar('el camino se marca solo con lo que ya se hizo', /[5-7] de 7 pasos/.test(textoPagina()), (textoPagina().match(/\d de 7 pasos/) || [''])[0]);
@@ -414,26 +414,26 @@ async function flujo() {
   await ir('#/mi/archivos'); await espera(300);
   const u = await ventana().MT.archivos.url(ventana().MT.db.lista('archivos')[0].id);
   afirmar('el contenido del archivo sigue guardado al recargar', !!u);
-  // 15. Planes, funciones Pro bloqueadas y registro
+  // 15. Formas de participar, lo que viene y el registro
   await ir('#/planes'); ventana().MT.router.recargar(); await espera(300);
-  afirmar('los planes muestran Demo, Gratis, Pro y Colegio', ['Demo', 'Gratis', 'Pro', 'Colegio'].every((n) => [...doc().querySelectorAll('.plan-tarjeta .etiqueta')].some((e) => e.textContent === n)) && doc().querySelectorAll('.plan-tarjeta').length === 4);
-  afirmar('la tabla distingue lo incluido hoy de lo bloqueado en desarrollo', /Incluido/.test(textoPagina()) && /Pro · en desarrollo/.test(textoPagina()) && /Servicio/.test(textoPagina()));
-  afirmar('no se publican precios inventados', !/\$\s?\d|COP|USD|\d+\s?€/.test(textoPagina()) && /se define con los primeros colegios/i.test(textoPagina()));
-  await ir('#/planes/servicios'); ventana().MT.router.recargar(); await espera(250);
-  afirmar('hay siete servicios y tres paquetes', doc().querySelectorAll('.servicio').length === 7 && doc().querySelectorAll('#app .plan-tarjeta').length === 3);
+  afirmar('las formas de participar son cuatro y dicen en qué etapa está cada una', ['Demostración', 'Lista de interés', 'Espacio compartido', 'Con un colegio'].every((n) => [...doc().querySelectorAll('.plan-tarjeta .etiqueta')].some((e) => e.textContent === n)) && doc().querySelectorAll('.plan-tarjeta').length === 4);
+  afirmar('la tabla distingue lo disponible hoy de lo que viene', /Disponible/.test(textoPagina()) && /Próximamente/.test(textoPagina()) && /Acompañamiento/.test(textoPagina()));
+  afirmar('el lenguaje es sobrio: sin precios, sin planes de pago y sin lenguaje de venta', !/\$\s?\d|COP|USD|\d+\s?€|Probar gratis|Prueba gratuita|\bPro\b|cotizaci|paquete/i.test(textoPagina()));
+  await ir('#/planes/acompanamiento'); ventana().MT.router.recargar(); await espera(250);
+  afirmar('hay siete formas de acompañamiento y tres rutas posibles', doc().querySelectorAll('.servicio').length === 7 && doc().querySelectorAll('#app .plan-tarjeta').length === 3);
   afirmar('implementación, asesoría y acompañamiento figuran entre los servicios', ['Implementación', 'Asesoría pedagógica', 'Acompañamiento del piloto', 'Capacitación'].every((t) => textoPagina().includes(t)));
   // Las funciones Pro se ven con candado y solo explican
   await comoRol('coordinacion', '#/mi'); await espera(250);
   const pros = [...doc().querySelectorAll('.nav-pro')];
-  afirmar('coordinación ve funciones Pro bloqueadas en su menú', pros.length === 3 && pros.every((b) => /Pro/.test(b.textContent)), String(pros.length));
+  afirmar('coordinación ve lo que viene como "próximamente" en su menú', pros.length === 3 && pros.every((b) => /Próximamente/.test(b.textContent)), String(pros.length));
   afirmar('lo que ya funciona sigue desbloqueado: sus secciones siguen siendo enlaces', doc().querySelectorAll('.nav-lateral a').length === 4);
   pros[0].click(); await espera(250);
-  afirmar('una función Pro explica qué es, dice que está en desarrollo y ofrece la prueba gratuita', /En desarrollo/.test(doc().querySelector('dialog[open]') ? doc().querySelector('dialog[open]').innerText : '') && !!enDialogo('Solicitar prueba gratuita'));
+  afirmar('lo que viene explica qué es, dice que está en desarrollo y ofrece que le avisen', /En desarrollo/.test(doc().querySelector('dialog[open]') ? doc().querySelector('dialog[open]').innerText : '') && !!enDialogo('Quiero que me avisen'));
   doc().querySelector('dialog[open]').close(); await espera(150);
   await comoRol('docente', '#/mi/ajustes'); await espera(250);
-  afirmar('el docente ve el botón de exportar PIAR con candado', [...doc().querySelectorAll('.pro-candado')].some((b) => /PIAR/.test(b.textContent)));
+  afirmar('el docente ve el botón de exportar PIAR como "próximamente"', [...doc().querySelectorAll('.pro-candado')].some((b) => /PIAR/.test(b.textContent) && /Próximamente/.test(b.textContent)));
   // Registro: validación y cuenta gratuita
-  await ir('#/registro/gratis'); ventana().MT.router.recargar(); await espera(250);
+  await ir('#/registro/lista'); ventana().MT.router.recargar(); await espera(250);
   const formR = () => doc().querySelector('form.formulario--registro');
   poner(doc().getElementById('cmp-correo') || formR().querySelector('[name="correo"]'), 'no-es-un-correo');
   formR().querySelector('button[type=submit]').click(); await espera(250);
@@ -443,12 +443,12 @@ async function flujo() {
   afirmar('sin autorizar el tratamiento del correo no se registra', /aceptar el tratamiento/.test(textoPagina()) && !ventana().MT.store.obtener().cuenta);
   formR().querySelector('#consentimiento').click();
   formR().querySelector('button[type=submit]').click(); await espera(400);
-  afirmar('con correo válido y autorización, la cuenta gratuita queda reservada', !!doc().querySelector('.registro-exito') && ventana().MT.store.obtener().cuenta && ventana().MT.store.obtener().cuenta.plan === 'gratis' && /Cuenta gratuita/.test(doc().getElementById('plan-chip').textContent));
+  afirmar('con correo válido y autorización, el correo queda en la lista de interés', !!doc().querySelector('.registro-exito') && ventana().MT.store.obtener().cuenta && ventana().MT.store.obtener().cuenta.plan === 'gratis' && /En lista de interés/.test(doc().getElementById('plan-chip').textContent));
   afirmar('el registro solo guarda lo mínimo: correo, rol, institución y plan (sin nombres)', Object.keys(ventana().MT.store.obtener().cuenta).sort().join() === 'correo,fecha,institucion,plan,rol,via');
-  await ir('#/registro/prueba'); ventana().MT.router.recargar(); await espera(250);
+  await ir('#/registro/conversar'); ventana().MT.router.recargar(); await espera(250);
   formR().querySelector('#consentimiento').click();
   formR().querySelector('button[type=submit]').click(); await espera(400);
-  afirmar('la prueba gratuita de Pro se solicita y el chip lo dice', ventana().MT.store.obtener().cuenta.plan === 'prueba' && /Prueba Pro/.test(doc().getElementById('plan-chip').textContent));
+  afirmar('la conversación sobre un colegio se solicita y el chip lo dice', ventana().MT.store.obtener().cuenta.plan === 'prueba' && /Conversación solicitada/.test(doc().getElementById('plan-chip').textContent));
   doc().getElementById('rol-actual').click(); await espera(150);
   [...doc().querySelectorAll('#menu-rol button')].find((b) => /Empezar de nuevo/.test(b.textContent)).click(); await espera(250);
   enDialogo('Sí, empezar de nuevo').click(); await espera(500);

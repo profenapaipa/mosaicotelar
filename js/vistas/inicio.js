@@ -40,7 +40,7 @@
           h('ul', { class: 'hilos-leyenda', 'aria-label': 'Sus tres portales' }, [['kinesis', 'Kinesis', 'el aula'], ['valeria', 'ValerIA', 'la guía'], ['wisfox', 'Wisfox', 'el estudiante'], ['mosaico', 'Mosaico Telar', 'la plataforma que los une']].map(([id, n, r]) => h('li', { 'data-espacio': id }, h('i', { 'aria-hidden': 'true' }), h('strong', null, n), ' ' + r))),
           h('div', { class: 'acciones' },
             h('a', { class: 'btn', href: '#roles', onclick: (e) => { e.preventDefault(); const el = document.getElementById('roles'); if (el) el.scrollIntoView({ behavior: 'smooth' }); } }, 'Entrar con mi rol'),
-            h('a', { class: 'btn btn--suave', href: '#/registro/gratis' }, 'Probar gratis')),
+            h('a', { class: 'btn btn--suave', href: '#/planes' }, 'Participar')),
           h('ul', { class: 'confianza' }, ['Pensado desde la pedagogía inclusiva y el DUA', 'Información clínica aislada', 'Funciona sin instalar nada'].map((t) => h('li', null, t)))),
         h('div', { class: 'vitrina' },
           h('div', { class: 'dispositivo dispositivo--a' }, h('img', { src: 'assets/capturas/docente.jpg', alt: 'El espacio del docente: sus estudiantes, el siguiente paso y las actividades planeadas con DUA', width: '1280', height: '800' }), h('span', { class: 'dispositivo-rotulo' }, 'Espacio del docente')),
@@ -64,8 +64,8 @@
             componente('valeria', 'ValerIA', 'La guía', 'Una asistente de IA que propone y no decide. Ayuda al docente a diseñar y al estudiante a resolver dudas. Hoy responde con ejemplos.')),
           h('p', { class: 'plataforma__une' }, h('strong', null, 'Cómo se conectan: '), 'Kinesis le pasa a Wisfox la actividad ya aprobada, Wisfox le devuelve a Kinesis el progreso, y ValerIA ayuda a los dos.')),
         h('div', { class: 'objetivo' }, h('p', { class: 'etiqueta' }, 'Para qué existe'),
-          h('p', { class: 'objetivo__texto' }, 'Para que cada estudiante encuentre en el aula caminos para aprender a su manera, y para que la docencia tenga herramientas que le quiten peso al trámite y le devuelvan tiempo para lo que más importa: la diversidad de quienes aprenden.'),
-          h('p', { class: 'objetivo__sentido' }, 'Tecnología con sentido: el sentido humano va por encima de lo económico y de lo burocrático.')),
+          h('p', { class: 'objetivo__texto' }, 'Para que cada estudiante encuentre en el aula caminos para aprender a su manera, y para que quienes enseñan cuenten con herramientas que acompañen su labor.'),
+          h('p', { class: 'objetivo__sentido' }, 'Tecnología con sentido: humana, pedagógica, al servicio del encuentro.')),
         h('div', { class: 'acciones' }, h('a', { class: 'btn', href: '#roles', onclick: (e) => { e.preventDefault(); const el = document.getElementById('roles'); if (el) el.scrollIntoView({ behavior: 'smooth' }); } }, 'Elegir mi rol'),
           h('a', { class: 'btn btn--suave', href: '#/portales' }, 'Ver los tres portales'))));
 
@@ -94,11 +94,11 @@
 
       c.append(h('section', { class: 'seccion', 'aria-labelledby': 'h-problema' },
         h('h2', { id: 'h-problema' }, 'Cada aula reúne muchas maneras de aprender'),
-        h('p', { class: 'bajada' }, 'Cada estudiante percibe y vive el mundo a su manera, y la docencia ya hace un esfuerzo enorme por atenderlo. Mosaico Telar nace para apoyar ese trabajo: que formatos y registros pasen a un segundo plano y el tiempo vuelva a la pedagogía.'),
+        h('p', { class: 'bajada' }, 'En cada aula conviven muchas maneras de aprender. Queremos tejer entre ellas: herramientas que ayuden a la docencia a imaginar, probar y acompañar.'),
         h('div', { class: 'rejilla rejilla--3' },
           h('div', { class: 'tarjeta' }, h('span', { class: 'cifra' }, '22.803'), h('p', null, 'estudiantes con discapacidad en colegios oficiales de Bogotá, marzo de 2026 (3,38 % de la matrícula): una parte de esa diversidad.'), h('a', { href: OAPE, rel: 'noopener' }, 'Boletín de la OAPE')),
           h('div', { class: 'tarjeta' }, h('span', { class: 'cifra' }, 'Una mirada que evoluciona'), h('p', null, 'La normatividad de educación inclusiva y la reflexión pedagógica avanzan hacia una atención más humana y cercana. Mosaico Telar la toma como punto de partida, no como meta.')),
-          h('div', { class: 'tarjeta' }, h('span', { class: 'cifra' }, 'Todos'), h('p', null, 'Todos aprendemos distinto, y por eso todos somos parte del mosaico. La herramienta está para servir a esa diversidad, no para medirla.')))));
+          h('div', { class: 'tarjeta' }, h('span', { class: 'cifra' }, 'Todos'), h('p', null, 'Todos aprendemos distinto, y por eso todos somos parte del mosaico. La herramienta está para acompañar esa diversidad.')))));
 
       c.append(h('section', { class: 'seccion', 'aria-labelledby': 'h-datos' },
         h('div', { class: 'garantias' },
@@ -113,9 +113,9 @@
           h('p', { style: 'margin-top:1rem' }, h('a', { href: '#/recorrido/datos' }, 'Ver cómo viaja la información')))));
 
       c.append(h('section', { class: 'seccion', 'aria-labelledby': 'h-participa' },
-        h('h2', { id: 'h-participa' }, 'Llévala a tu colegio'),
-        h('p', { class: 'bajada' }, 'Puedes recorrer la demostración completa sin registrarte. Estamos construyendo, con calma y con las autorizaciones necesarias, la forma de acompañar a cada colegio.'),
-        h('div', { class: 'acciones' }, h('a', { class: 'btn', href: '#/registro/gratis' }, 'Crear cuenta gratis'), h('a', { class: 'btn btn--suave', href: '#/registro/prueba' }, 'Solicitar prueba gratuita de Pro'), h('a', { class: 'btn btn--suave', href: '#/planes' }, 'Ver planes y servicios'), h('a', { class: 'btn btn--suave', href: '#/hoja/propuesta' }, 'Ver la propuesta'))));
+        h('h2', { id: 'h-participa' }, 'Participa en su construcción'),
+        h('p', { class: 'bajada' }, 'Puedes recorrer la demostración completa sin registrarte. Si quieres seguirnos de cerca o conversar sobre tu colegio, hay una puerta abierta.'),
+        h('div', { class: 'acciones' }, h('a', { class: 'btn', href: '#/registro/lista' }, 'Dejar mi correo'), h('a', { class: 'btn btn--suave', href: '#/registro/conversar' }, 'Conversar sobre mi colegio'), h('a', { class: 'btn btn--suave', href: '#/planes' }, 'Ver las formas de participar'), h('a', { class: 'btn btn--suave', href: '#/hoja/propuesta' }, 'Conocer nuestro sentido'))));
 
       main.append(c);
     },

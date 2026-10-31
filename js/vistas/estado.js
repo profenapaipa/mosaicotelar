@@ -17,24 +17,24 @@
   function propuesta(c) {
     c.append(MT.plan.avisoConstruccion());
     c.append(h('section', { class: 'siguiente-banner' }, h('div', null, h('p', { class: 'etiqueta' }, 'Nuestro sentido'),
-      h('h2', null, 'Poner la tecnología al servicio de la diversidad de formas de aprender, y quitarle peso al trámite para que la docencia se dedique a lo que más importa.'),
-      h('p', null, 'Mosaico Telar reúne herramientas para que docentes, orientación, familias y estudiantes atiendan, juntos y con claridad, las distintas maneras de percibir y de vivir el mundo que hay en cada aula. Los formatos y los registros pasan a un segundo plano; el sentido humano va primero.'))));
+      h('h2', null, 'Poner la tecnología al servicio de la diversidad de formas de aprender, acompañando la labor docente.'),
+      h('p', null, 'Mosaico Telar reúne herramientas para que docentes, orientación, familias y estudiantes se encuentren y atiendan, juntos y con claridad, las distintas maneras de percibir y de vivir el mundo que hay en cada aula.'))));
     c.append(h('div', { class: 'rejilla rejilla--2', style: 'margin-top:1rem' },
-      tarjeta('Lo que vemos en las aulas', h('p', null, 'Cada aula reúne estudiantes que aprenden, perciben y viven el mundo de maneras distintas. La docencia ya hace un esfuerzo enorme por atenderlas, y buena parte de su tiempo se va en formatos y registros que podrían apoyarla mejor.'),
+      tarjeta('Lo que vemos en las aulas', h('p', null, 'Cada aula reúne estudiantes que aprenden, perciben y viven el mundo de maneras distintas, y la docencia las acompaña con dedicación. Queremos aportarle herramientas que hagan más sencillo conocer, planear y ajustar.'),
         h('p', null, 'En colegios oficiales de Bogotá hay 22.803 estudiantes con discapacidad (marzo de 2026), una parte de esa diversidad. ', h('a', { href: OAPE, rel: 'noopener' }, 'Boletín de la OAPE'), '.'),
         h('p', { class: 'suave' }, 'La normatividad de educación inclusiva sigue evolucionando hacia una mirada más humana y empática. Mosaico Telar la toma como punto de partida, no como meta.')),
       tarjeta('Para quién es', h('p', null, h('strong', null, 'Quienes la usan: '), 'docentes, orientación, familias, coordinación y estudiantes.'),
         h('p', null, h('strong', null, 'Con quienes la construimos: '), 'rectorías, coordinaciones académicas y entidades del sector educativo.'),
         h('p', { class: 'suave' }, 'El modelo de sostenibilidad está por definir con ellos.'))));
     c.append(h('div', { class: 'rejilla rejilla--3', style: 'margin-top:1rem' },
-      tarjeta('Valor para el colegio', lista(['Un registro claro del proceso, que acompaña al equipo en lugar de recargarlo', 'Menos trabajo duplicado entre docente y orientación: más tiempo para lo pedagógico', 'Un lenguaje común para hablar de los apoyos de cada estudiante'])),
+      tarjeta('Valor para el colegio', lista(['Un registro claro del proceso, que acompaña al equipo', 'Menos trabajo repetido entre docente y orientación, y más tiempo para el encuentro', 'Un lenguaje común para hablar de los apoyos de cada estudiante'])),
       tarjeta('Valor para la familia', lista(['Ve el proceso mientras ocurre', 'Entiende qué cambió y por qué', 'Sabe cómo acompañar en casa'])),
       tarjeta('Valor para un aliado', lista(['Una necesidad real de las aulas, con respaldo en la normatividad', 'Un producto construido por estudiantes y docentes, con sentido pedagógico', 'Aprendizajes de un piloto antes de crecer']))));
     c.append(h('div', { class: 'rejilla rejilla--2', style: 'margin-top:1rem' },
       tarjeta('Cómo podría sostenerse (por definir)', lista(['El sentido pedagógico va primero; la sostenibilidad es lo que permite seguir', 'Un piloto acompañado en un curso, sin costo', 'Luego, un modelo que se definirá con los primeros colegios', 'Aliados que apoyen el servidor, la revisión de seguridad y el contenido'])),
-      tarjeta('Cómo sabremos que funciona', lista(['Cuánto tiempo se ahorra el equipo en trámites y se dedica a lo pedagógico', 'Porcentaje de ajustes propuestos que orientación aprueba', 'Uso por rol (docentes, familias, estudiantes)', 'Percepción de docentes, familias y estudiantes, con una encuesta corta']))));
+      tarjeta('Cómo sabremos que funciona', lista(['Cuánto tiempo gana el equipo para el encuentro con los estudiantes', 'Porcentaje de ajustes propuestos que orientación aprueba', 'Uso por rol (docentes, familias, estudiantes)', 'Percepción de docentes, familias y estudiantes, con una encuesta corta']))));
     c.append(h('div', { class: 'rejilla rejilla--2', style: 'margin-top:1rem' },
-      tarjeta('Riesgos y cómo se manejan', lista(['Datos de menores: ningún dato real hasta que todo esté en regla', 'La IA se equivoca: solo propone, decide quien enseña, y nunca ve información clínica', 'Que se sienta como más trámite: se mide con el equipo y se corrige; la meta es quitar carga, no agregarla', 'Que no se adopte: guía de inicio rápido por rol y un piloto con acompañamiento'])),
+      tarjeta('Riesgos y cómo se manejan', lista(['Datos de menores: ningún dato real hasta que todo esté en regla', 'La IA se equivoca: solo propone, decide quien enseña, y nunca ve información clínica', 'Que se sienta como una carga más: se conversa con el equipo y se ajusta; la herramienta debe acompañar, no sumar tareas', 'Que no se adopte: guía de inicio rápido por rol y un piloto con acompañamiento'])),
       tarjeta('Qué necesitamos', lista(['Un colegio piloto y un curso', 'Revisión legal de protección de datos (Ley 1581)', 'Las autorizaciones de familias, colegio y demás entidades', 'Definir el modelo de empresa', 'Un servidor y su mantenimiento']),
         h('div', { class: 'acciones' }, h('a', { class: 'btn', href: '#/piloto' }, 'Conversar sobre un piloto')))));
   }

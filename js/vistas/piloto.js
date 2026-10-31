@@ -43,7 +43,7 @@
   MT.router.registrar({
     id: 'piloto', titulo: 'Piloto', espacio: '',
     render(main) {
-      const c = pagina(main, { etiqueta: 'Piloto', titulo: 'Llévala a tu colegio', descripcion: 'Un piloto acompañado, paso a paso y sin datos reales hasta que todo esté en regla.' });
+      const c = pagina(main, { etiqueta: 'Piloto', titulo: 'Conversemos sobre tu colegio', descripcion: 'Un piloto acompañado, paso a paso, y sin datos reales hasta que todo esté en regla.' });
       c.append(h('div', { class: 'tarjeta' }, h('h2', null, 'Cómo trabajamos'),
         h('ol', { class: 'pasos-piloto' }, FASES.map(([t, d]) => h('li', null, h('strong', null, t), h('p', null, d))))), h('div', { style: 'margin-top:1rem' }));
       c.append(MT.plan.avisoConstruccion());

@@ -12,7 +12,7 @@
   function espacio(main, { marca: nombreMarca, nombre, descripcion, ruta, tabs, sub, usuario }) {
     const nav = h('nav', { class: 'nav-lateral', 'aria-label': 'Secciones de ' + nombre },
       tabs.map((t) => (t.pro
-        ? h('button', { class: 'nav-pro', type: 'button', 'aria-label': `${t.etiqueta}: función Pro, bloqueada`, onclick: () => MT.plan.abrirPro(t.pro) }, icono(t.icono), t.etiqueta, MT.plan.candadoSvg(), MT.plan.etiquetaPro())
+        ? h('button', { class: 'nav-pro', type: 'button', 'aria-label': `${t.etiqueta}: próximamente`, onclick: () => MT.plan.abrirPro(t.pro) }, icono(t.icono), t.etiqueta, MT.plan.candadoSvg(), MT.plan.etiquetaPro())
         : h('a', { href: t.href || `#/${ruta}/${t.id}`, 'aria-current': t.id === sub ? 'page' : null },
           icono(t.icono), t.etiqueta, t.nuevo ? h('span', { class: 'nuevo' }, t.nuevo) : null))));
     const lateral = h('aside', { class: 'lateral' }, h('div', { class: 'lateral-panel' },
