@@ -33,16 +33,26 @@
   }
 
   function geometria() {
-    const piezas = [];
-    CORTES.forEach(([y0, y1], j) => CORTES.forEach(([x0, x1], i) => piezas.push(pieza(x0, y0, x1, y1, i === 0 && j === 0 ? R : 0, i === 2 && j === 0 ? R : 0, i === 2 && j === 2 ? R : 0, i === 0 && j === 2 ? R : 0))));
-    const puentes = [];
+    // Cada pieza es un camino propio. Los puentes negros NO son una forma aparte: se suman a las dos piezas que unen.
+    // Si fueran otra forma, el suavizado de bordes dejaría ver una línea clara entre el puente y la pieza (se notaba mientras
+    // aparecían). Dentro de un mismo camino no hay borde que suavizar, y al estar el puente en los dos caminos, ninguno de sus
+    // lados queda como arista entre formas distintas.
+    const caminos = [];
+    CORTES.forEach(([y0, y1], j) => { caminos[j] = []; CORTES.forEach(([x0, x1], i) => caminos[j][i] = [pieza(x0, y0, x1, y1, i === 0 && j === 0 ? R : 0, i === 2 && j === 0 ? R : 0, i === 2 && j === 2 ? R : 0, i === 0 && j === 2 ? R : 0)]); });
     // Quién pasa por encima en cada cruce (a = hilo vertical, b = hilo horizontal): se alterna, como en un tejido.
     const encima = (a, b) => ((a + b) % 2 === 0 ? 'h' : 'v');
+    const une = (d, ...fichas) => fichas.forEach(([i, j]) => caminos[j][i].push(d));
     for (let a = 0; a < 2; a++) for (let b = 0; b < 2; b++) {
       const cx = CORTES[a][1]; const cy = CORTES[b][1];
-      if (encima(a, b) === 'h') puentes.push(`M${cx} ${cy - PUENTE}h${HILO}v${PUENTE}h-${HILO}Z`, `M${cx} ${cy + HILO}h${HILO}v${PUENTE}h-${HILO}Z`);
-      else puentes.push(`M${cx - PUENTE} ${cy}h${PUENTE}v${HILO}h-${PUENTE}Z`, `M${cx + HILO} ${cy}h${PUENTE}v${HILO}h-${PUENTE}Z`);
+      if (encima(a, b) === 'h') {   // el vertical pasa por debajo: dos puentes en la columna del hilo, uno arriba y uno abajo del cruce
+        const arriba = `M${cx} ${cy - PUENTE}h${HILO}v${PUENTE}h-${HILO}Z`; const abajo = `M${cx} ${cy + HILO}h${HILO}v${PUENTE}h-${HILO}Z`;
+        une(arriba, [a, b], [a + 1, b]); une(abajo, [a, b + 1], [a + 1, b + 1]);
+      } else {                      // el horizontal pasa por debajo: dos puentes en la fila del hilo, uno a cada lado del cruce
+        const izq = `M${cx - PUENTE} ${cy}h${PUENTE}v${HILO}h-${PUENTE}Z`; const der = `M${cx + HILO} ${cy}h${PUENTE}v${HILO}h-${PUENTE}Z`;
+        une(izq, [a, b], [a, b + 1]); une(der, [a + 1, b], [a + 1, b + 1]);
+      }
     }
+    const piezas = caminos.flat().map((p) => p.join(''));
     /* Los hilos de color, por tramos. Dos decisiones que evitan las líneas finas del borde:
        1. Donde un hilo pasa por debajo, su tramo termina DENTRO del puente negro (2 unidades), nunca en seco; y el hilo que pasa
           por encima lo cruza de una sola pieza. Así no hay cuadritos de "cruce" superpuestos, que dejaban rayas del mismo color.
@@ -58,7 +68,7 @@
       const cortes = [0, 1].filter((a) => encima(a, b) === 'v').map((a) => CORTES[a][1]);
       tramos(2, cortes).forEach(([i, f], k) => hilos.push({ eje: 'h', x: i, y: CORTES[b][1] - EXTRA, w: f - i, h: HILO + 2 * EXTRA, color: COLOR.h[b], d: 0.7 + b * 0.4 + k * 0.1 }));
     }
-    return { piezas, puentes: puentes.join(''), hilos };
+    return { piezas, hilos };
   }
 
   /* El logo. opciones: { animar: true, mono: false, clase: '' }. Devuelve { el, repetir, alternar, esMono }. */
@@ -66,11 +76,11 @@
     const o = Object.assign({ animar: true, mono: false, clase: '' }, op);
     const g = geometria();
     const hilos = g.hilos.map((t) => `<rect class="hilo hilo--${t.eje}" style="--d:${t.d}s" x="${t.x}" y="${t.y}" width="${t.w}" height="${t.h}" fill="${t.color}"/>`).join('');
-    const unica = g.piezas.join('') + g.puentes;
+    const unica = g.piezas.join('');
     const el = svg(`<svg class="logo-tejido ${o.clase}" viewBox="0 0 64 64" role="img" aria-label="Mosaico Telar: nueve piezas unidas por cuatro hilos de colores que se cruzan" focusable="false">
       <g class="hilos">${hilos}</g>
       <path class="tela-unica" fill="currentColor" d="${unica}"/>
-      <g class="piezas">${g.piezas.map((d, i) => `<path class="pieza" style="--i:${i}" fill="currentColor" d="${d}"/>`).join('')}<path class="puentes" fill="currentColor" d="${g.puentes}"/></g></svg>`);
+      <g class="piezas">${g.piezas.map((d, i) => `<path class="pieza" style="--i:${i}" fill="currentColor" d="${d}"/>`).join('')}</g></svg>`);
     if (o.mono) el.classList.add('mono');
     let temporizador = null;
     let solape = null;
