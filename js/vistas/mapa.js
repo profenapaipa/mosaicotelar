@@ -186,7 +186,7 @@
     ['Para todos y para cada quien', 'El DUA es la base: la clase se piensa para todos desde el diseño, y el ajuste individual acompaña lo que el diseño no alcanza.'],
     ['Quien enseña decide', 'Las herramientas proponen y explican; la docencia y el equipo de orientación deciden. La tecnología media, no sustituye.'],
     ['Cuidado de la información', 'Lo clínico queda aparte y solo lo ve orientación. La inteligencia artificial nunca lo recibe, y cada rol ve únicamente lo que necesita.'],
-    ['Tres portales, un tejido', 'Kinesis, ValerIA y Wisfox nacieron como proyectos de estudiantes y hoy comparten identidad, rol y datos.'],
+    ['Tres portales, un tejido', 'Kinesis, ValerIA y Wisfox nacieron como proyectos de estudiantes y hoy se encuentran en una misma plataforma, con una identidad común. Que compartan también sus datos es parte de lo que estamos construyendo.'],
   ];
   const EN_CONSTRUCCION = ['Un servidor con cuentas, para compartir el trabajo entre personas y dispositivos', 'ValerIA conectada a un modelo de lenguaje', 'El documento del PIAR en el formato oficial', 'Más materias en la ruta del estudiante'];
 

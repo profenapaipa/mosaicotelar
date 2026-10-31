@@ -382,7 +382,10 @@ async function flujo() {
   const marco = [...confianza.querySelectorAll('.termino')].find((b) => /leyes que los respaldan/.test(b.textContent)); if (marco) { marco.click(); await espera(250); }
   afirmar('las leyes que los respaldan abren el marco normativo explicado', !!marco && /Ley 115 de 1994/.test(doc().querySelector('dialog[open]') ? doc().querySelector('dialog[open]').innerText : '') && /Decreto 1421 de 2017/.test(doc().querySelector('dialog[open]') ? doc().querySelector('dialog[open]').innerText : ''));
   if (doc().querySelector('dialog[open]')) { doc().querySelector('dialog[open]').close(); await espera(150); }
+  afirmar('cada portal se presenta como un hilo (estudiante, quien enseña, el que cruza a los otros dos)', /hilo del estudiante/.test(inicioTxt) && /hilo de quien enseña/.test(inicioTxt) && /hilo que cruza a los otros dos/.test(inicioTxt) && /malla curricular de su institución/.test(inicioTxt));
+  afirmar('la bienvenida no afirma que los portales originales ya comparten datos', /compartir los datos es lo que viene con el servidor/.test(inicioTxt));
   await ir('#/glosario'); ventana().MT.router.recargar(); await espera(150);
+  afirmar('el glosario define la agentividad y el marco normativo con precisión', /Agentividad/.test(textoPagina()) && /que aprueba la Convención/.test(textoPagina()));
   afirmar('el glosario define los tres términos del eje', ['Neurodiversidad', 'Neurodivergencia', 'Neurodesarrollo'].every((t) => textoPagina().includes(t)) && !/OAPE/.test(textoPagina()));
   await ir('#/hoja/propuesta');
   afirmar('la propuesta parte del sentido pedagógico y no menciona a otras empresas', /nuestro sentido/i.test(textoPagina()) && !/PIARPLUS|piarplus|competencia/i.test(textoPagina()));

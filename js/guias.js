@@ -12,19 +12,19 @@
   const PORTALES = {
     kinesis: {
       nombre: 'Kinesis', rotulo: 'El aula', paraQuien: 'Docentes, orientación, familias y coordinación',
-      que: 'Donde se planea una clase inclusiva y se decide qué ajuste recibe cada estudiante. Reúne los perfiles de apoyo, la planeación con DUA y la aprobación de orientación.',
+      que: 'Es el hilo de quien enseña: desde aquí la docencia teje la personalización del aprendizaje con cada estudiante.',
       haces: ['Ver los apoyos de cada estudiante, sin diagnóstico', 'Planear con los tres principios del DUA', 'Proponer, revisar y aprobar ajustes', 'Mostrar a la familia lo ya aprobado'],
       entrega: 'Entrega a Wisfox la actividad aprobada y a la familia las novedades.', estado: ['Disponible', 'ok'],
     },
     valeria: {
       nombre: 'ValerIA', rotulo: 'La guía', paraQuien: 'Docentes y estudiantes',
-      que: 'Una asistente de inteligencia artificial que propone y no decide. Ayuda al docente a diseñar y al estudiante a resolver dudas. Nunca recibe información clínica.',
+      que: 'Es el hilo que cruza a los otros dos: propone, ordena y lleva la información hasta quien debe decidir. La IA amplía la agentividad de las personas; no la reemplaza.',
       haces: ['Pedir ideas para una actividad', 'Pedir ayuda para redactar un ajuste', 'Aclarar una duda de un tema', 'Responder en español e inglés'],
       entrega: 'Entrega propuestas al docente y explicaciones al estudiante.', estado: ['Respuestas de ejemplo', 'aviso'],
     },
     wisfox: {
       nombre: 'Wisfox', rotulo: 'El estudiante', paraQuien: 'Estudiantes (y su familia, acompañando)',
-      que: 'Donde el estudiante aprende a su ritmo: rutas por materia, lecciones, quizes con explicación, puntos y logros, con un zorro que acompaña.',
+      que: 'Es el hilo del estudiante: material didáctico interactivo que parte de la malla curricular de su institución.',
       haces: ['Seguir su ruta de aprendizaje', 'Hacer la actividad que le llegó, a su medida', 'Responder quizes y ganar logros', 'Preguntar sus dudas a ValerIA'],
       entrega: 'Devuelve al docente el progreso: quiz, puntos y logros.', estado: ['Disponible', 'ok'],
     },
