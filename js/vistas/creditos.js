@@ -21,8 +21,7 @@
           h('p', null, 'Las lecciones y los quizes de Inglés de grado 8.° fueron escritos por el equipo de Wisfox a partir de la malla de Inglés 2026.'))));
       c.append(h('div', { class: 'tarjeta', style: 'margin-top:1rem' }, h('h2', null, 'Fuentes y herramientas abiertas'),
         h('ul', null,
-          h('li', null, 'Tipografías Nunito y Newsreader, con licencia SIL Open Font License.'),
-          h('li', null, 'Cifras de matrícula: boletín de la Oficina Asesora de Planeación de la Secretaría de Educación de Bogotá.')),
+          h('li', null, 'Tipografías Nunito y Newsreader, con licencia SIL Open Font License.')),
         h('p', { class: 'suave' }, 'Si algo de lo que ves merece un crédito que no está, dínoslo: queremos que cada aporte tenga su lugar.')));
     },
   });

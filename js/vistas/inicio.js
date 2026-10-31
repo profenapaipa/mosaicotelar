@@ -6,7 +6,6 @@
   const { h, marca } = MT.ui;
   const st = MT.store;
 
-  const OAPE = 'https://oape.educacionbogota.edu.co/sites/default/files/2026-05/3.Marzo_2026_Boletin_Mensual_1.pdf';
 
   function tarjetaRol(r) {
     return h('article', { class: 'tarjeta rol-tarjeta' },
@@ -36,7 +35,7 @@
               h('button', { class: 'btn btn--chico btn--suave', type: 'button', onclick: tejido.repetir }, 'Ver otra vez'),
               h('button', { class: 'btn btn--chico btn--suave', type: 'button', 'aria-pressed': 'false', onclick: (e) => { e.currentTarget.setAttribute('aria-pressed', String(tejido.alternar())); } }, 'Blanco y negro'))),
             h('div', null, h('h1', null, 'Mosaico Telar'), h('p', { class: 'marca-hero__lema' }, 'Tejemos caminos para aprender.'))),
-          h('p', { class: 'intro' }, 'La plataforma donde el docente planea una clase inclusiva, orientación la valida, la familia la ve y cada estudiante la recibe a su medida.'),
+          h('p', { class: 'intro' }, 'Cada cerebro se desarrolla a su ritmo (neurodesarrollo), algunos por caminos distintos a los más comunes (neurodivergencia), y esa variedad es parte natural de lo humano (neurodiversidad). Mosaico Telar acompaña esa variedad en el aula.'),
           h('ul', { class: 'hilos-leyenda', 'aria-label': 'Sus tres portales' }, [['kinesis', 'Kinesis', 'el aula'], ['valeria', 'ValerIA', 'la guía'], ['wisfox', 'Wisfox', 'el estudiante'], ['mosaico', 'Mosaico Telar', 'la plataforma que los une']].map(([id, n, r]) => h('li', { 'data-espacio': id }, h('i', { 'aria-hidden': 'true' }), h('strong', null, n), ' ' + r))),
           h('div', { class: 'acciones' },
             h('a', { class: 'btn', href: '#roles', onclick: (e) => { e.preventDefault(); const el = document.getElementById('roles'); if (el) el.scrollIntoView({ behavior: 'smooth' }); } }, 'Entrar con mi rol'),
@@ -55,7 +54,7 @@
 
       c.append(h('section', { class: 'seccion', 'aria-labelledby': 'h-que' },
         h('h2', { id: 'h-que' }, 'Qué es Mosaico Telar'),
-        h('p', { class: 'bajada' }, 'Mosaico Telar es la plataforma que reúne tres portales para que una clase inclusiva llegue completa, del docente al estudiante. Cada portal nació como un proyecto de estudiantes; juntos comparten una identidad, un camino para cada rol y los mismos datos.'),
+        h('p', { class: 'bajada' }, 'Es la plataforma donde el docente planea una clase inclusiva, orientación la valida, la familia la ve y cada estudiante la recibe a su medida. Reúne tres portales para que esa clase llegue completa, del docente al estudiante. Cada portal nació como un proyecto de estudiantes; juntos comparten una identidad, un camino para cada rol y los mismos datos.'),
         h('div', { class: 'plataforma' },
           h('span', { class: 'plataforma__rotulo' }, marca('mosaico', 'plataforma__marca'), 'Mosaico Telar · la plataforma'),
           h('div', { class: 'rejilla rejilla--3' },
@@ -96,7 +95,7 @@
         h('h2', { id: 'h-problema' }, 'Cada aula reúne muchas maneras de aprender'),
         h('p', { class: 'bajada' }, 'En cada aula conviven muchas maneras de aprender. Queremos tejer entre ellas: herramientas que ayuden a la docencia a imaginar, probar y acompañar.'),
         h('div', { class: 'rejilla rejilla--3' },
-          h('div', { class: 'tarjeta' }, h('span', { class: 'cifra' }, '22.803'), h('p', null, 'estudiantes con discapacidad en colegios oficiales de Bogotá, marzo de 2026 (3,38 % de la matrícula): una parte de esa diversidad.'), h('a', { href: OAPE, rel: 'noopener' }, 'Boletín de la OAPE')),
+          h('div', { class: 'tarjeta' }, h('span', { class: 'cifra' }, 'Cada estudiante'), h('p', null, 'tiene una experiencia y una realidad de vida diferentes. Por eso el aprendizaje se personaliza, en un entorno inclusivo donde las distintas formas de desarrollarse y de aprender encuentran su lugar.')),
           h('div', { class: 'tarjeta' }, h('span', { class: 'cifra' }, 'Una mirada que evoluciona'), h('p', null, 'La normatividad de educación inclusiva y la reflexión pedagógica avanzan hacia una atención más humana y cercana. Mosaico Telar la toma como punto de partida, no como meta.')),
           h('div', { class: 'tarjeta' }, h('span', { class: 'cifra' }, 'Todos'), h('p', null, 'Todos aprendemos distinto, y por eso todos somos parte del mosaico. La herramienta está para acompañar esa diversidad.')))));
 

@@ -9,10 +9,12 @@
   const { pagina } = MT.comun;
 
   const TERMINOS = [
-    { sigla: 'PIAR', nombre: 'Plan Individual de Ajustes Razonables', que: 'La herramienta con la que el colegio y la familia planean los ajustes que un estudiante con discapacidad necesita para aprender y participar. Lo contempla el Decreto 1421 de 2017.' },
+    { sigla: 'PIAR', nombre: 'Plan Individual de Ajustes Razonables', que: 'La herramienta con la que el colegio y la familia planean los ajustes que un estudiante necesita para aprender y participar. Lo contempla el Decreto 1421 de 2017, que lo establece para estudiantes con discapacidad.' },
+    { palabra: 'neurodiversidad', nombre: 'Neurodiversidad', que: 'La idea de que las diferencias en cómo funciona el cerebro humano son una variación natural, como la diversidad cultural o biológica. No describe a una persona sola: describe a un grupo, y en un aula todos somos parte de ella.' },
+    { palabra: 'neurodivergencia', nombre: 'Neurodivergencia', que: 'La manera de procesar, aprender o percibir que se aparta de lo más habitual. Es una forma de ser y de aprender, no una falta.' },
+    { palabra: 'neurodesarrollo', nombre: 'Neurodesarrollo', que: 'El proceso por el cual el cerebro y el sistema nervioso se desarrollan y se organizan desde la infancia, y con ellos la atención, el lenguaje, la memoria y la manera de relacionarse. Cada persona lo recorre a su ritmo.' },
     { sigla: 'DUA', nombre: 'Diseño Universal para el Aprendizaje', que: 'Una manera de planear la clase pensando desde el principio en que todos aprendemos distinto. Tiene tres principios: ofrecer varias formas de presentar la información (el qué), de expresarse (el cómo) y de motivarse (el por qué).' },
     { sigla: 'XP', nombre: 'Puntos de experiencia', que: 'Los puntos que ganas al hacer lecciones y quizes. Suben tu nivel. Son para ver tu propio avance, no para compararte con nadie.' },
-    { sigla: 'OAPE', nombre: 'Oficina de la Secretaría de Educación de Bogotá', que: 'La dependencia que publica los boletines de cifras de matrícula. De ahí sale el dato de estudiantes con discapacidad en colegios oficiales.' },
     { nombre: 'Ajuste', que: MT.guias.AJUSTE },
     { nombre: 'Apoyo', que: 'Lo que le sirve a un estudiante para aprender, por ejemplo más tiempo o imágenes junto al texto. En Mosaico Telar un apoyo se describe siempre sin diagnóstico.' },
     { nombre: 'Información clínica', que: 'Datos de salud o un diagnóstico. En Mosaico Telar solo existe como archivos que ve únicamente orientación: ni docentes, ni familias, ni coordinación, ni la inteligencia artificial la reciben.' },
@@ -20,17 +22,19 @@
     { nombre: 'Portal', que: 'Cada una de las tres partes de la plataforma: Kinesis (el aula), ValerIA (la guía) y Wisfox (el estudiante).' },
   ];
 
-  const SIGLAS = TERMINOS.filter((t) => t.sigla);
+  // Se marcan al primer uso las siglas y también las palabras clave del eje narrativo (neurodiversidad, neurodivergencia, neurodesarrollo).
+  const SIGLAS = TERMINOS.filter((t) => t.sigla || t.palabra);
+  const clave = (t) => t.sigla || t.palabra;
   const NO = 'BUTTON, A, LABEL, SELECT, OPTION, TEXTAREA, INPUT, DIALOG, H1, SCRIPT, STYLE, SVG, ABBR, .termino, .vivos, [role="heading"]';
 
   function explicar(t) {
-    MT.dlg.abrir({ titulo: `${t.sigla}: ${t.nombre}`, cuerpo: h('div', null, h('p', null, t.que), h('p', null, h('a', { href: '#/glosario', onclick: () => document.querySelector('dialog[open]') && document.querySelector('dialog[open]').close() }, 'Ver todo el glosario'))),
+    MT.dlg.abrir({ titulo: t.sigla ? `${t.sigla}: ${t.nombre}` : t.nombre, cuerpo: h('div', null, h('p', null, t.que), h('p', null, h('a', { href: '#/glosario', onclick: () => document.querySelector('dialog[open]') && document.querySelector('dialog[open]').close() }, 'Ver todo el glosario'))),
       acciones: [{ texto: 'Entendido', onclick: (cerrar) => cerrar() }] });
   }
 
   /* Marca la primera aparición de cada sigla en una pantalla. Solo toca texto corrido: nunca títulos, botones ni enlaces. */
   function marcar(main) {
-    const pendientes = new Map(SIGLAS.map((t) => [t.sigla, t]));
+    const pendientes = new Map(SIGLAS.map((t) => [clave(t), t]));
     const walker = document.createTreeWalker(main, NodeFilter.SHOW_TEXT, { acceptNode: (n) => (n.parentElement && !n.parentElement.closest(NO) && n.nodeValue.trim() ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT) });
     const nodos = []; while (walker.nextNode()) nodos.push(walker.currentNode);
     for (const nodo of nodos) {

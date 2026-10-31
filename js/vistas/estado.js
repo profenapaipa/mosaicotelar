@@ -9,8 +9,7 @@
   const { pagina } = MT.comun;
 
   const TABS = [{ id: 'propuesta', etiqueta: 'Propuesta' }, { id: 'arquitectura', etiqueta: 'Arquitectura' }, { id: 'etapas', etiqueta: 'Etapas' }];
-  const OAPE = 'https://oape.educacionbogota.edu.co/sites/default/files/2026-05/3.Marzo_2026_Boletin_Mensual_1.pdf';
-
+  
   const tarjeta = (t, ...hijos) => h('div', { class: 'tarjeta' }, h('h2', null, t), ...hijos);
   const lista = (l) => h('ul', null, l.map((x) => h('li', null, x)));
 
@@ -21,7 +20,7 @@
       h('p', null, 'Mosaico Telar reúne herramientas para que docentes, orientación, familias y estudiantes se encuentren y atiendan, juntos y con claridad, las distintas maneras de percibir y de vivir el mundo que hay en cada aula.'))));
     c.append(h('div', { class: 'rejilla rejilla--2', style: 'margin-top:1rem' },
       tarjeta('Lo que vemos en las aulas', h('p', null, 'Cada aula reúne estudiantes que aprenden, perciben y viven el mundo de maneras distintas, y la docencia las acompaña con dedicación. Queremos aportarle herramientas que hagan más sencillo conocer, planear y ajustar.'),
-        h('p', null, 'En colegios oficiales de Bogotá hay 22.803 estudiantes con discapacidad (marzo de 2026), una parte de esa diversidad. ', h('a', { href: OAPE, rel: 'noopener' }, 'Boletín de la OAPE'), '.'),
+        h('p', null, 'Cada estudiante tiene una experiencia y una realidad de vida diferentes. Por eso el aprendizaje se personaliza, en un entorno inclusivo donde las distintas formas de desarrollarse y de aprender encuentran su lugar.'),
         h('p', { class: 'suave' }, 'La normatividad de educación inclusiva sigue evolucionando hacia una mirada más humana y empática. Mosaico Telar la toma como punto de partida, no como meta.')),
       tarjeta('Para quién es', h('p', null, h('strong', null, 'Quienes la usan: '), 'docentes, orientación, familias, coordinación y estudiantes.'),
         h('p', null, h('strong', null, 'Con quienes la construimos: '), 'rectorías, coordinaciones académicas y entidades del sector educativo.'),

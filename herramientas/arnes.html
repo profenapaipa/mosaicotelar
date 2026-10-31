@@ -373,6 +373,11 @@ async function flujo() {
   const inicioTxt = textoPagina();
   afirmar('el inicio pone primero el sentido humano y pedagógico', /humana, pedagógica, al servicio del encuentro/i.test(inicioTxt) && /diversidad/i.test(inicioTxt));
   afirmar('el inicio no culpa a la docencia del trámite', !/en la práctica, queda en una carpeta|por cumplir|solo por el papeleo|después de darla|no lo hizo a tiempo|por encima de lo económico|segundo plano/i.test(inicioTxt));
+  afirmar('la bienvenida nombra y explica los tres términos: neurodesarrollo, neurodivergencia y neurodiversidad', ['neurodesarrollo', 'neurodivergencia', 'neurodiversidad'].every((t) => new RegExp(t, 'i').test(inicioTxt)) && /Mosaico Telar acompaña esa variedad en el aula/.test(inicioTxt));
+  afirmar('el eje es lo cognitivo y la personalización: sin la cifra de discapacidad en general', /realidad de vida diferentes/.test(inicioTxt) && !/22\.803/.test(inicioTxt));
+  afirmar('cada término se explica al tocarlo', doc().querySelectorAll('#app .termino').length >= 1);
+  await ir('#/glosario'); ventana().MT.router.recargar(); await espera(150);
+  afirmar('el glosario define los tres términos del eje', ['Neurodiversidad', 'Neurodivergencia', 'Neurodesarrollo'].every((t) => textoPagina().includes(t)) && !/OAPE/.test(textoPagina()));
   await ir('#/hoja/propuesta');
   afirmar('la propuesta parte del sentido pedagógico y no menciona a otras empresas', /nuestro sentido/i.test(textoPagina()) && !/PIARPLUS|piarplus|competencia/i.test(textoPagina()));
   afirmar('el sitio ya no tiene la comparación con otra plataforma', !doc().querySelector('a[href*="comparar"]'));
@@ -458,9 +463,9 @@ async function flujo() {
   afirmar('empezar de nuevo borra el trabajo pero conserva la cuenta', ventana().MT.store.obtener().cuenta && ventana().MT.store.obtener().cuenta.correo === 'docente@colegio.edu.co');
   // El logo: cuatro hilos de colores distintos y sin costuras al terminar
   await ir('#/'); ventana().MT.router.recargar(); await espera(4200);
-  const hilosColor = [...doc().querySelectorAll('.logo-tejido .hilo')].map((r) => ventana().getComputedStyle(r).fill);
+  const hilosColor = [...doc().querySelectorAll('.marca-hero .logo-tejido .hilo')].map((r) => ventana().getComputedStyle(r).fill);
   afirmar('el logo trae cuatro hilos de cuatro colores distintos', hilosColor.length >= 4 && new Set(hilosColor).size === 4, hilosColor.join(' | '));
-  const cajas = [...doc().querySelectorAll('.logo-tejido .hilo')].map((r) => ['x', 'y', 'width', 'height'].map((k) => parseFloat(r.getAttribute(k))));
+  const cajas = [...doc().querySelectorAll('.marca-hero .logo-tejido .hilo')].map((r) => ['x', 'y', 'width', 'height'].map((k) => parseFloat(r.getAttribute(k))));
   const solapan = cajas.some((p, i) => cajas.some((q, j) => j > i && p[0] < q[0] + q[2] && q[0] < p[0] + p[2] && p[1] < q[1] + q[3] && q[1] < p[1] + p[3]));
   afirmar('los hilos no se superponen entre sí ni hay cuadritos de cruce (así no quedan rayas del borde)', !solapan && doc().querySelectorAll('.logo-tejido .cruce, .logo-tejido .cruces').length === 0, 'tramos=' + cajas.length);
   const lg = doc().querySelector('.marca-hero .logo-tejido');
