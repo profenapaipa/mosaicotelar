@@ -184,9 +184,12 @@
   const INICIOS = [1050, 1250, 1450, 1650]; const TRAVESIA = 1350; const MUESTRAS = 30;
   function tejer(el, g, forma) {
     const A = [];
-    const an = (nodo, kf, op) => { const a = nodo.animate(kf, Object.assign({ fill: 'both' }, op)); A.push(a); return a; };
+    // Lo que termina en el estado base (piezas, lienzo, tramos) usa fill "backwards": al acabar, la animación deja de aplicarse. Con "both"
+    // el navegador sigue tratando cada pieza como una capa propia y compone sus bordes por separado, lo que dejaba líneas tenues entre
+    // piezas que comparten arista. Solo lo que debe quedarse en su valor final (punta, relevo) usa "both".
+    const an = (nodo, kf, op) => { const a = nodo.animate(kf, Object.assign({ fill: 'backwards' }, op)); A.push(a); return a; };
     const lienzo = el.querySelector('.lienzo');
-    an(lienzo, [{ scale: forma.escala }, { scale: 1 }], { duration: 1500, easing: SUAVE });
+    an(lienzo, [{ scale: forma.escala }, { scale: 1 }], { duration: 1050, easing: SUAVE });
     // 1. Las piezas llegan separadas y encajan. Las del centro primero, las esquinas al final.
     el.querySelectorAll('.pieza').forEach((n) => {
       const i = +n.dataset.i; const j = +n.dataset.j;
@@ -206,13 +209,14 @@
       const punta = el.querySelector(`.punta[data-linea="${k}"]`);
       an(punta, muestras.map((s, n) => {
         // La aguja solo se ve mientras cabe dentro del logo (su radio es lo que sobresale del hilo) y mientras el hilo va a la vista.
-        const visible = s >= 2 + radio && s <= 62 - radio && l.tramos.some(([a, b]) => s >= a && s <= b);
+        // Antes de llegar a un puente la punta se apaga (su borde redondo dejaría cuñas de fondo contra el negro) y el hilo sigue plano hasta él.
+        const visible = s >= 2 + radio && l.tramos.some(([a, b]) => s >= a && s <= (b === 62 ? 62 : b - 2) - radio);
         return { transform: l.eje === 'v' ? `translate(${l.centro}px, ${f(s)}px)` : `translate(${f(s)}px, ${l.centro}px)`, opacity: visible ? 1 : 0 };
-      }), { duration: TRAVESIA, delay: INICIOS[k] });
+      }), { duration: TRAVESIA, delay: INICIOS[k], fill: 'both' });
     });
     // 3. El relevo a la forma única: las dos formas son idénticas, una se enciende y la otra se apaga.
-    an(el.querySelector('.tela-unica'), [{ opacity: 0 }, { opacity: 1 }], { duration: 1, delay: RELEVO });
-    an(el.querySelector('.piezas'), [{ opacity: 1 }, { opacity: 0 }], { duration: 1, delay: RELEVO + 10 });
+    an(el.querySelector('.tela-unica'), [{ opacity: 0 }, { opacity: 1 }], { duration: 1, delay: RELEVO, fill: 'both' });
+    an(el.querySelector('.piezas'), [{ opacity: 1 }, { opacity: 0 }], { duration: 1, delay: RELEVO + 10, fill: 'both' });
     return A;
   }
   // La versión calmada: sin desplazamientos ni giros, solo aparece suavemente.
