@@ -10,7 +10,7 @@
 <pre id="resultado" style="position:fixed;top:0;left:0;max-width:100%;background:#fff;color:#000;font:11px monospace;white-space:pre-wrap"></pre>
 <script>
 const SECC = { docente: ['resumen', 'estudiantes', 'actividades', 'ajustes', 'notas', 'archivos'], orientacion: ['resumen', 'ajustes', 'estudiantes', 'notas', 'archivos'], familia: ['resumen', 'archivos'], coordinacion: ['resumen', 'estudiantes', 'cursos', 'categorias'], estudiante: ['resumen', 'ruta', 'logros', 'archivos'] };
-const RUTAS = [[null, '#/'], [null, '#/mi'], [null, '#/mapa/conexiones'], [null, '#/valeria/chat'], [null, '#/valeria/conexion'], [null, '#/recorrido/camino'], [null, '#/recorrido/roles'], [null, '#/recorrido/datos'], [null, '#/portales'], [null, '#/portales/kinesis'], [null, '#/portales/wisfox'], [null, '#/portales/valeria'], [null, '#/glosario'], [null, '#/planes/planes'], [null, '#/planes/servicios'], [null, '#/registro/gratis'], [null, '#/registro/prueba'], [null, '#/guia/docente'], [null, '#/guia/estudiante'], [null, '#/hoja/propuesta'], [null, '#/hoja/arquitectura'], [null, '#/hoja/etapas'], [null, '#/piloto'], [null, '#/identidad'],
+const RUTAS = [[null, '#/'], [null, '#/mi'], [null, '#/mapa/conexiones'], [null, '#/mapa/distingue'], [null, '#/valeria/chat'], [null, '#/valeria/conexion'], [null, '#/recorrido/camino'], [null, '#/recorrido/roles'], [null, '#/recorrido/datos'], [null, '#/portales'], [null, '#/portales/kinesis'], [null, '#/portales/wisfox'], [null, '#/portales/valeria'], [null, '#/glosario'], [null, '#/planes/planes'], [null, '#/planes/servicios'], [null, '#/registro/gratis'], [null, '#/registro/prueba'], [null, '#/guia/docente'], [null, '#/guia/estudiante'], [null, '#/hoja/propuesta'], [null, '#/hoja/arquitectura'], [null, '#/hoja/etapas'], [null, '#/piloto'], [null, '#/identidad'],
   ...Object.entries(SECC).flatMap(([rol, l]) => l.map((x) => [rol, '#/mi/' + x]))];
 const ANCHOS = [390, 1280];
 const TEMAS = ['claro', 'oscuro'];
@@ -376,6 +376,10 @@ async function flujo() {
   await ir('#/hoja/propuesta');
   afirmar('la propuesta parte del sentido pedagógico y no menciona a otras empresas', /nuestro sentido/i.test(textoPagina()) && !/PIARPLUS|piarplus|competencia/i.test(textoPagina()));
   afirmar('el sitio ya no tiene la comparación con otra plataforma', !doc().querySelector('a[href*="comparar"]'));
+  await ir('#/mapa/distingue'); ventana().MT.router.recargar(); await espera(250);
+  afirmar('Qué nos distingue conserva sus diferencias, dichas desde lo propio y sin nombrar a nadie', doc().querySelectorAll('.diferencial .tarjeta').length === 5 && /Quien enseña decide/.test(textoPagina()) && /Lo que todavía estamos construyendo/.test(textoPagina()) && !/PIARPLUS|competencia|frente a/i.test(textoPagina()));
+  await ir('#/'); ventana().MT.router.recargar(); await espera(250);
+  afirmar('la bienvenida enlaza a la página de lo que nos distingue', !!doc().querySelector('a[href="#/mapa/distingue"]'));
   await ir('#/planes'); ventana().MT.router.recargar();
   afirmar('planes, registro y piloto avisan que el proyecto está en construcción y sin cobros', /Un proyecto en construcción/.test(textoPagina()) && /no hay cobros ni contratos/.test(textoPagina()));
   afirmar('el pie no presenta un cargo legal mientras el modelo de empresa se coordina', !/Representante legal/i.test(doc().querySelector('footer').innerText));

@@ -179,12 +179,34 @@
     MT.router.alSalir(() => window.removeEventListener('resize', alCambiar));
   }
 
+  /* Qué nos distingue. Es información importante para quien conoce la plataforma por primera vez, así que tiene su lugar propio.
+     Se dice desde lo que la plataforma hace y cree, sin compararla con nadie. */
+  const DISTINGUE = [
+    ['Un camino compartido', 'El ajuste nace en el aula y viaja, con su razón, a orientación, a la familia y al estudiante. Cada paso se ve y se puede conversar.'],
+    ['Para todos y para cada quien', 'El DUA es la base: la clase se piensa para todos desde el diseño, y el ajuste individual acompaña lo que el diseño no alcanza.'],
+    ['Quien enseña decide', 'Las herramientas proponen y explican; la docencia y el equipo de orientación deciden. La tecnología media, no sustituye.'],
+    ['Cuidado de la información', 'Lo clínico queda aparte y solo lo ve orientación. La inteligencia artificial nunca lo recibe, y cada rol ve únicamente lo que necesita.'],
+    ['Tres portales, un tejido', 'Kinesis, ValerIA y Wisfox nacieron como proyectos de estudiantes y hoy comparten identidad, rol y datos.'],
+  ];
+  const EN_CONSTRUCCION = ['Un servidor con cuentas, para compartir el trabajo entre personas y dispositivos', 'ValerIA conectada a un modelo de lenguaje', 'El documento del PIAR en el formato oficial', 'Más materias en la ruta del estudiante'];
+
+  function distingue(c) {
+    c.append(h('div', { class: 'rejilla rejilla--3 diferencial' }, DISTINGUE.map(([t, p]) => h('div', { class: 'tarjeta tarjeta--borde' }, h('h2', { class: 'h3' }, t), h('p', null, p)))));
+    c.append(h('div', { class: 'tarjeta', style: 'margin-top:1rem' }, h('h2', null, 'Lo que todavía estamos construyendo'),
+      h('p', { class: 'suave' }, 'Decirlo con claridad también es parte del cuidado: hay cosas que ya funcionan y otras que vienen.'),
+      h('ul', null, EN_CONSTRUCCION.map((x) => h('li', null, x))),
+      h('div', { class: 'acciones' }, h('a', { class: 'btn btn--suave', href: '#/hoja/etapas' }, 'Ver las etapas'))));
+  }
+
+  const TABS = [{ id: 'conexiones', etiqueta: 'Cómo se conecta todo' }, { id: 'distingue', etiqueta: 'Qué nos distingue' }];
   MT.router.registrar({
-    id: 'mapa', titulo: 'Mapa', espacio: '', subs: [{ id: 'conexiones' }],
-    render(main) {
-      const c = pagina(main, { etiqueta: 'Mapa interactivo', titulo: 'Cómo se conecta todo',
-        descripcion: 'Los tres proyectos de estudiantes, sus módulos y lo que viaja entre ellos. Toca cualquier módulo.' });
-      conexiones(c);
+    id: 'mapa', titulo: 'Mapa', espacio: '', subs: TABS,
+    render(main, { sub }) {
+      const c = pagina(main, { etiqueta: 'Mapa interactivo', titulo: sub === 'distingue' ? 'Qué nos distingue' : 'Cómo se conecta todo',
+        descripcion: sub === 'distingue' ? 'Lo que hace particular a esta manera de acompañar la diversidad en el aula.' : 'Los tres proyectos de estudiantes, sus módulos y lo que viaja entre ellos. Toca cualquier módulo.' });
+      c.append(h('nav', { class: 'pestanas-pagina', 'aria-label': 'Secciones del mapa' },
+        TABS.map((t) => h('a', { href: '#/mapa/' + t.id, 'aria-current': t.id === sub ? 'page' : null }, t.etiqueta))));
+      (sub === 'distingue' ? distingue : conexiones)(c);
     },
   });
 })(window.MT = window.MT || {});

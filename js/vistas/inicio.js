@@ -89,7 +89,8 @@
         h('div', { class: 'rejilla rejilla--3 diferencial' },
           h('div', { class: 'tarjeta tarjeta--borde' }, h('h3', null, 'Un camino compartido'), h('p', null, 'Docentes, orientación, familias y estudiantes ven el mismo proceso, cada uno con lo suyo, y cada paso se entiende.')),
           h('div', { class: 'tarjeta tarjeta--borde' }, h('h3', null, 'Para todos, no solo con diagnóstico'), h('p', null, 'El DUA es la base: la clase se piensa para todos y el ajuste cubre lo que el diseño no alcanza.')),
-          h('div', { class: 'tarjeta tarjeta--borde' }, h('h3', null, 'Protegida por diseño'), h('p', null, 'La información clínica queda aislada y la IA nunca la recibe.')))));
+          h('div', { class: 'tarjeta tarjeta--borde' }, h('h3', null, 'Protegida por diseño'), h('p', null, 'La información clínica queda aislada y la IA nunca la recibe.'))),
+        h('p', { style: 'margin-top:1rem' }, h('a', { href: '#/mapa/distingue' }, 'Conocer todo lo que nos distingue'))));
 
       c.append(h('section', { class: 'seccion', 'aria-labelledby': 'h-problema' },
         h('h2', { id: 'h-problema' }, 'Cada aula reúne muchas maneras de aprender'),
