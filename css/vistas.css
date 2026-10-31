@@ -343,3 +343,17 @@ input[type="file"] { width: 100%; font: 400 1rem var(--fuente); color: var(--tin
 .plataforma__une { margin: 1rem 0 0; padding-top: .8rem; border-top: 2px dotted var(--linea); }
 .objetivo { margin: 1.2rem 0; border-left: 6px solid var(--tinta); padding: .4rem 0 .4rem 1.1rem; }
 .objetivo__texto { font: 700 clamp(1.25rem, 2.6vw, 1.7rem)/1.3 var(--fuente-titulo); margin: 0; max-width: 40ch; }
+
+/* Cómo lo construimos: cuadrícula de cinco miradas por cinco etapas; cada celda muestra tres puntos (existe, pilotaje, seguimos tejiendo). */
+.celda-leyenda { display: flex; flex-wrap: wrap; gap: .5rem 1.25rem; margin: 0 0 .75rem; align-items: center; }
+.punto-celda { display: inline-block; width: 12px; height: 12px; border-radius: 50%; border: 2px solid currentColor; opacity: .35; vertical-align: middle; }
+.punto-celda--on { opacity: 1; }
+.punto-celda.p1 { color: var(--hilo-kinesis, #2E8B57); }
+.punto-celda.p2 { color: var(--hilo-wisfox, #C77F00); }
+.punto-celda.p3 { color: var(--hilo-mosaico, #E0527E); }
+.punto-celda--on.p1 { background: currentColor; }
+.punto-celda--on.p2 { background: currentColor; }
+.punto-celda--on.p3 { background: currentColor; }
+.construccion .celda { display: inline-flex; gap: .4rem; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; padding: .4rem .6rem; background: transparent; border: 1px solid var(--borde, #ccc); border-radius: 8px; cursor: pointer; color: inherit; }
+.construccion .celda:focus-visible { outline: 3px solid currentColor; outline-offset: 2px; }
+.celda-detalle__bloque h3 { margin: .75rem 0 .15rem; font-size: 1rem; }
