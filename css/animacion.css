@@ -3,30 +3,18 @@
    Todo se apaga si la persona pide menos movimiento (al final del archivo). */
 
 /* ---- El logo tejido ---- */
-.logo-tejido { display: block; width: 100%; height: auto; color: var(--tinta); overflow: visible; }
-.logo-tejido .piezas { display: none; }
-.logo-tejido { shape-rendering: geometricPrecision; }
+/* El estado base es el logo final: forma única y hilos. La animación (js/tejido.js, API de animaciones web) enciende las piezas
+   y las agujas solo mientras dura, y al terminar se cancela y vuelve a este estado, que es idéntico al último cuadro. */
+.logo-tejido { display: block; width: 100%; height: auto; color: var(--tinta); overflow: visible; shape-rendering: geometricPrecision; }
+.logo-tejido .piezas, .logo-tejido .punta { display: none; }
+.logo-tejido.tejiendo .piezas, .logo-tejido.tejiendo .punta { display: inline; }
 .logo-tejido .hilos { opacity: 1; transition: opacity .7s ease; }
 .logo-tejido.mono .hilos { opacity: 0; }
-.logo-tejido .hilo, .logo-tejido .pieza { transform-box: fill-box; }
+/* Los hilos de los tramos escalan desde su extremo; las piezas giran sobre su propio centro (el origen va en cada pieza, en unidades del dibujo). */
+.logo-tejido .hilo { transform-box: fill-box; }
 .logo-tejido .hilo--v { transform-origin: top; }
 .logo-tejido .hilo--h { transform-origin: left; }
-.logo-tejido .pieza { transform-origin: center; }
-
-/* Mientras se teje: las nueve piezas aparecen una a una, los hilos cruzan con un pequeño rebote, y al final se pasa a la forma única */
-.logo-tejido.tejiendo { transform-origin: center; animation: tj-pulso .7s ease-in-out 2.3s; }
-.logo-tejido.tejiendo .tela-unica { display: none; }
-.logo-tejido.tejiendo.cerrando .tela-unica { display: inline; }   /* el relevo: las dos formas, idénticas, una sobre otra */
-.logo-tejido.tejiendo .piezas { display: inline; }
-.logo-tejido.tejiendo .pieza { animation: tj-pieza .8s cubic-bezier(.22, 1.25, .36, 1) calc(var(--i) * .06s) both; will-change: transform, opacity; }
-.logo-tejido.tejiendo .hilo--v { animation: tj-hilo-v .9s cubic-bezier(.16, 1, .3, 1) var(--d) both; will-change: transform; }
-.logo-tejido.tejiendo .hilo--h { animation: tj-hilo-h .9s cubic-bezier(.16, 1, .3, 1) var(--d) both; will-change: transform; }
-
-@keyframes tj-pieza { from { opacity: 0; transform: scale(.3) rotate(-18deg); } to { opacity: 1; transform: none; } }
-@keyframes tj-hilo-v { from { transform: scaleY(0); } to { transform: scaleY(1); } }
-@keyframes tj-hilo-h { from { transform: scaleX(0); } to { transform: scaleX(1); } }
-@keyframes tj-pop { from { opacity: 0; transform: scale(.2); } to { opacity: 1; transform: none; } }
-@keyframes tj-pulso { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.035); } }
+.logo-tejido .pieza { transform-box: view-box; }
 
 /* Cargador: los hilos suben y bajan sin parar, para esperas reales */
 .logo-cargador { width: 56px; height: 56px; }
@@ -66,8 +54,16 @@
 .rol-tarjeta:hover .rol-icono { transform: rotate(-8deg) scale(1.1); }
 
 @media (prefers-reduced-motion: reduce) {
-  .logo-tejido.tejiendo, .logo-tejido.tejiendo * , .logo-cargador.cargando *, #progreso-hilos, #progreso-hilos span { animation: none !important; }
+  .logo-cargador.cargando *, #progreso-hilos, #progreso-hilos span { animation: none !important; }
   .revela { opacity: 1; transform: none; transition: none; }
   .seccion.revela:not(.visto) h2::after { width: min(120px, 30%); }
   .rol-tarjeta:hover, .plan-tarjeta:hover, .portal:hover, .servicio:hover { transform: none; }
 }
+
+/* Movimiento calmado: una opción que la persona activa (html[data-movimiento="calmado"]) aunque su sistema no pida reducir
+   movimiento. Quita los desplazamientos, los giros y los hilos que corren; queda solo lo que aparece suavemente. */
+[data-movimiento="calmado"] .logo-cargador.cargando *, [data-movimiento="calmado"] #progreso-hilos, [data-movimiento="calmado"] #progreso-hilos span { animation: none !important; }
+[data-movimiento="calmado"] .revela { opacity: 1; transform: none; transition: none; }
+[data-movimiento="calmado"] .seccion.revela:not(.visto) h2::after { width: min(120px, 30%); }
+[data-movimiento="calmado"] .rol-tarjeta:hover, [data-movimiento="calmado"] .plan-tarjeta:hover, [data-movimiento="calmado"] .portal:hover, [data-movimiento="calmado"] .servicio:hover { transform: none; }
+[data-movimiento="calmado"] .rol-tarjeta:hover .rol-icono { transform: none; }
