@@ -30,8 +30,13 @@
   const RELEVO = 3050;   // ms: instante del cambio a la forma única
   // La lengüeta y su muesca: cuánto entra en la vecina, cuánto más alta que el puente es, cuánto la rebasa para que no haya
   // línea clara en el borde de la muesca, y el radio de las esquinas redondeadas.
-  const ENC = { prof: 4, alto: 3, solape: 0.6, radio: 2 };
-  const SEPARA = 5.5;    // cuánto se separan las piezas de las vecinas al llegar (debe ser mayor que la profundidad de la lengüeta)
+  // Hay dos formas de encaje para elegir (solo cambian la animación; el logo final es el mismo): "escalon", sobria, y "curva",
+  // más grande y redondeada, que se acerca más al rompecabezas. "separa" es cuánto se alejan las piezas al llegar y debe superar
+  // la profundidad de la lengüeta; "escala" encoge el conjunto al inicio para que, separadas, quepan en el mismo cuadro.
+  const FORMAS = {
+    escalon: { prof: 4, alto: 3, solape: 0.6, radio: 2, separa: 5.5, escala: 0.9 },
+    curva: { prof: 5, alto: 6, solape: 0.6, radio: 4, separa: 7.5, escala: 0.84 },
+  };
   const f = (n) => +n.toFixed(2);
   const igual = (a, b) => Math.abs(a - b) < 0.01;
 
@@ -62,8 +67,8 @@
   }
 
   // El contorno de una pieza: su cuadrado con las esquinas externas redondeadas y, en las esquinas que reciben una lengüeta, una muesca.
-  function contorno(x0, y0, x1, y1, radios, muescas) {
-    const rc = ENC.radio; const v = []; const m = muescas;
+  function contorno(x0, y0, x1, y1, radios, muescas, rc) {
+    const v = []; const m = muescas;
     if (m.TL) v.push([x0, y0 + m.TL.nh, 0], [x0 + m.TL.nw, y0 + m.TL.nh, rc], [x0 + m.TL.nw, y0, 0]); else v.push([x0, y0, radios.TL]);
     if (m.TR) v.push([x1 - m.TR.nw, y0, 0], [x1 - m.TR.nw, y0 + m.TR.nh, rc], [x1, y0 + m.TR.nh, 0]); else v.push([x1, y0, radios.TR]);
     if (m.BR) v.push([x1, y1 - m.BR.nh, 0], [x1 - m.BR.nw, y1 - m.BR.nh, rc], [x1 - m.BR.nw, y1, 0]); else v.push([x1, y1, radios.BR]);
@@ -75,7 +80,7 @@
      piezas sean distintas entre sí). La muesca es un escalón en la esquina que da al cruce; la lengüeta, el puente prolongado
      hasta rellenar ese escalón con un pequeño excedente (solape) dentro de la pieza vecina: así, al encajar, negro sobre negro
      y sin línea clara. El tramo que cruza el hueco mide justo lo que el puente final. */
-  function encajes(puentes) {
+  function encajes(puentes, ENC) {
     const muescas = {}; const lenguetas = {};
     const { prof, alto, solape, radio } = ENC;
     const sinRadios = () => ({ TL: 0, TR: 0, BR: 0, BL: 0 });
@@ -111,7 +116,7 @@
     return { muescas, lenguetas };
   }
 
-  function geometria() {
+  function geometria(forma) {
     // Cada pieza es un camino propio. Los puentes negros NO son una forma aparte: se suman a las dos piezas que unen.
     // Si fueran otra forma, el suavizado de bordes dejaría ver una línea clara entre el puente y la pieza. Dentro de un mismo
     // camino no hay borde que suavizar, y al estar el puente en los dos caminos, ninguno de sus lados queda como arista entre
@@ -139,12 +144,12 @@
     const piezas = caminos.flat().map((p) => p.join(''));
 
     // Las piezas de la animación: cada una con su muesca (si recibe) y sus lengüetas (si da).
-    const { muescas, lenguetas } = encajes(puentes);
+    const { muescas, lenguetas } = encajes(puentes, forma);
     const cuerpos = [];
     CORTES.forEach(([y0, y1], j) => CORTES.forEach(([x0, x1], i) => {
       const clave = i + ',' + j;
       const radios = { TL: i === 0 && j === 0 ? R : 0, TR: i === 2 && j === 0 ? R : 0, BR: i === 2 && j === 2 ? R : 0, BL: i === 0 && j === 2 ? R : 0 };
-      cuerpos.push({ i, j, cx: (x0 + x1) / 2, cy: (y0 + y1) / 2, cuerpo: contorno(x0, y0, x1, y1, radios, muescas[clave] || {}), lenguetas: lenguetas[clave] || [] });
+      cuerpos.push({ i, j, cx: (x0 + x1) / 2, cy: (y0 + y1) / 2, cuerpo: contorno(x0, y0, x1, y1, radios, muescas[clave] || {}, forma.radio), lenguetas: lenguetas[clave] || [] });
     }));
 
     /* Los hilos de color, por tramos. Dos decisiones que evitan las líneas finas del borde:
@@ -177,19 +182,19 @@
   const SUAVE = 'cubic-bezier(.45, 0, .2, 1)';
   const suave3 = (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
   const INICIOS = [1050, 1250, 1450, 1650]; const TRAVESIA = 1350; const MUESTRAS = 30;
-  function tejer(el, g) {
+  function tejer(el, g, forma) {
     const A = [];
     const an = (nodo, kf, op) => { const a = nodo.animate(kf, Object.assign({ fill: 'both' }, op)); A.push(a); return a; };
     const lienzo = el.querySelector('.lienzo');
-    an(lienzo, [{ scale: 0.9 }, { scale: 1 }], { duration: 1500, easing: SUAVE });
+    an(lienzo, [{ scale: forma.escala }, { scale: 1 }], { duration: 1500, easing: SUAVE });
     // 1. Las piezas llegan separadas y encajan. Las del centro primero, las esquinas al final.
     el.querySelectorAll('.pieza').forEach((n) => {
       const i = +n.dataset.i; const j = +n.dataset.j;
       const retraso = 60 * ((i === 1 ? 0 : 1) + (j === 1 ? 0 : 1));
       const giro = ((i + j) % 2 ? 1 : -1) * 5;
       an(n, [{ opacity: 0 }, { opacity: 1 }], { duration: 380, delay: retraso, easing: 'ease-out' });
-      an(n, [{ translate: `${(i - 1) * SEPARA}px ${(j - 1) * SEPARA}px` }, { translate: '0px 0px' }], { duration: 1000, delay: retraso + 120, easing: SUAVE });
-      an(n, [{ rotate: `${giro}deg` }, { rotate: '0deg' }], { duration: 640, delay: retraso + 120, easing: 'cubic-bezier(.3, 0, .2, 1)' });
+      an(n, [{ translate: `${(i - 1) * forma.separa}px ${(j - 1) * forma.separa}px` }, { translate: '0px 0px' }], { duration: 820, delay: retraso + 120, easing: SUAVE });
+      an(n, [{ rotate: `${giro}deg` }, { rotate: '0deg' }], { duration: 560, delay: retraso + 120, easing: 'cubic-bezier(.3, 0, .2, 1)' });
     });
     // 2. Cada hilo avanza de un borde al otro con su aguja. La punta y los tramos usan la misma curva de avance, por eso se ve continuo.
     g.lineas.forEach((l, k) => {
@@ -215,10 +220,11 @@
     return [el.querySelector('.lienzo').animate([{ opacity: 0 }, { opacity: 1 }], { duration: 700, easing: 'ease-out', fill: 'both' })];
   }
 
-  /* El logo. opciones: { animar: true, mono: false, clase: '' }. Devuelve { el, repetir, alternar, esMono, irA }. */
+  /* El logo. opciones: { animar: true, mono: false, clase: '', forma: 'curva' (la elegida) | 'escalon' }. Devuelve { el, repetir, alternar, esMono, irA, animaciones }. */
   function logo(op) {
-    const o = Object.assign({ animar: true, mono: false, clase: '' }, op);
-    const g = geometria();
+    const o = Object.assign({ animar: true, mono: false, clase: '', forma: 'curva' }, op);
+    const forma = FORMAS[o.forma] || FORMAS.curva;
+    const g = geometria(forma);
     const tips = g.lineas.map((l, k) => `<circle class="punta" data-linea="${k}" r="${HILO / 2 + EXTRA}" cx="0" cy="0" fill="${l.color}"/>`).join('');
     const hilos = g.hilos.map((t) => `<rect class="hilo hilo--${t.eje}" data-linea="${t.linea}" data-desde="${t.desde}" data-hasta="${t.hasta}" x="${t.x}" y="${t.y}" width="${t.w}" height="${t.h}" fill="${t.color}"/>`).join('');
     const unica = g.piezas.join('');
@@ -236,7 +242,7 @@
       limpiar(); if (!el.animate) return;
       const suave = reducido() || calmado();
       el.classList.add('tejiendo');
-      animaciones = suave ? calma(el) : tejer(el, g);
+      animaciones = suave ? calma(el) : tejer(el, g, forma);
       temporizador = setTimeout(limpiar, suave ? 800 : DURACION);
     };
     if (o.animar && !reducido()) repetir();
@@ -244,7 +250,7 @@
     const irA = (ms) => { clearTimeout(temporizador); animaciones.forEach((a) => { a.pause(); a.currentTime = ms; }); };
     // Pasar de color a blanco y negro (y volver) mostrando las dos versiones de la marca.
     const alternar = () => { el.classList.toggle('mono'); return el.classList.contains('mono'); };
-    return { el, repetir, alternar, irA, esMono: () => el.classList.contains('mono') };
+    return { el, repetir, alternar, irA, animaciones: () => animaciones, esMono: () => el.classList.contains('mono') };
   }
 
   // Compatibilidad con la bienvenida: el logo que se teje.
