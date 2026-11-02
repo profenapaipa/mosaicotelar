@@ -19,9 +19,9 @@ const f = document.getElementById('f');
 const salida = { casos: [], flujo: [], fatal: null };
 let n = 0;
 
-function cargar(ruta, ancho) {
+function cargar(ruta, ancho, alto) {
   return new Promise((res) => {
-    f.style.width = ancho + 'px'; f.style.height = '900px';
+    f.style.width = ancho + 'px'; f.style.height = (alto || 900) + 'px';
     f.onload = () => res();
     f.src = '../index.html?t=' + (++n) + ruta;
   });
@@ -56,7 +56,7 @@ const razon = (a, b) => { const x = lum(a), y = lum(b); return (Math.max(x, y) +
 function medirContraste() {
   const malos = []; let omitidos = 0; let medidos = 0;
   const d = doc();
-  d.querySelectorAll('header *, main *, footer *, .nav-movil *').forEach((el) => {
+  d.querySelectorAll('header *, main *, footer *, .nav-movil *, .guion *').forEach((el) => {
     const tieneTexto = [...el.childNodes].some((x) => x.nodeType === 3 && x.textContent.trim());
     if (!tieneTexto || !el.getClientRects().length) return;
     const cs = ventana().getComputedStyle(el);
@@ -73,7 +73,7 @@ function medirContraste() {
 }
 
 /* ---- una pantalla en un ancho y un tema ---- */
-function medirCaso(ruta, ancho, tema) {
+function medirCaso(ruta, ancho, tema, extra) {
   const d = doc(); const w = ventana(); const fallos = [];
   d.documentElement.dataset.tema = tema;
   const e = d.documentElement;
@@ -99,6 +99,7 @@ function medirCaso(ruta, ancho, tema) {
   // La barra de navegación debe verse completa: en celular, todos sus íconos dentro de la pantalla.
   const riel = [...d.querySelectorAll('.riel-items a')].filter((x) => { const r = x.getBoundingClientRect(); return r.width && (r.right > e.clientWidth + 1 || r.left < -1); });
   if (riel.length) fallos.push(`${riel.length} íconos del riel quedan fuera de la pantalla`);
+  if (extra) fallos.push(...extra());   // comprobaciones propias de un modo (por ejemplo, el modo presentación)
   const c = medirContraste();
   if (c.total) fallos.push(`${c.total} textos sin contraste suficiente: ` + c.malos.join(' ; '));
   return { ruta, ancho, tema, fallos, contraste: { medidos: c.medidos, omitidos: c.omitidos } };
@@ -552,6 +553,276 @@ async function flujo() {
   afirmar('sin errores de ejecución en todo el recorrido', !(ventana().__errores && ventana().__errores.length), ventana().__errores && ventana().__errores.join(' | '));
 }
 
+/* ---------------------------------------------------------------------------------------------------------------------------
+   Demostración en vivo (fase 1): modo presentación, reinicio de un clic, aviso y respaldo sin conexión, versión calmada,
+   funcionamiento sin conexión (service worker) y red de seguridad contra la pantalla en blanco.
+   --------------------------------------------------------------------------------------------------------------------------- */
+
+// Las pantallas en modo presentación: tamaños de proyector (1920x1080, 1280x720) y celular, en los dos temas.
+const TAMANOS_PRES = [[1920, 1080], [1280, 720], [390, 844]];
+const RUTAS_PRES = [[null, '#/'], [null, '#/mi'], [null, '#/portales'], [null, '#/portales/kinesis'], [null, '#/portales/wisfox'], ['docente', '#/mi/ajustes'], ['estudiante', '#/mi/resumen'], [null, '#/recorrido/camino']];
+
+// Lo que además se mide cuando el modo presentación está activo.
+function medirPresentacion(ancho) {
+  const d = doc(); const w = ventana(); const e = d.documentElement; const fallos = [];
+  if (e.dataset.presentacion !== 'activa') return ['el modo presentación no quedó activo'];
+  const g = d.getElementById('guion-mesa');
+  if (!g || !g.getClientRects().length) return ['no se ve el guion de la mesa'];
+  const r = g.getBoundingClientRect();
+  if (r.bottom > w.innerHeight + 1 || r.left < -1 || r.right > e.clientWidth + 1) fallos.push(`el guion se sale de la pantalla (${Math.round(r.left)},${Math.round(r.bottom)} a ${Math.round(r.right)})`);
+  if (r.height > w.innerHeight * 0.5) fallos.push(`el guion ocupa más de la mitad de la pantalla (${Math.round(r.height)} de ${w.innerHeight})`);
+  const pad = parseFloat(w.getComputedStyle(d.body).paddingBottom);
+  if (pad < g.offsetHeight - 1) fallos.push(`el guion tapa el final de la página (relleno ${pad} < ${g.offsetHeight})`);
+  const vivos = d.querySelector('.vivos:not([hidden])');
+  if (vivos && vivos.getBoundingClientRect().bottom > r.top + 1) fallos.push(`el guion tapa el portal (${Math.round(vivos.getBoundingClientRect().bottom)} > ${Math.round(r.top)})`);
+  const letra = parseFloat(w.getComputedStyle(e).fontSize);
+  if (ancho >= 1600 && letra < 23.9) fallos.push(`a 1920 px la letra base debe ser de 24 px (es ${letra})`);
+  if (ancho >= 1000 && ancho < 1600 && letra < 19.9) fallos.push(`a 1280 px la letra base debe ser de 20 px (es ${letra})`);
+  ['.pie', '.riel-abajo', '.barra-portales__ayuda'].forEach((s) => { const x = d.querySelector(s); if (x && ancho > 860 && x.getClientRects().length) fallos.push(`${s} debería estar oculto en modo presentación`); });
+  // Controles grandes: ningún botón visible de menos de 36 px (los del celular quedan fuera del cálculo de 44 px de la franja).
+  const chicos = [...d.querySelectorAll('.btn')].filter((x) => x.getClientRects().length && x.getBoundingClientRect().height < 36);
+  if (chicos.length && ancho > 860) fallos.push(`${chicos.length} botones de menos de 36 px en modo presentación`);
+  return fallos;
+}
+
+async function casosPresentacion() {
+  for (const [ancho, alto] of TAMANOS_PRES) for (const [rol, ruta] of RUTAS_PRES) {
+    localStorage.clear();
+    localStorage.setItem('mosaicotelar.presentacion', JSON.stringify({ activo: true, paso: 3 }));
+    if (rol) localStorage.setItem('mosaicotelar.v2', JSON.stringify({ rol }));
+    await cargar(ruta, ancho, alto); await espera(450);
+    for (const tema of TEMAS) {
+      const c = medirCaso('presentación ' + (rol ? rol + ' ' : '') + ruta + ' ' + alto + 'p', ancho, tema, () => medirPresentacion(ancho));
+      salida.casos.push(c); await espera(60);
+    }
+  }
+}
+
+const visible = (x) => !!x && x.getClientRects().length > 0;
+const rutaDe = (hash) => hash.replace(/^#\/?/, '').split('/').filter(Boolean);
+
+async function flujoDemostracion() {
+  const MTw = () => ventana().MT; const D = () => doc();
+  const CINCO = ['coordinacion', 'orientacion', 'docente', 'familia', 'estudiante'];
+
+  /* ===== 1. Modo presentación ===== */
+  localStorage.clear();
+  await cargar('#/', 1280, 720); await espera(500);
+  const bp = D().getElementById('btn-presentacion');
+  afirmar('presentación: hay un botón "Modo presentación" en la franja, con su atajo anunciado', !!bp && bp.getAttribute('aria-keyshortcuts') === 'Alt+P' && bp.getAttribute('aria-pressed') === 'false' && visible(bp));
+  afirmar('presentación: sin activarlo, el sitio no cambia (sin atributo ni guion)', !D().documentElement.dataset.presentacion && !D().getElementById('guion-mesa'));
+  const letraAntes = parseFloat(ventana().getComputedStyle(D().documentElement).fontSize);
+  bp.click(); await espera(350);
+  const guion = () => D().getElementById('guion-mesa');
+  afirmar('presentación: el botón activa el modo y muestra el guion', D().documentElement.dataset.presentacion === 'activa' && bp.getAttribute('aria-pressed') === 'true' && visible(guion()));
+  afirmar('presentación: la letra crece (a 1280 px, de 16 a 20 px)', letraAntes === 16 && parseFloat(ventana().getComputedStyle(D().documentElement).fontSize) === 20, String(letraAntes));
+  afirmar('presentación: hay menos navegación (sin pie, sin enlaces de planes ni hoja de ruta)', !visible(D().querySelector('.pie')) && !visible(D().querySelector('.riel-abajo')) && !visible(D().querySelector('.barra-portales__ayuda')));
+  afirmar('presentación: el guion dice que es un borrador por aprobar mientras no esté aprobado', MTw().mensajes.guion.aprobado === true || /\[por aprobar\]/.test(guion().innerText), guion().innerText.slice(0, 80));
+  const pasos = MTw().mensajes.guion.pasos;
+  afirmar('presentación: el guion recorre los cinco roles', CINCO.every((r) => pasos.some((p) => p.rol === r)), pasos.map((p) => p.rol).join());
+  const malosPasos = pasos.filter((p) => { const [r = 'inicio', sub] = rutaDe(p.hash); const def = MTw().router.rutas[r]; if (!def) return true; if (r === 'mi' && p.rol) return !(MTw().secciones[p.rol] || []).some((s) => s.id === sub); return false; });
+  afirmar('presentación: cada paso del guion lleva a una pantalla y a una sección que existen para su rol', malosPasos.length === 0, malosPasos.map((p) => p.hash + '/' + p.rol).join());
+  const sig = () => [...D().querySelectorAll('#guion-mesa button')].find((b) => b.textContent.trim() === 'Siguiente');
+  const ant = () => [...D().querySelectorAll('#guion-mesa button')].find((b) => b.textContent.trim() === 'Anterior');
+  afirmar('presentación: en el primer paso "Anterior" está desactivado', ant().disabled && !sig().disabled);
+  // Recorre el guion entero: cada paso cambia de rol y de pantalla, y cae en una pantalla con su título.
+  const fallosPaso = [];
+  for (let i = 1; i < pasos.length; i++) {
+    sig().click(); await espera(300);
+    const hubo = ventana().__errores && ventana().__errores.length;
+    const h1 = D().querySelectorAll('main h1').length + [...D().querySelectorAll('main [role="heading"][aria-level="1"]')].filter(visible).length;
+    if (ventana().location.hash !== pasos[i].hash) fallosPaso.push(`${i}: hash ${ventana().location.hash}`);
+    else if (MTw().store.obtener().rol !== pasos[i].rol) fallosPaso.push(`${i}: rol ${MTw().store.obtener().rol}`);
+    else if (h1 !== 1) fallosPaso.push(`${i}: ${h1} títulos`);
+    else if (hubo) fallosPaso.push(`${i}: errores ${ventana().__errores.join('|')}`);
+    else if (!new RegExp(`Paso ${i + 1} de ${pasos.length}`).test(guion().innerText)) fallosPaso.push(`${i}: el guion no marca el paso`);
+  }
+  afirmar(`presentación: "Siguiente" recorre los ${pasos.length} pasos, cada uno en su rol y su pantalla, sin errores`, fallosPaso.length === 0, fallosPaso.join(' ; '));
+  afirmar('presentación: en el último paso "Siguiente" se desactiva y el foco no se pierde', sig().disabled && doc().activeElement !== doc().body);
+  ant().click(); await espera(300);
+  afirmar('presentación: "Anterior" vuelve un paso', ventana().location.hash === pasos[pasos.length - 2].hash && MTw().presentacion.paso() === pasos.length - 2);
+  // Teclado: las flechas cambian de paso con el foco en el guion; Alt+G lleva el foco al guion
+  ant().focus(); ant().dispatchEvent(new (ventana().KeyboardEvent)('keydown', { key: 'ArrowLeft', bubbles: true })); await espera(300);
+  afirmar('presentación: la flecha izquierda, con el foco en el guion, retrocede un paso', MTw().presentacion.paso() === pasos.length - 3, String(MTw().presentacion.paso()));
+  D().body.focus(); D().dispatchEvent(new (ventana().KeyboardEvent)('keydown', { code: 'KeyG', key: 'g', altKey: true, bubbles: true })); await espera(150);
+  afirmar('presentación: Alt+G lleva el foco al guion', !!D().activeElement.closest('#guion-mesa'), D().activeElement.tagName);
+  // El guion se oculta y se vuelve a mostrar; la página recupera el espacio
+  [...D().querySelectorAll('#guion-mesa button')].find((b) => b.textContent.trim() === 'Ocultar guion').click(); await espera(250);
+  const mostrar = D().querySelector('.guion__mostrar');
+  afirmar('presentación: "Ocultar guion" deja solo un botón pequeño para volver a mostrarlo y libera el espacio', visible(mostrar) && !visible(D().querySelector('.guion__cuerpo')) && ventana().getComputedStyle(D().documentElement).getPropertyValue('--guion-alto').trim() === '0px');
+  mostrar.click(); await espera(250);
+  afirmar('presentación: "Mostrar guion" lo devuelve', visible(D().querySelector('.guion__cuerpo')) && !visible(mostrar));
+  // Atajo Alt+P
+  D().dispatchEvent(new (ventana().KeyboardEvent)('keydown', { code: 'KeyP', key: 'p', altKey: true, bubbles: true })); await espera(250);
+  afirmar('presentación: Alt+P desactiva el modo y todo vuelve a como estaba', !D().documentElement.dataset.presentacion && !visible(guion()) && parseFloat(ventana().getComputedStyle(D().documentElement).fontSize) === 16 && bp.getAttribute('aria-pressed') === 'false');
+  D().dispatchEvent(new (ventana().KeyboardEvent)('keydown', { code: 'KeyP', key: 'p', altKey: true, bubbles: true })); await espera(250);
+  afirmar('presentación: Alt+P lo vuelve a activar', D().documentElement.dataset.presentacion === 'activa' && visible(guion()));
+  afirmar('presentación: sin Alt, la tecla p no activa nada (no choca con quien escribe)', (() => { D().dispatchEvent(new (ventana().KeyboardEvent)('keydown', { code: 'KeyP', key: 'p', bubbles: true })); return D().documentElement.dataset.presentacion === 'activa'; })());
+  // Recordar el modo al recargar
+  await cargar('#/mi', 1280, 720); await espera(500);
+  afirmar('presentación: recargar la página no saca del modo (y recuerda el paso)', D().documentElement.dataset.presentacion === 'activa' && visible(guion()) && MTw().presentacion.paso() === pasos.length - 3);
+
+  /* ===== 2. Reinicio de un clic ===== */
+  await cargar('#/', 1280, 720); await espera(500);
+  MTw().store.cambiar((s) => { s.rol = 'docente'; });
+  const notasAntes = MTw().db.lista('notas').length;
+  MTw().db.crear('notas', { texto: 'Prueba de reinicio', autor: 'docente', fecha: new Date().toISOString() });
+  await ir('#/portales/kinesis'); await espera(300);
+  MTw().presentacion.ir(5);                      // un paso a la mitad del guion
+  await espera(300);
+  const hechas = MTw().db.lista('notas').length === notasAntes + 1 && MTw().store.obtener().rol === 'orientacion';
+  D().getElementById('btn-reiniciar-mesa').click(); await espera(700);
+  afirmar('reinicio: había trabajo que borrar (una nota creada y un rol elegido)', hechas);
+  afirmar('reinicio: con UN solo clic, sin ventana de confirmación', !D().querySelector('dialog[open]'));
+  afirmar('reinicio: vuelven los datos de ejemplo', MTw().db.lista('notas').length === notasAntes, String(MTw().db.lista('notas').length));
+  afirmar('reinicio: el rol queda sin elegir', MTw().store.obtener().rol === '');
+  afirmar('reinicio: se vuelve al inicio y al primer paso del guion', ventana().location.hash === '#/' && MTw().presentacion.paso() === 0 && /Paso 1 de/.test(guion().innerText));
+  afirmar('reinicio: se cierran los portales abiertos (marcos y vista dividida)', MTw().vivos.abiertos().length === 0 && MTw().vivos.lado() === null);
+  afirmar('reinicio: avisa que terminó', /Listo/.test(avisos()), avisos());
+  afirmar('reinicio: conserva el modo presentación', D().documentElement.dataset.presentacion === 'activa');
+  // El reinicio del menú de rol (fuera del modo presentación) sigue pidiendo confirmación
+  const confirmo = ventana().MT.barra.empezarDeNuevo(); await espera(300);
+  afirmar('reinicio: desde el menú de rol sigue pidiendo confirmación', !!D().querySelector('dialog[open]'));
+  enDialogo('Cancelar').click(); await confirmo;
+
+  /* ===== 3. Sin conexión: aviso y respaldo de los portales ===== */
+  localStorage.clear();
+  await cargar('#/', 1280, 800); await espera(500);
+  const av = () => D().querySelector('.aviso-conexion');
+  afirmar('sin conexión: con conexión no hay aviso', !av() || av().hidden);
+  ventana().dispatchEvent(new (ventana().Event)('offline')); await espera(250);
+  afirmar('sin conexión: al caerse la conexión aparece un aviso (role=status) que dice qué sigue funcionando', !!av() && !av().hidden && av().getAttribute('role') === 'status' && /Sin conexión/.test(av().innerText) && /sigue funcionando/.test(av().innerText) && /Kinesis y Wisfox necesitan internet/.test(av().innerText), av() && av().innerText);
+  afirmar('sin conexión: el aviso está dentro de la franja y no empuja los portales fuera de su sitio', !!av().closest('.franja') && visible(av()));
+  await ir('#/portales/kinesis'); await espera(500);
+  const panel = (id) => D().querySelector(`.vivo-panel[data-portal="${id}"]`);
+  const resp = (id) => panel(id) && panel(id).querySelector('.vivo-respaldo');
+  afirmar('sin conexión: Kinesis muestra un panel de respaldo y no un recuadro vacío ni la página de error', visible(resp('kinesis')) && /Kinesis no se puede abrir ahora/.test(resp('kinesis').innerText) && !panel('kinesis').querySelector('iframe'), resp('kinesis') && resp('kinesis').innerText.slice(0, 60));
+  const rr = resp('kinesis').getBoundingClientRect();
+  afirmar('sin conexión: el respaldo ocupa el lugar del portal (no es una cajita)', rr.width > ventana().innerWidth * 0.6 && rr.height > 250, Math.round(rr.width) + 'x' + Math.round(rr.height));
+  const tr = resp('kinesis').innerText;
+  afirmar('sin conexión: el respaldo explica qué pasa y qué sigue funcionando', /se abre desde internet/.test(tr) && /Lo que sigue funcionando/i.test(tr) && /Mi espacio/.test(tr) && /datos de ejemplo/.test(tr) && /se guarda en este dispositivo/.test(tr), tr);
+  const botonesR = [...resp('kinesis').querySelectorAll('button, a.btn')].map((x) => x.textContent.trim());
+  afirmar('sin conexión: ofrece ir a Mi espacio, intentar de nuevo y abrir aparte', botonesR.includes('Ver Kinesis en Mi espacio') && botonesR.includes('Intentar de nuevo') && botonesR.includes('Abrir aparte'), botonesR.join());
+  afirmar('sin conexión: el aviso del respaldo es amable (sin culpar ni mostrar errores técnicos)', !/error|falló|fallo|culpa|ERR_/i.test(tr));
+  [...resp('kinesis').querySelectorAll('button')].find((b) => /Intentar de nuevo/.test(b.textContent)).click(); await espera(400);
+  afirmar('sin conexión: "Intentar de nuevo" sin red lo dice y deja el respaldo a la vista', /Todavía no se puede abrir/.test(resp('kinesis').innerText) && visible(resp('kinesis')));
+  [...resp('kinesis').querySelectorAll('button')].find((b) => /Ver Kinesis en Mi espacio/.test(b.textContent)).click(); await espera(400);
+  afirmar('sin conexión: "Ver Kinesis en Mi espacio" lleva a la versión equivalente (sin rol, como docente)', /^#\/mi\//.test(ventana().location.hash) && MTw().store.obtener().rol === 'docente', ventana().location.hash + ' ' + MTw().store.obtener().rol);
+  // El mismo respaldo para Wisfox, y con el rol de estudiante ya elegido
+  MTw().store.cambiar((s) => { s.rol = 'estudiante'; });
+  await ir('#/portales/wisfox'); await espera(500);
+  afirmar('sin conexión: Wisfox también tiene su respaldo', visible(resp('wisfox')) && /Wisfox no se puede abrir ahora/.test(resp('wisfox').innerText));
+  [...resp('wisfox').querySelectorAll('button')].find((b) => /Ver Wisfox en Mi espacio/.test(b.textContent)).click(); await espera(400);
+  afirmar('sin conexión: con el rol elegido, el respaldo no cambia de rol y lleva a su sección', MTw().store.obtener().rol === 'estudiante' && /^#\/mi/.test(ventana().location.hash), ventana().location.hash);
+  // Vuelve la conexión: el aviso lo dice y los portales se intentan abrir solos
+  MTw().conexion.sondear = async () => true;
+  ventana().dispatchEvent(new (ventana().Event)('online')); await espera(400);
+  afirmar('sin conexión: al volver la conexión el aviso lo dice', /Volvió la conexión/.test(av().innerText));
+  afirmar('sin conexión: al volver, los portales con respaldo se intentan abrir de nuevo (vuelve el marco)', !!panel('kinesis').querySelector('iframe') && !visible(resp('kinesis')) && !!panel('wisfox').querySelector('iframe') && !visible(resp('wisfox')));
+  afirmar('sin conexión: el marco vuelve a apuntar a la dirección del portal', panel('kinesis').querySelector('iframe').getAttribute('src') === MTw().config.portales.kinesis);
+  // Red conectada pero sin salida a internet: el sondeo falla aunque el navegador diga "en línea"
+  await cargar('#/', 1280, 800); await espera(400);
+  ventana().MT.conexion.sondear = async () => false;
+  await ir('#/portales/wisfox'); await espera(500);
+  afirmar('sin conexión: si el portal no responde aunque haya red (sondeo fallido), también se muestra el respaldo', visible(resp('wisfox')) && !panel('wisfox').querySelector('iframe') && !av(), resp('wisfox') ? '' : 'sin respaldo');
+  afirmar('sin conexión: el respaldo tiene un único título de nivel 1 en la página', (D().querySelectorAll('main h1').length + [...D().querySelectorAll('main [role="heading"][aria-level="1"]')].filter(visible).length) === 1);
+
+  /* ===== 4. Versión calmada ===== */
+  localStorage.clear();
+  await cargar('#/', 1280, 800); await espera(500);
+  D().getElementById('btn-apariencia').click(); await espera(150);
+  const cb = D().getElementById('opcion-calmado');
+  afirmar('calmado: el menú de Apariencia trae el interruptor "Versión calmada" con su explicación', !!cb && visible(cb) && /Versión calmada/.test(cb.closest('label').innerText) && /animaciones/.test(D().getElementById('ayuda-calmado').innerText) && cb.getAttribute('aria-describedby') === 'ayuda-calmado');
+  const dur = (el, prop) => Math.max(...ventana().getComputedStyle(el)[prop].split(',').map(parseFloat));
+  const btn = D().querySelector('.franja .btn');
+  const normal = dur(D().querySelector('main .btn') || btn, 'transitionDuration');
+  cb.click(); await espera(250);
+  afirmar('calmado: al encenderlo, <html> lleva data-movimiento="calmado" y se guarda en este navegador', D().documentElement.dataset.movimiento === 'calmado' && JSON.parse(localStorage.getItem('mosaicotelar.apariencia')).movimiento === 'calmado');
+  const quieto = [...D().querySelectorAll('*')].filter((x) => visible(x) && (dur(x, 'transitionDuration') > 0.01 || dur(x, 'animationDuration') > 0.01)).slice(0, 4).map((x) => x.tagName + '.' + x.className);
+  afirmar('calmado: no queda ninguna transición ni animación de más de 10 ms en la pantalla', quieto.length === 0, quieto.join(', '));
+  afirmar('calmado: baja la carga del fondo (sin trama de hilos, sombras planas y sin la barra de hilos)', ventana().getComputedStyle(D().documentElement).getPropertyValue('--trama-fondo').trim() === 'none' && ventana().getComputedStyle(D().getElementById('progreso-hilos')).display === 'none');
+  afirmar('calmado: sin el modo, los botones sí tenían transición (la regla es la que cambia algo)', normal > 0.05, String(normal));
+  await cargar('#/', 1280, 800); await espera(500);
+  afirmar('calmado: se recuerda al recargar y se aplica antes del primer pintado', D().documentElement.dataset.movimiento === 'calmado');
+  D().getElementById('btn-apariencia').click(); await espera(150);
+  afirmar('calmado: el interruptor aparece encendido al volver', D().getElementById('opcion-calmado').checked);
+  D().getElementById('opcion-calmado').click(); await espera(250);
+  afirmar('calmado: al apagarlo todo vuelve', !D().documentElement.dataset.movimiento && dur(D().querySelector('main .btn') || D().querySelector('.franja .btn'), 'transitionDuration') > 0.05);
+
+  /* ===== 5. Funcionamiento sin conexión: la cáscara y el service worker ===== */
+  const texto = async (ruta) => { const r = await fetch(ruta, { cache: 'no-store' }); return r.ok ? r.text() : null; };
+  const sw = await texto('../sw.js'); const idx = await texto('../index.html');
+  afirmar('sin red: existe sw.js y su lista de archivos se puede leer', !!sw && /const CASCARA = \[/.test(sw));
+  const inicioLista = sw ? sw.indexOf('const CASCARA = [') : -1;
+  const bloqueLista = inicioLista >= 0 ? sw.slice(inicioLista, sw.indexOf('];', inicioLista)) : '';
+  const lista = [...bloqueLista.matchAll(/'([^']+)'/g)].map((m) => m[1]);
+  const refs = [...idx.matchAll(/(?:src|href)="([^"#?:]+)"/g)].map((m) => m[1]);
+  const css = await Promise.all(refs.filter((r) => /^css\/.+\.css$/.test(r)).map(async (r) => [r, await texto('../' + r)]));
+  const deCss = css.flatMap(([r, t]) => [...(t || '').matchAll(/url\("?([^")]+)"?\)/g)].map((m) => m[1]).filter((u) => !/^data:/.test(u)).map((u) => new URL(u, 'http://x/' + r).pathname.slice(1)));
+  const jsInicio = (await texto('../js/vistas/inicio.js')) || '';
+  const deJs = [...jsInicio.matchAll(/src: '(assets\/[^']+)'/g)].map((m) => m[1]);
+  const necesarios = [...new Set([...refs, ...deCss, ...deJs])];
+  const faltan = necesarios.filter((r) => !lista.includes(r));
+  afirmar('sin red: todo lo que carga index.html, las hojas de estilo (tipografías) y la pantalla de inicio está en la lista del service worker', faltan.length === 0, 'faltan: ' + faltan.join(', '));
+  const huerfanos = [];
+  for (const r of lista) { if (r === './') continue; const ok = (await fetch('../' + r, { method: 'HEAD', cache: 'no-store' })).ok; if (!ok) huerfanos.push(r); }
+  afirmar('sin red: cada archivo de la lista del service worker existe (si no, la instalación falla entera)', huerfanos.length === 0, huerfanos.join(', '));
+  const sinComentarios = sw.replace(/\/\*[\s\S]*?\*\//g, '');
+  afirmar('sin red: el service worker no usa rutas absolutas (el sitio vive en la subruta /mosaicotelar/)', !/['"`]\/[a-z]/i.test(sinComentarios), (sinComentarios.match(/['"`]\/[a-z][^'"`]*/i) || [''])[0]);
+  const man = JSON.parse((await texto('../manifest.webmanifest')) || '{}');
+  afirmar('sin red: el manifiesto trae nombre, inicio y alcance relativos, modo de aplicación e íconos de 192 y 512 px', man.name === 'Mosaico Telar' && man.start_url === './' && man.scope === './' && man.display === 'standalone' && ['192x192', '512x512'].every((t) => (man.icons || []).some((i) => i.sizes === t)), JSON.stringify(man).slice(0, 120));
+  const iconosOk = await Promise.all((man.icons || []).map(async (i) => (await fetch('../' + i.src, { method: 'HEAD' })).ok));
+  afirmar('sin red: los íconos del manifiesto existen', iconosOk.length > 0 && iconosOk.every(Boolean));
+  const csp = idx.match(/Content-Security-Policy" content="([^"]+)"/)[1];
+  afirmar("sin red: la política de seguridad permite el worker y el manifiesto propios", /worker-src 'self'/.test(csp) && /manifest-src 'self'/.test(csp));
+  const origenes = Object.values((MTw() || ventana().MT).config.portales).map((u) => new URL(u).origin);
+  const connect = (csp.match(/connect-src ([^;]+)/) || [, ''])[1];
+  afirmar('sin red: la política deja comprobar (sondear) la dirección de cada portal, y nada más', origenes.every((o) => connect.includes(o)) && !/\*|https:(?!\/\/)/.test(connect), connect);
+  afirmar('sin red: la página enlaza el manifiesto', /<link rel="manifest" href="manifest\.webmanifest">/.test(idx));
+  afirmar('sin red: la red de seguridad se carga antes que el resto de los scripts', idx.indexOf('js/red-de-seguridad.js') > 0 && idx.indexOf('js/red-de-seguridad.js') < idx.indexOf('js/tema.js') && idx.indexOf('js/tema.js') < idx.indexOf('js/ui.js'));
+  // El worker se registra de verdad (http en 127.0.0.1 cuenta como contexto seguro) y guarda la cáscara
+  await cargar('#/', 1280, 800);
+  const reg = await Promise.race([ventana().navigator.serviceWorker.ready, espera(8000).then(() => null)]);
+  afirmar('sin red: el service worker se registra y queda activo', !!reg && !!reg.active && /\/sw\.js$/.test(reg.active.scriptURL), reg ? reg.active && reg.active.scriptURL : 'no se registró en 8 s');
+  if (reg) {
+    const nombres = await ventana().caches.keys();
+    afirmar('sin red: la caché lleva versión y prefijo propios (no toca las de otros proyectos)', nombres.every((n) => /^mosaicotelar-v\d+$/.test(n)) && nombres.length === 1, nombres.join());
+    const claves = (await (await ventana().caches.open(nombres[0])).keys()).map((r) => r.url);
+    const sinGuardar = lista.filter((r) => r !== './' && !claves.some((u) => u.endsWith('/' + r)));
+    afirmar('sin red: el worker guardó toda la cáscara', sinGuardar.length === 0, 'sin guardar: ' + sinGuardar.join(', '));
+  }
+
+  /* ===== 6. Robustez: nunca una pantalla en blanco ===== */
+  await cargar('#/', 1280, 800); await espera(600);
+  afirmar('robustez: con la pantalla visible, la red de seguridad no tapa nada', (ventana().MT.seguridad.comprobar(), !D().getElementById('red-de-seguridad')));
+  [...D().getElementById('app').children].forEach((x) => x.remove());
+  afirmar('robustez: simulado el vacío, se detecta que main no tiene nada visible', ventana().MT.seguridad.hayContenido() === false);
+  ventana().MT.seguridad.comprobar(); await espera(150);
+  const rs = D().getElementById('red-de-seguridad');
+  const bs = rs ? [...rs.querySelectorAll('button')].map((b) => b.textContent.trim()) : [];
+  afirmar('robustez: si main queda vacío aparece un panel con título y tres salidas (reintentar, inicio, empezar de nuevo)', !!rs && rs.querySelectorAll('h1').length === 1 && bs.join() === 'Volver a intentar,Ir al inicio,Empezar de nuevo', bs.join());
+  afirmar('robustez: el panel lleva el foco a su título', D().activeElement === rs.querySelector('h1'));
+  afirmar('robustez: el panel es amable y no muestra detalles técnicos', !/TypeError|undefined|stack|Error:/i.test(rs.innerText), rs.innerText);
+  ventana().MT.seguridad.comprobar();
+  afirmar('robustez: llamarlo dos veces no duplica el panel', D().querySelectorAll('#red-de-seguridad').length === 1);
+  // Un error de ejecución que sí deja la pantalla usable: no se tapa
+  await cargar('#/mi', 1280, 800); await espera(500);
+  ventana().dispatchEvent(new (ventana().ErrorEvent)('error', { message: 'prueba' })); await espera(900);
+  afirmar('robustez: un error suelto con la pantalla usable no la tapa', !D().getElementById('red-de-seguridad'));
+  // Teclado: todo control visible se alcanza con Tab (ninguno con tabindex negativo)
+  const sinTab = []; const hayEnModo = [];
+  for (const [rol, ruta, pres] of [['docente', '#/mi/ajustes', false], [null, '#/portales/kinesis', false], ['docente', '#/mi/actividades', true], [null, '#/', true]]) {
+    localStorage.clear(); if (rol) localStorage.setItem('mosaicotelar.v2', JSON.stringify({ rol }));
+    if (pres) localStorage.setItem('mosaicotelar.presentacion', JSON.stringify({ activo: true, paso: 2 }));
+    await cargar(ruta, 1280, 720); await espera(500);
+    [...D().querySelectorAll('a[href], button, input, select, textarea, summary')].filter((x) => visible(x) && !x.disabled && x.tabIndex < 0).forEach((x) => sinTab.push(ruta + ' ' + x.tagName + '.' + x.className));
+    if (pres) hayEnModo.push(visible(D().getElementById('btn-reiniciar-mesa')) && !D().getElementById('btn-reiniciar-mesa').disabled);
+  }
+  afirmar('teclado: ningún control visible queda fuera del orden de Tab (con y sin modo presentación)', sinTab.length === 0, sinTab.slice(0, 4).join(' | '));
+  afirmar('teclado: "Empezar de nuevo" del guion se alcanza con el teclado', hayEnModo.every(Boolean));
+  afirmar('demostración: sin errores de ejecución en estas pruebas', !(ventana().__errores && ventana().__errores.filter((e) => e !== 'prueba').length), ventana().__errores && ventana().__errores.join(' | '));
+}
+
 (async () => {
   try {
     for (const ancho of ANCHOS) for (const [rol, ruta] of RUTAS) {
@@ -561,9 +832,11 @@ async function flujo() {
       for (const tema of TEMAS) { salida.casos.push(medirCaso((rol ? rol + ' ' : '') + ruta, ancho, tema)); await espera(60); }
     }
   } catch (e) { salida.fatal = 'pantallas: ' + String(e && e.stack || e); }
+  try { await casosPresentacion(); } catch (e) { salida.fatal = (salida.fatal ? salida.fatal + ' | ' : '') + 'presentación: ' + String(e && e.stack || e); }
   try {
     await flujo();
   } catch (e) { salida.fatal = (salida.fatal ? salida.fatal + ' | ' : '') + 'recorrido: ' + String(e && e.stack || e); }
+  try { await flujoDemostracion(); } catch (e) { salida.fatal = (salida.fatal ? salida.fatal + ' | ' : '') + 'demostración: ' + String(e && e.stack || e); }
   document.getElementById('resultado').textContent = JSON.stringify(salida);
   document.title = 'listo';
   // auditar.py escucha en /__resultado: así no hace falta ninguna espera fija.

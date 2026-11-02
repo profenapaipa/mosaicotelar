@@ -1,0 +1,89 @@
+/* presentacion.css: el modo presentación (js/presentacion.js). Todo cuelga de html[data-presentacion="activa"], así que sin el
+   atributo este archivo no cambia nada.
+
+   Lo que busca: que se lea a distancia en una pantalla de 1920x1080 o de 1280x720. Todo el sitio está medido en rem, por eso
+   subir la letra de la raíz agranda todo a la vez sin tocar cada regla. A 1920 px de ancho la base es de 24 px; a 1280 px, de 20 px. */
+
+@media (min-width: 861px) { html[data-presentacion="activa"] { font-size: 125%; } }
+@media (min-width: 1600px) { html[data-presentacion="activa"] { font-size: 150%; } }
+/* En el celular no se agranda nada: el modo es para proyectar, y una letra mayor allí desbordaría la pantalla. */
+
+/* Menos navegación: se quedan el riel de arriba, la barra de portales y el rol. Lo demás (planes, hoja de ruta, marca, pie)
+   no hace falta en la mesa y le quita espacio a la demostración. */
+html[data-presentacion="activa"] .riel-abajo,
+html[data-presentacion="activa"] .pie,
+html[data-presentacion="activa"] .barra-portales__ayuda,
+html[data-presentacion="activa"] .plan-chip,
+html[data-presentacion="activa"] .franja-guia,
+html[data-presentacion="activa"] #btn-ia { display: none; }
+
+/* Controles más grandes y foco más grueso: se ven y se aciertan a distancia. */
+@media (min-width: 861px) {
+  html[data-presentacion="activa"] .btn { min-height: 52px; padding: .6rem 1.4rem; font-size: 1.02rem; }
+  html[data-presentacion="activa"] .btn--chico { min-height: 44px; padding: .35rem 1.1rem; font-size: .95rem; }
+  html[data-presentacion="activa"] .franja .btn { min-height: 40px; font-size: .9rem; }
+  /* La franja es una sola fila: la nota de demostración se achica para dejar sitio a los botones y a los portales. */
+  html[data-presentacion="activa"] .franja p { font-size: .7rem; }
+  html[data-presentacion="activa"] .franja .btn { padding: .1rem .9rem; font-size: .85rem; }
+  html[data-presentacion="activa"] .aviso-conexion { font-size: .78rem; padding: .2rem .7rem; }
+  html[data-presentacion="activa"] .aviso-conexion .btn { min-height: 32px; }
+  html[data-presentacion="activa"] .riel a { font-size: .74rem; }
+  html[data-presentacion="activa"] .pestana__ir { padding-top: .6rem; padding-bottom: .6rem; }
+  html[data-presentacion="activa"] .pestana__texto small { font-size: .78rem; }
+  html[data-presentacion="activa"] .menu-portal,
+  html[data-presentacion="activa"] .menu-rol { font-size: 1rem; }
+}
+/* Con más letra, cinco tarjetas de rol en una fila no caben: pasan a tres, salvo en pantallas muy anchas (donde la base de 24 px equivale a 1280 px). */
+@media (min-width: 861px) and (max-width: 1599px) { html[data-presentacion="activa"] .rejilla--5 { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+html[data-presentacion="activa"] :focus-visible { outline-width: 4px; outline-offset: 3px; }
+
+/* La barra del guion deja sitio a los portales y al contenido: --guion-alto lo mide el script. */
+html[data-presentacion="activa"] body { padding-bottom: var(--guion-alto, 0px); }
+html[data-presentacion="activa"] .vivos { height: calc(100dvh - var(--cabeza) - var(--guion-alto, 0px)); min-height: 300px; }
+
+/* ---------------- El guion de la mesa ---------------- */
+.guion {
+  position: fixed; z-index: 55; left: var(--riel-ancho); right: 0; bottom: 0;
+  background: var(--panel); color: var(--sobre-panel);
+  border-top: 4px solid var(--hilo-mosaico);
+  font-size: .9rem;
+}
+.guion[hidden] { display: none; }
+.guion[data-oculto="si"] { left: auto; right: .8rem; bottom: .8rem; background: transparent; border: 0; }
+.guion__cuerpo { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: .3rem 1.6rem; align-items: center; padding: .5rem 1.2rem .45rem; }
+.guion__etiqueta { margin: 0; font: 800 .72rem var(--fuente); letter-spacing: .1em; text-transform: uppercase; color: var(--sobre-panel-suave); }
+.guion__borrador { color: #F0BE6C; letter-spacing: .04em; text-transform: none; font-size: .8rem; }
+.guion__meta { letter-spacing: 0; text-transform: none; font-size: .85rem; font-weight: 700; }
+.guion__titulo { margin: 0; font: 800 1.25rem/1.2 var(--fuente); letter-spacing: 0; color: var(--sobre-panel); }
+.guion__texto { margin: .1rem 0 0; max-width: 70ch; }
+.guion__nav { display: flex; gap: .6rem; }
+.guion__pie { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .4rem 1rem; }
+.guion__puntos { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0; }
+.guion__punto { width: 24px; height: 24px; padding: 0; border: 0; background: none; cursor: pointer; display: grid; place-items: center; }
+.guion__punto::before { content: ""; width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--sobre-panel-suave); }
+.guion__punto[aria-current="step"]::before { background: var(--sobre-panel); border-color: var(--sobre-panel); width: 16px; height: 16px; }
+.guion__utiles { display: flex; flex-wrap: wrap; gap: .4rem; }
+/* Los botones de uso ocasional del guion son más bajos que los de pasar de paso, para que la barra ocupe poco. */
+.guion .btn--chico { min-height: 36px; padding: .15rem .7rem; font-size: .78rem; }
+
+/* Sobre el panel oscuro (en cualquier tema) los botones de contorno usan la tinta clara. */
+.guion .btn--suave { color: var(--sobre-panel); border-color: var(--sobre-panel-suave); }
+.guion .btn--suave:hover { background: var(--sobre-panel); color: var(--panel); }
+.guion .btn[disabled] { opacity: .45; }
+.guion :focus-visible { outline-color: #FFFFFF; }
+.guion__mostrar { box-shadow: 0 6px 20px rgba(0, 0, 0, .35); }
+
+@media (max-width: 860px) {
+  /* En el celular el riel va abajo: el guion se sienta encima de él. */
+  .guion { left: 0; bottom: 5.4rem; font-size: .85rem; max-height: 40vh; overflow-y: auto; }
+  .guion[data-oculto="si"] { right: .6rem; bottom: 6rem; max-height: none; }
+  .guion__cuerpo { grid-template-columns: 1fr; padding: .5rem .8rem; }
+  .guion__nav .btn { flex: 1; min-height: 44px; }
+  /* En un celular el guion se queda en lo esencial: título, paso y botones. El texto y los puntos no caben. */
+  .guion__texto, .guion__puntos { display: none; }
+  #btn-presentacion { display: none; }
+  html[data-presentacion="activa"] body { padding-bottom: calc(var(--guion-alto, 0px) + 0px); }
+  html[data-presentacion="activa"] .vivos { height: calc(100dvh - var(--cabeza) - 5.4rem - var(--guion-alto, 0px)); min-height: 300px; }
+}
+
+@media print { .guion { display: none !important; } }

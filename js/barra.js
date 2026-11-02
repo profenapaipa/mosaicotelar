@@ -91,9 +91,17 @@
     MT.router.recargar();
   }
 
-  async function empezarDeNuevo() {
-    if (!(await MT.dlg.confirmar('Se borrará todo lo que creaste en este dispositivo (actividades, ajustes, notas y archivos) y volverán los datos de ejemplo.', 'Sí, empezar de nuevo'))) return;
-    await MT.archivos.vaciar(); st.reiniciar(); location.hash = '#/'; MT.router.recargar();
+  /* Devuelve true si se reinició. `confirmar: false` lo usa el modo presentación: en la mesa el reinicio es de un solo clic, porque
+     los datos son de ejemplo y quienes se turnan necesitan dejar todo limpio para la siguiente persona. */
+  async function empezarDeNuevo(opciones) {
+    const confirmar = !opciones || opciones.confirmar !== false;
+    if (confirmar && !(await MT.dlg.confirmar('Se borrará todo lo que creaste en este dispositivo (actividades, ajustes, notas y archivos) y volverán los datos de ejemplo.', 'Sí, empezar de nuevo'))) return false;
+    // Si el navegador no deja usar IndexedDB (modo privado, sin conexión a disco), los datos de ejemplo vuelven de todos modos.
+    try { await MT.archivos.vaciar(); } catch (e) { console.error(e); }
+    // Los portales abiertos también vuelven a empezar: sin esto el chat de ValerIA conservaría su conversación.
+    if (MT.vivos && MT.vivos.reiniciar) MT.vivos.reiniciar();
+    st.reiniciar(); location.hash = '#/'; MT.router.recargar();
+    return true;
   }
 
   function construirRol() {
@@ -128,5 +136,5 @@
 
   function pintarPlan() { const a = document.getElementById('plan-chip'); if (a) a.textContent = MT.plan.etiquetaPro ? MT.plan.etiquetaPlan() : ''; }
   function construir() { construirBarra(); construirRol(); pintarPlan(); st.suscribir(pintarPlan); actualizar(); }
-  MT.barra = { construir, actualizar, cerrar };
+  MT.barra = { construir, actualizar, cerrar, empezarDeNuevo };
 })(window.MT = window.MT || {});

@@ -1,0 +1,35 @@
+/* calmado.css: la versión calmada. Baja el movimiento al mínimo y la carga sensorial del fondo.
+
+   Se activa de dos maneras, con las mismas reglas:
+   - la persona la enciende en Apariencia (main.js pone html[data-movimiento="calmado"]; el nombre del atributo lo define marca en animacion.css);
+   - su sistema pide reducir el movimiento (prefers-reduced-motion), sin que tenga que hacer nada.
+
+   Cómo apaga el movimiento: en lugar de `animation: none` (que dejaría cada animación en su estado inicial, por ejemplo con el
+   contenido invisible), acorta todo a una milésima de milisegundo y sin repetir. La animación y la transición llegan enseguida a su
+   estado final, y los eventos animationend / transitionend siguen ocurriendo para el código que los espera. Las reglas más finas de
+   cada animación (el logo, los hilos, el revelado) están en animacion.css, que es de marca. */
+
+html[data-movimiento="calmado"] *,
+html[data-movimiento="calmado"] *::before,
+html[data-movimiento="calmado"] *::after {
+  animation-duration: .001ms !important; animation-delay: 0s !important; animation-iteration-count: 1 !important;
+  transition-duration: .001ms !important; transition-delay: 0s !important;
+  scroll-behavior: auto !important; will-change: auto !important;
+}
+/* Menos carga sensorial: sin la trama de hilos de fondo, sombras planas y sin la barra de hilos que cruza al cambiar de pantalla. */
+html[data-movimiento="calmado"] { --trama-fondo: none !important; --sombra: 0 0 0 1px var(--linea) !important; }
+html[data-movimiento="calmado"] #progreso-hilos { display: none; }
+html[data-movimiento="calmado"] .btn:active { transform: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important; animation-delay: 0s !important; animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important; transition-delay: 0s !important;
+    scroll-behavior: auto !important; will-change: auto !important;
+  }
+  #progreso-hilos { display: none; }
+  .btn:active { transform: none; }
+}
+
+/* Texto de ayuda bajo el interruptor, en el menú de Apariencia */
+.menu-apariencia__ayuda { font-size: .82rem; line-height: 1.4; margin: .1rem 0 0; }

@@ -40,6 +40,8 @@
     const r = document.documentElement;
     if (a.tema === 'claro' || a.tema === 'oscuro') r.dataset.tema = a.tema; else delete r.dataset.tema;
     if (a.texto === 'grande') r.dataset.texto = 'grande'; else delete r.dataset.texto;
+    // El nombre del atributo lo define animacion.css (marca); las reglas de reducción están allí y en css/calmado.css.
+    if (a.movimiento === 'calmado') r.dataset.movimiento = 'calmado'; else delete r.dataset.movimiento;
     try { localStorage.setItem(CLAVE_APAR, JSON.stringify(a)); } catch (e) { /* sin almacenamiento */ }
   }
 
@@ -53,7 +55,11 @@
     menu.append(
       h('fieldset', null, h('legend', null, 'Modo'), radio('sistema', 'Del sistema'), radio('claro', 'Claro'), radio('oscuro', 'Oscuro')),
       h('label', { class: 'casilla' }, h('input', { type: 'checkbox', checked: a.texto === 'grande',
-        onchange: (e) => { a.texto = e.target.checked ? 'grande' : 'normal'; aplicarApariencia(a); } }), 'Texto más grande'));
+        onchange: (e) => { a.texto = e.target.checked ? 'grande' : 'normal'; aplicarApariencia(a); } }), 'Texto más grande'),
+      h('label', { class: 'casilla' }, h('input', { type: 'checkbox', id: 'opcion-calmado', 'aria-describedby': 'ayuda-calmado', checked: a.movimiento === 'calmado',
+        onchange: (e) => { a.movimiento = e.target.checked ? 'calmado' : 'normal'; aplicarApariencia(a); } }), MT.mensajes.calmado.etiqueta),
+      h('p', { class: 'suave menu-apariencia__ayuda', id: 'ayuda-calmado' }, MT.mensajes.calmado.ayuda,
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches ? ' ' + MT.mensajes.calmado.sistema : ''));
     const cerrar = () => { menu.hidden = true; boton.setAttribute('aria-expanded', 'false'); };
     boton.addEventListener('click', () => { const abre = menu.hidden; menu.hidden = !abre; boton.setAttribute('aria-expanded', String(abre)); });
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !menu.hidden) { cerrar(); boton.focus(); } });

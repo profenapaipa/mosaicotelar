@@ -1,0 +1,16 @@
+{
+  "name": "Mosaico Telar",
+  "short_name": "Mosaico Telar",
+  "description": "Plataforma de educación inclusiva con tecnología. Funciona también sin conexión.",
+  "lang": "es",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#F6F2EA",
+  "theme_color": "#1A1714",
+  "icons": [
+    { "src": "assets/icono-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "assets/icono-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "assets/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

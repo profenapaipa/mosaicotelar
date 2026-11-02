@@ -1,0 +1,81 @@
+/* mensajes.js: los textos que estrenan el modo presentación, el funcionamiento sin conexión, la versión calmada y el respaldo
+   de los portales. Están todos aquí, y no repartidos por el código, por una razón: son textos públicos y los aprueba el dueño del
+   proyecto (guía de voz, regla de oro). Quien revisa solo tiene que abrir este archivo, y cambiar una frase no toca la lógica.
+
+   El guion de la mesa es un BORRADOR: mientras `aprobado` sea false, la pantalla lo dice con la marca "[por aprobar]".
+   Cuando el dueño lo apruebe basta con cambiar `aprobado` a true; la marca desaparece sola. */
+(function (MT) {
+  'use strict';
+
+  MT.mensajes = {
+    presentacion: {
+      activar: 'Modo presentación',
+      salir: 'Salir de la presentación',
+      ayudaBoton: 'Letra más grande y un guion para recorrer los cinco roles. Atajo: Alt+P.',
+      guion: 'Guion de la mesa',
+      borrador: '[por aprobar]',
+      paso: (n, total) => `Paso ${n} de ${total}`,
+      turno: (rol) => `Turno: ${rol}`,
+      turnoGeneral: 'Para todo el grupo',
+      anterior: 'Anterior',
+      siguiente: 'Siguiente',
+      empezarDeNuevo: 'Empezar de nuevo',
+      reiniciado: 'Listo: volvieron los datos de ejemplo y la plataforma quedó sin rol elegido.',
+      pantallaCompleta: 'Pantalla completa',
+      ocultar: 'Ocultar guion',
+      mostrar: 'Mostrar guion',
+      atajos: 'Con el foco en el guion, las flechas ← y → cambian de paso. Alt+G lleva el foco al guion.',
+    },
+
+    sinConexion: {
+      aviso: 'Sin conexión. Mosaico Telar sigue funcionando: los datos de ejemplo están en este dispositivo. Los portales de Kinesis y Wisfox necesitan internet y se abren de nuevo cuando regrese.',
+      volvio: 'Volvió la conexión.',
+      versionNueva: 'Hay una versión nueva de Mosaico Telar.',
+      recargar: 'Recargar',
+      cerrar: 'Cerrar el aviso',
+    },
+
+    respaldo: {
+      titulo: (portal) => `${portal} no se puede abrir ahora`,
+      explicacion: (portal) => `${portal} es una aplicación de su propio equipo y se abre desde internet. Ahora no hay conexión, o el portal no responde.`,
+      siguePuesto: 'Lo que sigue funcionando',
+      sigue: (portal) => [
+        `Mi espacio, con la versión equivalente de ${portal} dentro de esta plataforma: los mismos pasos, con datos de ejemplo.`,
+        'Lo que crees se guarda en este dispositivo.',
+        'ValerIA responde con ejemplos preparados.',
+      ],
+      verEnMiEspacio: (portal) => `Ver ${portal} en Mi espacio`,
+      reintentar: 'Intentar de nuevo',
+      reintentando: 'Comprobando la conexión…',
+      abrirAparte: 'Abrir aparte',
+      sigueSinConexion: 'Todavía no se puede abrir. Puedes seguir en Mi espacio.',
+      comoRol: (rol) => `Se abre como ${rol}; puedes cambiar de rol en la franja de arriba.`,
+    },
+
+    calmado: {
+      etiqueta: 'Versión calmada',
+      ayuda: 'Quita animaciones, transiciones y revelados, y suaviza el fondo.',
+      sistema: 'Tu sistema ya pide menos movimiento; esta opción lo mantiene aunque lo cambies.',
+    },
+
+    // Los textos de la red de seguridad contra pantalla en blanco viven en js/red-de-seguridad.js: ese archivo no puede depender de este.
+
+    /* El guion: un recorrido por los cinco roles siguiendo un ajuste, de principio a fin. Cada paso lleva a la pantalla donde ocurre
+       (rol y hash). `rol` vacío significa "sin rol elegido". Los textos son del borrador. */
+    guion: {
+      aprobado: false,
+      pasos: [
+        { rol: '', hash: '#/', titulo: 'Empezamos por el aula', texto: 'Presenta el proyecto en una frase: Mosaico Telar acompaña la variedad de formas de aprender en el aula y reúne en un mismo tejido a quienes la viven.' },
+        { rol: 'coordinacion', hash: '#/mi/cursos', titulo: 'Coordinación deja el colegio listo', texto: 'Se crea el curso y se registra a cada estudiante solo con un código, sin nombres.' },
+        { rol: 'orientacion', hash: '#/mi/estudiantes', titulo: 'Orientación registra los apoyos', texto: 'En el perfil de cada estudiante se marca lo que le ayuda a aprender. Aquí no hay diagnósticos.' },
+        { rol: 'docente', hash: '#/mi/actividades', titulo: 'La docencia planea la clase', texto: 'Se planea la actividad con los tres principios del DUA. ValerIA propone ideas; quien enseña decide.' },
+        { rol: 'docente', hash: '#/mi/ajustes', titulo: 'La docencia ajusta la actividad', texto: 'Cada apoyo se vuelve un cambio concreto, con su razón, y se envía a orientación.' },
+        { rol: 'orientacion', hash: '#/mi/ajustes', titulo: 'Orientación revisa y decide', texto: 'Aprueba el ajuste o lo devuelve con una nota. Nada avanza sin esta decisión.' },
+        { rol: 'familia', hash: '#/mi/resumen', titulo: 'La familia ve la novedad', texto: 'Solo aparece lo ya aprobado, con su razón y en lenguaje sencillo.' },
+        { rol: 'estudiante', hash: '#/mi/resumen', titulo: 'El estudiante recibe la actividad a su medida', texto: 'La practica, responde el quiz y gana logros a su ritmo.' },
+        { rol: 'docente', hash: '#/mi/resumen', titulo: 'La docencia ve el progreso', texto: 'Con lo que pasó, decide el siguiente paso. El ciclo vuelve a empezar.' },
+        { rol: '', hash: '#/portales', titulo: 'Los tres portales', texto: 'Kinesis, ValerIA y Wisfox son los proyectos de los que nace esta plataforma. Aquí se ven juntos.' },
+      ],
+    },
+  };
+})(window.MT = window.MT || {});

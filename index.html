@@ -9,9 +9,13 @@
 <meta property="og:description" content="Plataforma de educación inclusiva con tecnología.">
 <meta property="og:type" content="website">
 <meta name="theme-color" content="#1A1714">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; font-src 'self'; connect-src 'self'; frame-src https://profenapaipa.github.io; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; font-src 'self'; connect-src 'self' https://profenapaipa.github.io; worker-src 'self'; manifest-src 'self'; frame-src https://profenapaipa.github.io; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="no-referrer">
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="preload" href="fonts/nunito-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/nunito-800.woff2" as="font" type="font/woff2" crossorigin>
+<script src="js/red-de-seguridad.js"></script>
 <script src="js/tema.js"></script>
 <link rel="stylesheet" href="css/fuentes.css">
 <link rel="stylesheet" href="css/tokens.css">
@@ -22,6 +26,8 @@
 <link rel="stylesheet" href="css/animacion.css">
 <link rel="stylesheet" href="css/portales-vivos.css">
 <link rel="stylesheet" href="css/planes.css">
+<link rel="stylesheet" href="css/presentacion.css">
+<link rel="stylesheet" href="css/calmado.css">
 </head>
 <body>
 <a class="saltar" href="#app">Saltar al contenido</a>
@@ -64,6 +70,7 @@
 <aside class="panel-ia" id="slot-ia" hidden></aside>
 
 <script src="js/ui.js"></script>
+<script src="js/mensajes.js"></script>
 <script src="js/tejido.js"></script>
 <script src="js/config.js"></script>
 <script src="js/datos.js"></script>
@@ -75,8 +82,10 @@
 <script src="js/plan.js"></script>
 <script src="js/dialogos.js"></script>
 <script src="js/biblioteca.js"></script>
+<script src="js/conexion.js"></script>
 <script src="js/vivos.js"></script>
 <script src="js/barra.js"></script>
+<script src="js/presentacion.js"></script>
 <script src="js/ia-config.js"></script>
 <script src="js/ia.js"></script>
 <script src="js/router.js"></script>
