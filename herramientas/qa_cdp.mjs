@@ -15,7 +15,7 @@ const espera = (ms) => new Promise((r) => setTimeout(r, ms));
 
 export async function abrir({ ancho = 1280, alto = 800, puerto = 9444, navegador = 'chrome', movil = false, factor = 1 } = {}) {
   const perfil = fs.mkdtempSync(path.join(os.tmpdir(), 'qa-'));
-  const proc = spawn(NAVEGADORES[navegador], ['--headless=new', '--disable-gpu', '--hide-scrollbars', `--remote-debugging-port=${puerto}`, `--user-data-dir=${perfil}`, 'about:blank'], { stdio: 'ignore' });
+  const proc = spawn(NAVEGADORES[navegador], [...(process.env.QA_CON_PANTALLA ? [] : ['--headless=new', '--disable-gpu', '--hide-scrollbars']), `--remote-debugging-port=${puerto}`, `--user-data-dir=${perfil}`, 'about:blank'], { stdio: 'ignore' });
   let ws;
   for (let i = 0; i < 80 && !ws; i++) {
     try { const t = (await (await fetch(`http://127.0.0.1:${puerto}/json`)).json()).find((x) => x.type === 'page'); ws = t && t.webSocketDebuggerUrl; } catch { /* aún no */ }
