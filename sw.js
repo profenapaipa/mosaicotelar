@@ -76,6 +76,7 @@ const CASCARA = [
   'js/vistas/comun.js',
   'js/vistas/creditos.js',
   'js/vistas/espacio.js',
+  'js/vistas/construccion.js',
   'js/vistas/estado.js',
   'js/vistas/glosario.js',
   'js/vistas/identidad.js',
