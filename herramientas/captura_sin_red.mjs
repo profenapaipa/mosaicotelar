@@ -187,6 +187,7 @@ try {
   await recargar(BASE + 'index.html#/', 1500);
   const quieto = await evaluar(`[...document.querySelectorAll('*')].filter((x) => x.getClientRects().length && (Math.max(...getComputedStyle(x).transitionDuration.split(',').map(parseFloat)) > 0.01 || Math.max(...getComputedStyle(x).animationDuration.split(',').map(parseFloat)) > 0.01)).length`);
   comprobar('prefers-reduced-motion: no queda ninguna animación ni transición de más de 10 ms', quieto === 0, String(quieto));
+  comprobar('prefers-reduced-motion: tampoco hay desplazamiento suave (ni en CSS ni en JavaScript)', await evaluar(`getComputedStyle(document.documentElement).scrollBehavior === 'auto' && MT.movimiento.suave() === false`));
   await cdp('Emulation.setEmulatedMedia', { features: [] });
 } catch (err) { fallo = true; console.error('ERROR del script:', err); }
 

@@ -38,7 +38,7 @@
           h('p', { class: 'intro' }, 'Cada cerebro se desarrolla a su ritmo (neurodesarrollo), algunos por caminos distintos a los más comunes (neurodivergencia), y esa variedad es parte natural de lo humano (neurodiversidad). Mosaico Telar acompaña esa variedad en el aula.'),
           h('ul', { class: 'hilos-leyenda', 'aria-label': 'Sus tres portales' }, [['kinesis', 'Kinesis', 'el aula'], ['valeria', 'ValerIA', 'la guía'], ['wisfox', 'Wisfox', 'el estudiante'], ['mosaico', 'Mosaico Telar', 'la plataforma que los une']].map(([id, n, r]) => h('li', { 'data-espacio': id }, h('i', { 'aria-hidden': 'true' }), h('strong', null, n), ' ' + r))),
           h('div', { class: 'acciones' },
-            h('a', { class: 'btn', href: '#roles', onclick: (e) => { e.preventDefault(); const el = document.getElementById('roles'); if (el) el.scrollIntoView({ behavior: 'smooth' }); } }, 'Entrar con mi rol'),
+            h('a', { class: 'btn', href: '#roles', onclick: (e) => { e.preventDefault(); const el = document.getElementById('roles'); if (el) MT.movimiento.desplazar(el); } }, 'Entrar con mi rol'),
             h('a', { class: 'btn btn--suave', href: '#/planes' }, 'Participar')),
           h('ul', { class: 'confianza' },
             h('li', null, 'Pensado desde la pedagogía inclusiva, el DUA y el PIAR, y desde ',
@@ -69,7 +69,7 @@
         h('div', { class: 'objetivo' }, h('p', { class: 'etiqueta' }, 'Para qué existe'),
           h('p', { class: 'objetivo__texto' }, 'Para que cada estudiante encuentre en el aula caminos para aprender a su manera, y para que quienes enseñan cuenten con herramientas que acompañen su labor.'),
           h('p', { class: 'objetivo__sentido' }, 'Tecnología con sentido: humana, pedagógica, al servicio del encuentro.')),
-        h('div', { class: 'acciones' }, h('a', { class: 'btn', href: '#roles', onclick: (e) => { e.preventDefault(); const el = document.getElementById('roles'); if (el) el.scrollIntoView({ behavior: 'smooth' }); } }, 'Elegir mi rol'),
+        h('div', { class: 'acciones' }, h('a', { class: 'btn', href: '#roles', onclick: (e) => { e.preventDefault(); const el = document.getElementById('roles'); if (el) MT.movimiento.desplazar(el); } }, 'Elegir mi rol'),
           h('a', { class: 'btn btn--suave', href: '#/portales' }, 'Ver los tres portales'))));
 
       c.append(h('section', { class: 'seccion', id: 'roles', 'aria-labelledby': 'h-roles' },

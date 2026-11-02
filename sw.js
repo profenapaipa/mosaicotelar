@@ -64,6 +64,7 @@ const CASCARA = [
   'js/ia.js',
   'js/main.js',
   'js/mensajes.js',
+  'js/movimiento.js',
   'js/plan.js',
   'js/presentacion.js',
   'js/red-de-seguridad.js',

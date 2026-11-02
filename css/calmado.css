@@ -16,12 +16,16 @@ html[data-movimiento="calmado"] *::after {
   transition-duration: .001ms !important; transition-delay: 0s !important;
   scroll-behavior: auto !important; will-change: auto !important;
 }
+/* El desplazamiento suave de toda la página (base.css lo pone en <html>, que el selector * de arriba no alcanza) y el que pide el router
+   al cambiar de pantalla. El que pide JavaScript lo decide js/movimiento.js. */
+html[data-movimiento="calmado"] { scroll-behavior: auto !important; }
 /* Menos carga sensorial: sin la trama de hilos de fondo, sombras planas y sin la barra de hilos que cruza al cambiar de pantalla. */
 html[data-movimiento="calmado"] { --trama-fondo: none !important; --sombra: 0 0 0 1px var(--linea) !important; }
 html[data-movimiento="calmado"] #progreso-hilos { display: none; }
 html[data-movimiento="calmado"] .btn:active { transform: none; }
 
 @media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto !important; }
   *, *::before, *::after {
     animation-duration: .001ms !important; animation-delay: 0s !important; animation-iteration-count: 1 !important;
     transition-duration: .001ms !important; transition-delay: 0s !important;

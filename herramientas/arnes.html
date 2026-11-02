@@ -609,7 +609,7 @@ async function casosPresentacion() {
     localStorage.clear();
     localStorage.setItem('mosaicotelar.presentacion', JSON.stringify({ activo: true, paso: 3 }));
     if (rol) localStorage.setItem('mosaicotelar.v2', JSON.stringify({ rol }));
-    await cargar(ruta, ancho, alto); await espera(450);
+    await cargar(ruta, ancho, alto); await espera(800);
     for (const tema of TEMAS) {
       const c = medirCaso('presentación ' + (rol ? rol + ' ' : '') + ruta + ' ' + alto + 'p', ancho, tema, () => medirPresentacion(ancho));
       salida.casos.push(c); await espera(60);
@@ -796,7 +796,8 @@ async function flujoDemostracion() {
   afirmar("sin red: la política de seguridad permite el worker y el manifiesto propios", /worker-src 'self'/.test(csp) && /manifest-src 'self'/.test(csp));
   const origenes = Object.values((MTw() || ventana().MT).config.portales).map((u) => new URL(u).origin);
   const connect = (csp.match(/connect-src ([^;]+)/) || [, ''])[1];
-  afirmar('sin red: la política deja comprobar (sondear) la dirección de cada portal, y nada más', origenes.every((o) => connect.includes(o)) && !/\*|https:(?!\/\/)/.test(connect), connect);
+  const urlsPortales = Object.values(ventana().MT ? ventana().MT.config.portales : (MTw() || ventana().MT).config.portales);
+  afirmar('sin red: la política deja comprobar (sondear) solo las dos rutas de los portales, no todo el dominio', urlsPortales.every((u) => connect.split(/\s+/).includes(u)) && !/\*|https:\/\/[^\/\s]+(?=\s|$)/.test(connect), connect);
   afirmar('sin red: la página enlaza el manifiesto', /<link rel="manifest" href="manifest\.webmanifest">/.test(idx));
   afirmar('sin red: la red de seguridad se carga antes que el resto de los scripts', idx.indexOf('js/red-de-seguridad.js') > 0 && idx.indexOf('js/red-de-seguridad.js') < idx.indexOf('js/tema.js') && idx.indexOf('js/tema.js') < idx.indexOf('js/ui.js'));
   // El worker se registra de verdad (http en 127.0.0.1 cuenta como contexto seguro) y guarda la cáscara
@@ -862,6 +863,50 @@ async function flujoDemostracion() {
   const despuesBases = (await ventana().indexedDB.databases()).map((d) => d.name);
   afirmar('reinicio: borra las bases de sesión de Firebase', antesBases.includes('firebaseLocalStorageDb') && !despuesBases.includes('firebaseLocalStorageDb'), antesBases.join() + ' -> ' + despuesBases.join());
   localStorage.removeItem('otraApp');
+
+  /* ===== 8. QA-02: la línea de rescate y el error HTTP; QA-08: el desplazamiento suave ===== */
+  localStorage.clear();
+  await cargar('#/', 1280, 800); await espera(400);
+  await ir('#/portales/kinesis'); await espera(500);
+  const resc = () => D().querySelector('.vivos .vivo-rescate');
+  const textoResc = resc() ? resc().innerText.replace(/\s+/g, ' ').trim() : '';
+  afirmar('QA-02: bajo la barra del portal hay una línea fija "¿No ves el portal? Ábrelo aparte o usa Mi espacio"', visible(resc()) && textoResc.startsWith('¿No ves el portal? Ábrelo aparte o usa Mi espacio'), textoResc);
+  afirmar('QA-02: la línea de rescate está marcada [por aprobar] mientras no se apruebe', MTw().mensajes.rescate.aprobado === true || /\[por aprobar\]/.test(textoResc));
+  const enl = resc() && resc().querySelector('a');
+  afirmar('QA-02: "Ábrelo aparte" abre la dirección del portal en otra pestaña, de forma segura', !!enl && enl.getAttribute('href') === MTw().config.portales.kinesis && enl.target === '_blank' && /noopener/.test(enl.rel));
+  afirmar('QA-02: la línea sigue ahí después de que el marco cargue (no depende del evento load)', (await espera(1500), visible(resc())));
+  const barraAlto = D().querySelector('.vivo-barra').getBoundingClientRect().height;
+  afirmar('QA-02: la línea no hace crecer la barra de herramientas del portal', barraAlto < 90, String(barraAlto));
+  [...resc().querySelectorAll('button')].find((b) => /usa Mi espacio/.test(b.textContent)).click(); await espera(400);
+  afirmar('QA-02: "usa Mi espacio" lleva a la versión equivalente', /^#\/mi/.test(ventana().location.hash), ventana().location.hash);
+  await ir('#/portales/valeria'); await espera(300);
+  afirmar('QA-02: en ValerIA (que vive dentro de la plataforma) la línea no aparece', !visible(resc()));
+  // Un portal que responde con error HTTP: la plataforma lo ve y muestra el respaldo (el sondeo lee el estado en el mismo origen)
+  for (const estado of [404, 503]) {
+    await cargar('#/', 1280, 800); await espera(300);
+    ventana().fetch = async () => new (ventana().Response)('no hay nada', { status: estado });
+    // El sondeo lee el estado solo cuando el portal es del mismo origen que la plataforma: aquí se simula esa condición.
+    MTw().config.portales.wisfox = new URL('../index.html', location.href).href;
+    await ir('#/portales/wisfox'); await espera(600);
+    const r = D().querySelector('.vivo-panel[data-portal="wisfox"] .vivo-respaldo');
+    afirmar(`QA-02: si el portal responde con error ${estado}, se muestra el respaldo y no un marco con la página de error`, visible(r) && !D().querySelector('.vivo-panel[data-portal="wisfox"] iframe'), r ? '' : 'sin respaldo');
+  }
+  await cargar('#/', 1280, 800); await espera(300);
+  ventana().fetch = async () => new (ventana().Response)('ok', { status: 200 });
+  MTw().config.portales.wisfox = new URL('../index.html', location.href).href;
+  await ir('#/portales/wisfox'); await espera(600);
+  afirmar('QA-02: si el portal responde bien (200), se muestra el marco y no el respaldo', !!D().querySelector('.vivo-panel[data-portal="wisfox"] iframe') && !visible(D().querySelector('.vivo-panel[data-portal="wisfox"] .vivo-respaldo')));
+  // Desplazamiento suave (QA-08)
+  localStorage.clear();
+  await cargar('#/', 1280, 800); await espera(500);
+  const pedidos = []; ventana().Element.prototype.scrollIntoView = function (o) { pedidos.push(o && o.behavior); };
+  const entrar = () => [...D().querySelectorAll('a.btn')].find((a) => a.getAttribute('href') === '#roles');
+  afirmar('QA-08: sin calmado, el botón de la bienvenida se desplaza con suavidad y <html> trae scroll-behavior suave', !!entrar() && (entrar().click(), pedidos[pedidos.length - 1] === 'smooth') && ventana().getComputedStyle(D().documentElement).scrollBehavior === 'smooth' && ventana().MT.movimiento.suave() === true, pedidos.join());
+  D().documentElement.dataset.movimiento = 'calmado';
+  entrar().click();
+  afirmar('QA-08: con la versión calmada, el desplazamiento de JavaScript es inmediato', pedidos[pedidos.length - 1] === 'auto' && ventana().MT.movimiento.suave() === false && ventana().MT.movimiento.calmado() === true, pedidos.join());
+  afirmar('QA-08: con la versión calmada, <html> deja de desplazarse con suavidad (también el desplazamiento del router)', ventana().getComputedStyle(D().documentElement).scrollBehavior === 'auto');
+  delete D().documentElement.dataset.movimiento;
 
   afirmar('demostración: sin errores de ejecución en estas pruebas', !(ventana().__errores && ventana().__errores.filter((e) => e !== 'prueba').length), ventana().__errores && ventana().__errores.join(' | '));
 }
