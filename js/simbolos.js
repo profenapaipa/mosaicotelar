@@ -68,7 +68,8 @@
       <path class="flujo__hilo flujo__hilo--leyenda flujo__hilo--camino" d="M24 464H84"/>${lineas([T.leyendaCamino], 96, 469, 'flujo__texto flujo__texto--leyenda', 'start')}
     </svg>`;
     const fig = document.createElement('figure');
-    fig.className = ('flujo ' + o.clase).trim();
+    // El nombre de la clase raíz no puede ser "flujo": ol.flujo ya la usa la página Roles y datos.
+    fig.className = ('flujo-portales ' + o.clase).trim();
     const dibujoEl = svg(dibujo);
     const lista = document.createElement('ol'); lista.className = 'solo-lectores';
     T.lista.forEach((t) => { const li = document.createElement('li'); li.textContent = t; lista.append(li); });
