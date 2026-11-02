@@ -8,7 +8,9 @@
   const { h } = MT.ui;
   const { pagina } = MT.comun;
 
-  const TABS = [{ id: 'propuesta', etiqueta: 'Propuesta' }, { id: 'arquitectura', etiqueta: 'Arquitectura' }, { id: 'etapas', etiqueta: 'Etapas' }, { id: 'construccion', etiqueta: 'Cómo lo construimos' }];
+  const TABS = [{ id: 'propuesta', etiqueta: 'Propuesta' }, { id: 'arquitectura', etiqueta: 'Arquitectura' }, { id: 'etapas', etiqueta: 'Etapas' }];
+  // La cuadrícula "Cómo lo construimos" sigue oculta hasta que el dueño apruebe sus textos (MT.config.mostrarConstruccion = true).
+  const tabs = () => (MT.config && MT.config.mostrarConstruccion ? TABS.concat({ id: 'construccion', etiqueta: 'Cómo lo construimos' }) : TABS);
   
   const tarjeta = (t, ...hijos) => h('div', { class: 'tarjeta' }, h('h2', null, t), ...hijos);
   const lista = (l) => h('ul', null, l.map((x) => h('li', null, x)));
@@ -72,11 +74,11 @@
   }
 
   MT.router.registrar({
-    id: 'hoja', titulo: 'Hoja de ruta', espacio: '', subs: TABS,
+    id: 'hoja', titulo: 'Hoja de ruta', espacio: '', subs: tabs,
     render(main, { sub }) {
       const c = pagina(main, { etiqueta: 'Hoja de ruta', titulo: { propuesta: 'Nuestro sentido y cómo podría sostenerse', arquitectura: 'Cómo está construida y qué falta', etapas: 'Qué hay hoy y qué viene' }[sub],
         descripcion: 'La mirada de quien decide si probar, apoyar o llevarla a su colegio.' });
-      c.append(h('nav', { class: 'pestanas-pagina', 'aria-label': 'Secciones de la hoja de ruta' }, TABS.map((t) => h('a', { href: '#/hoja/' + t.id, 'aria-current': t.id === sub ? 'page' : null }, t.etiqueta))));
+      c.append(h('nav', { class: 'pestanas-pagina', 'aria-label': 'Secciones de la hoja de ruta' }, tabs().map((t) => h('a', { href: '#/hoja/' + t.id, 'aria-current': t.id === sub ? 'page' : null }, t.etiqueta))));
       ({ propuesta, arquitectura, etapas, construccion: (x) => MT.construccion.cuadricula(x) })[sub](c);
     },
   });

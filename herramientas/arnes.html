@@ -10,7 +10,7 @@
 <pre id="resultado" style="position:fixed;top:0;left:0;max-width:100%;background:#fff;color:#000;font:11px monospace;white-space:pre-wrap"></pre>
 <script>
 const SECC = { docente: ['resumen', 'estudiantes', 'actividades', 'ajustes', 'notas', 'archivos'], orientacion: ['resumen', 'ajustes', 'estudiantes', 'notas', 'archivos'], familia: ['resumen', 'archivos'], coordinacion: ['resumen', 'estudiantes', 'cursos', 'categorias'], estudiante: ['resumen', 'ruta', 'logros', 'archivos'] };
-const RUTAS = [[null, '#/'], [null, '#/mi'], [null, '#/mapa/conexiones'], [null, '#/mapa/distingue'], [null, '#/valeria/chat'], [null, '#/valeria/conexion'], [null, '#/recorrido/camino'], [null, '#/recorrido/roles'], [null, '#/recorrido/datos'], [null, '#/portales'], [null, '#/portales/kinesis'], [null, '#/portales/wisfox'], [null, '#/portales/valeria'], [null, '#/glosario'], [null, '#/creditos'], [null, '#/planes/formas'], [null, '#/planes/acompanamiento'], [null, '#/registro/lista'], [null, '#/registro/conversar'], [null, '#/guia/docente'], [null, '#/guia/estudiante'], [null, '#/hoja/propuesta'], [null, '#/hoja/arquitectura'], [null, '#/hoja/etapas'], [null, '#/hoja/construccion'], [null, '#/piloto'], [null, '#/identidad'],
+const RUTAS = [[null, '#/'], [null, '#/mi'], [null, '#/mapa/conexiones'], [null, '#/mapa/distingue'], [null, '#/valeria/chat'], [null, '#/valeria/conexion'], [null, '#/recorrido/camino'], [null, '#/recorrido/roles'], [null, '#/recorrido/datos'], [null, '#/portales'], [null, '#/portales/kinesis'], [null, '#/portales/wisfox'], [null, '#/portales/valeria'], [null, '#/glosario'], [null, '#/creditos'], [null, '#/planes/formas'], [null, '#/planes/acompanamiento'], [null, '#/registro/lista'], [null, '#/registro/conversar'], [null, '#/guia/docente'], [null, '#/guia/estudiante'], [null, '#/hoja/propuesta'], [null, '#/hoja/arquitectura'], [null, '#/hoja/etapas'], [null, '#/piloto'], [null, '#/identidad'],
   ...Object.entries(SECC).flatMap(([rol, l]) => l.map((x) => [rol, '#/mi/' + x]))];
 const ANCHOS = [390, 1280];
 const TEMAS = ['claro', 'oscuro'];
@@ -384,12 +384,15 @@ async function flujo() {
   if (doc().querySelector('dialog[open]')) { doc().querySelector('dialog[open]').close(); await espera(150); }
   afirmar('cada portal se presenta como un hilo (estudiante, quien enseña, el que cruza a los otros dos)', /hilo del estudiante/.test(inicioTxt) && /hilo de quien enseña/.test(inicioTxt) && /hilo que cruza a los otros dos/.test(inicioTxt) && /malla curricular de su institución/.test(inicioTxt));
   afirmar('la bienvenida no afirma que los portales originales ya comparten datos', /compartir los datos es lo que viene con el servidor/.test(inicioTxt));
+  afirmar('la cuadrícula Cómo lo construimos sigue oculta mientras no se apruebe', !ventana().MT.config.mostrarConstruccion);
+  ventana().MT.config.mostrarConstruccion = true;
   await ir('#/hoja/construccion'); await espera(150);
   const celdas = ventana().document.querySelectorAll('table.construccion button.celda');
   afirmar('Cómo lo construimos: cuadrícula de 5 por 5 celdas', celdas.length === 25);
   celdas[0].click(); await espera(150);
   afirmar('una celda abre su detalle con los tres estados', /Existe/.test(textoPagina()) && /Lo que seguimos tejiendo/.test(textoPagina()));
   ventana().document.querySelectorAll('dialog[open]').forEach((d) => d.close());
+  ventana().MT.config.mostrarConstruccion = false;
   await ir('#/glosario'); ventana().MT.router.recargar(); await espera(150);
   afirmar('el glosario define la agentividad y el marco normativo con precisión', /Agentividad/.test(textoPagina()) && /que aprueba la Convención/.test(textoPagina()));
   afirmar('el glosario define los tres términos del eje', ['Neurodiversidad', 'Neurodivergencia', 'Neurodesarrollo'].every((t) => textoPagina().includes(t)) && !/OAPE/.test(textoPagina()));
