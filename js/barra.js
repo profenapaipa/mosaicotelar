@@ -99,7 +99,8 @@
     // Si el navegador no deja usar IndexedDB (modo privado, sin conexión a disco), los datos de ejemplo vuelven de todos modos.
     try { await MT.archivos.vaciar(); } catch (e) { console.error(e); }
     // Los portales abiertos también vuelven a empezar: sin esto el chat de ValerIA conservaría su conversación.
-    if (MT.vivos && MT.vivos.reiniciar) MT.vivos.reiniciar();
+    // y se borra lo que Kinesis y Wisfox guardaron en este navegador (ver vivos.js).
+    if (MT.vivos && MT.vivos.reiniciar) await MT.vivos.reiniciar();
     st.reiniciar(); location.hash = '#/'; MT.router.recargar();
     return true;
   }

@@ -829,6 +829,30 @@ async function flujoDemostracion() {
   }
   afirmar('teclado: ningún control visible queda fuera del orden de Tab (con y sin modo presentación)', sinTab.length === 0, sinTab.slice(0, 4).join(' | '));
   afirmar('teclado: "Empezar de nuevo" del guion se alcanza con el teclado', hayEnModo.every(Boolean));
+  /* ===== 7. Texto legible en proyector (QA-07), sin solicitudes fallidas (QA-22) y limpieza de lo que guardan los portales ===== */
+  localStorage.clear();
+  await cargar('#/planes/formas', 1280, 720); await espera(500);
+  const celdas = [...D().querySelectorAll('.tabla-planes td, .tabla-planes th, .tabla-planes .celda-texto')].filter((x) => visible(x) && x.textContent.trim());
+  const pequenas = celdas.filter((x) => parseFloat(ventana().getComputedStyle(x).fontSize) < 13.99).map((x) => x.textContent.trim().slice(0, 20) + ' ' + ventana().getComputedStyle(x).fontSize);
+  afirmar('QA-07: la tabla de Participar mide 14 px o más en todas sus celdas', celdas.length > 10 && pequenas.length === 0, `${celdas.length} celdas; pequeñas: ${pequenas.slice(0, 3).join(', ')}`);
+  await cargar('#/', 1280, 720); await espera(500);
+  const rotulos = [...D().querySelectorAll('.dispositivo-rotulo')].filter(visible);
+  afirmar('QA-07: los rótulos de la bienvenida miden 14 px o más', rotulos.length > 0 && rotulos.every((x) => parseFloat(ventana().getComputedStyle(x).fontSize) >= 13.99), rotulos.map((x) => ventana().getComputedStyle(x).fontSize).join());
+  const hay = ventana().MT.ia.puedeHaberServidor;
+  afirmar('QA-22: en GitHub Pages y desde el disco no se pregunta por /api/estado; en un servidor local sí', hay('profenapaipa.github.io', 'https:') === false && hay('', 'file:') === false && hay('localhost', 'http:') === true && hay('127.0.0.1', 'http:') === true);
+  // Lo que Kinesis y Wisfox guardan en este navegador (mismo dominio) se borra al empezar de nuevo; lo demás no
+  ['wisfoState', 'wisfoxModo', 'firebase:authUser:abc', 'kinesis-apariencia'].forEach((k) => localStorage.setItem(k, '{}'));
+  localStorage.setItem('otraApp', 'queda'); localStorage.setItem('mosaicotelar.apariencia', '{"texto":"grande"}');
+  await new Promise((res) => { const q = ventana().indexedDB.open('firebaseLocalStorageDb', 1); q.onupgradeneeded = () => q.result.createObjectStore('x'); q.onsuccess = () => { q.result.close(); res(); }; q.onerror = () => res(); });
+  const antesBases = (await ventana().indexedDB.databases()).map((d) => d.name);
+  await MTw().barra.empezarDeNuevo({ confirmar: false }); await espera(300);
+  const restantes = Object.keys(localStorage);
+  afirmar('reinicio: borra lo que Wisfox y Kinesis guardan en este navegador (wisfo*, firebase:, kinesis-)', !restantes.some((k) => /^(wisfo|firebase:|kinesis-)/.test(k)), restantes.join());
+  afirmar('reinicio: no toca lo que no es de ellos (otra clave y la apariencia de Mosaico Telar)', localStorage.getItem('otraApp') === 'queda' && localStorage.getItem('mosaicotelar.apariencia') === '{"texto":"grande"}');
+  const despuesBases = (await ventana().indexedDB.databases()).map((d) => d.name);
+  afirmar('reinicio: borra las bases de sesión de Firebase', antesBases.includes('firebaseLocalStorageDb') && !despuesBases.includes('firebaseLocalStorageDb'), antesBases.join() + ' -> ' + despuesBases.join());
+  localStorage.removeItem('otraApp');
+
   afirmar('demostración: sin errores de ejecución en estas pruebas', !(ventana().__errores && ventana().__errores.filter((e) => e !== 'prueba').length), ventana().__errores && ventana().__errores.join(' | '));
 }
 

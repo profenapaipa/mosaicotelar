@@ -193,8 +193,34 @@
     lado = null;
     Object.entries(paneles).forEach(([id, el]) => { if (el.soltar) el.soltar(); el.remove(); delete paneles[id]; });
     if (MT.barra) MT.barra.actualizar();
+    return limpiarAlmacenAjeno();
   }
 
-  MT.vivos = { mostrar, ocultar, reiniciar, abiertos: () => Object.keys(paneles), activo: () => (raiz && !raiz.hidden ? activo : null), lado: () => lado, dividir(id) { if (id && id !== activo) { lado = id; refrescar(); } } };
+  /* Lo que Kinesis y Wisfox guardan en este navegador. Comparten dominio con la plataforma (profenapaipa.github.io), así que desde aquí
+     se puede ver y borrar sin tocar su código. Se borra solo lo que tiene el rastro de cada uno, y NADA de "mosaicotelar.": ni los datos
+     de ejemplo, ni la apariencia, ni el modo presentación.
+       - Wisfox: sus claves empiezan por "wisfo" (wisfoState, wisfoPerfil, wisfoxModo…) y usa Firebase, que deja la sesión en
+         localStorage ("firebase:") y en tres bases de IndexedDB.
+       - Kinesis: la versión publicada es una demostración sin datos propios; solo guarda su apariencia ("kinesis-apariencia").
+     Si más adelante esas aplicaciones guardan otra cosa con otros nombres, hay que sumarlos aquí. Si QA-13 quita allow-same-origin de los
+     marcos, sus datos quedan aislados y esto solo limpia lo que se haya abierto "aparte". */
+  const PREFIJOS_AJENOS = ['wisfo', 'firebase:', 'kinesis-'];
+  const BASES_AJENAS = ['firebaseLocalStorageDb', 'firebase-heartbeat-database', 'firebase-installations-database', 'firebase-app-check-database', 'firebase_remote_config'];
+  async function limpiarAlmacenAjeno() {
+    const borradas = [];
+    try {
+      Object.keys(localStorage).filter((k) => PREFIJOS_AJENOS.some((p) => k.startsWith(p))).forEach((k) => { localStorage.removeItem(k); borradas.push(k); });
+      Object.keys(sessionStorage).filter((k) => PREFIJOS_AJENOS.some((p) => k.startsWith(p))).forEach((k) => sessionStorage.removeItem(k));
+    } catch (e) { /* sin almacenamiento */ }
+    // Una base abierta por un marco que acaba de quitarse tarda en cerrarse: no se espera más de un segundo y medio.
+    const bases = BASES_AJENAS.map((n) => new Promise((res) => {
+      try { const q = indexedDB.deleteDatabase(n); q.onsuccess = q.onerror = q.onblocked = () => res(); } catch (e) { res(); }
+      setTimeout(res, 1500);
+    }));
+    await Promise.all(bases);
+    return borradas;
+  }
+
+  MT.vivos = { mostrar, ocultar, reiniciar, limpiarAlmacenAjeno, abiertos: () => Object.keys(paneles), activo: () => (raiz && !raiz.hidden ? activo : null), lado: () => lado, dividir(id) { if (id && id !== activo) { lado = id; refrescar(); } } };
   MT.vivos.iniciar = iniciar;
 })(window.MT = window.MT || {});

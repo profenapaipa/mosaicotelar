@@ -19,8 +19,12 @@
   const demora = (ms) => new Promise((r) => setTimeout(r, ms));
   const emitir = () => window.dispatchEvent(new CustomEvent('mt-ia-modo'));
 
+  /* ¿Vale la pena preguntar por /api/estado? En GitHub Pages y desde el disco no hay servidor y la pregunta solo deja un 404 en la consola
+     (QA-22), justo donde alguien podría mirar durante la muestra. En el servidor del piloto o en un localhost sí se pregunta. */
+  const puedeHaberServidor = (host, protocolo) => protocolo !== 'file:' && !/\.github\.io$/.test(host || '');
+
   async function detectar() {
-    if (cfg.proveedor !== 'simulado' && window.location.protocol !== 'file:') {
+    if (cfg.proveedor !== 'simulado' && (cfg.base || puedeHaberServidor(window.location.hostname, window.location.protocol))) {
       try {
         const r = await fetch((cfg.base || '') + '/api/estado', { signal: AbortSignal.timeout(cfg.deteccion || 2500) });
         if (r.ok) {
@@ -192,5 +196,5 @@
     alternar() { this.abierto ? this.cerrar() : this.abrir(); },
   };
 
-  MT.ia = { info, detectar, preguntar, consultar, montarChat, panel, chipModo };
+  MT.ia = { info, detectar, puedeHaberServidor, preguntar, consultar, montarChat, panel, chipModo };
 })(window.MT = window.MT || {});

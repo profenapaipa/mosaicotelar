@@ -18,7 +18,7 @@
 .dispositivo--a { width: 82%; left: 0; top: 0; }
 .dispositivo--b { width: 56%; right: 0; bottom: -10px; border-radius: 12px; padding: 6px 6px 6px; }
 .dispositivo--b img { border-radius: 6px; }
-.dispositivo-rotulo { position: absolute; left: 12px; bottom: 10px; background: var(--papel); color: var(--tinta); font: 800 .72rem var(--fuente); padding: .1rem .6rem; border-radius: 999px; }
+.dispositivo-rotulo { position: absolute; left: 12px; bottom: 10px; background: var(--papel); color: var(--tinta); font: 800 .875rem var(--fuente); padding: .1rem .6rem; border-radius: 999px; }   /* 14 px (QA-07) */
 
 .seccion { padding: 2.8rem 0; border-top: 1px solid var(--linea); }
 .seccion > h2 { max-width: 26ch; }

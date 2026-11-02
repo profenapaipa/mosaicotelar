@@ -27,7 +27,7 @@
 .tabla-planes .celda-pro { color: var(--ambar-texto); font-weight: 700; }
 .tabla-planes .celda-serv { color: var(--azul); font-weight: 700; }
 .tabla-planes .celda-no { color: var(--tinta-suave); }
-.tabla-planes .celda-texto { display: block; font-size: .72rem; font-weight: 600; }
+.tabla-planes .celda-texto { display: block; font-size: .875rem; font-weight: 600; }   /* 14 px: a 11,5 px no se lee en un proyector (QA-07) */
 .servicio { border-top: 5px solid var(--e-vivo, var(--tinta)); }
 .servicio h2 { font-size: 1.35rem; margin: 0 0 .2rem; }
 .servicio ul { padding-left: 1.2rem; display: grid; gap: .3rem; }
