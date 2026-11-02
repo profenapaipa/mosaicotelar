@@ -7,8 +7,9 @@
 .flujo__texto--leyenda { fill: var(--tinta-suave); font-weight: 600; }
 .flujo__caja { fill: none; stroke: var(--tinta); stroke-width: 2; }
 .flujo__guia { fill: none; stroke: var(--tinta-suave); stroke-width: 3; stroke-linecap: round; }
-.flujo__punta { fill: none; stroke: var(--tinta-suave); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
-.flujo__punta--valeria { stroke: var(--hilo-valeria); }
+/* Las puntas son triángulos rellenos, no trazos: se leen claras aunque el hilo que llega sea punteado. */
+.flujo__punta { fill: var(--tinta-suave); stroke: var(--tinta-suave); stroke-width: 2; stroke-linejoin: round; }
+.flujo__punta--valeria { fill: var(--hilo-valeria); stroke: var(--hilo-valeria); }
 .flujo__funda { fill: none; stroke: var(--flujo-fondo, var(--papel)); stroke-width: 10; stroke-linecap: butt; }
 .flujo__hilo { fill: none; stroke-width: 5; stroke-linecap: round; }
 .flujo__hilo--wisfox { stroke: var(--hilo-wisfox); }
