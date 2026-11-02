@@ -545,6 +545,15 @@ async function flujo() {
     afirmar('movimiento calmado: el logo solo se desvanece (sin desplazar ni girar)', anims.length === 1 && anims[0].effect.getKeyframes().every((k) => !('translate' in k) && !('rotate' in k) && !('transform' in k)), 'animaciones=' + anims.length);
     lc.el.remove(); delete doc().documentElement.dataset.movimiento;
   }
+    // El diagrama de flujo de los portales no desborda en un celular (390 px menos los márgenes) y trae su lista para lectores de pantalla.
+    {
+      const caja = doc().createElement('div'); caja.style.cssText = 'width:358px;position:relative'; doc().body.append(caja);
+      const fig = ventana().MT.simbolos.flujo(); caja.append(fig);
+      const ancho = fig.querySelector('svg').getBoundingClientRect().width;
+      afirmar('el diagrama de flujo de los portales no desborda a 390 px', fig.scrollWidth <= 358 && caja.scrollWidth <= 358 && ancho <= 358.5, 'ancho=' + ancho + ' scroll=' + caja.scrollWidth);
+      afirmar('el diagrama de flujo trae texto alternativo y una lista ordenada para lectores de pantalla', !!fig.querySelector('svg title') && fig.querySelectorAll('ol.solo-lectores li').length >= 4 && fig.classList.contains('flujo-portales'));
+      caja.remove();
+    }
   // ---- fin logo (agente de marca) ----
   const csp = doc().querySelector('meta[http-equiv="Content-Security-Policy"]');
   afirmar('la página trae una política de seguridad de contenido restrictiva', !!csp && /script-src 'self'/.test(csp.content) && /object-src 'none'/.test(csp.content) && /frame-src https:\/\/profenapaipa\.github\.io/.test(csp.content) && !/unsafe-eval/.test(csp.content));

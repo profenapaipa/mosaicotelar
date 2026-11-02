@@ -52,7 +52,7 @@
       <rect class="flujo__caja" x="4" y="14" width="168" height="62" rx="12"/>${lineas(T.malla, 88, 40, 'flujo__texto')}
       <rect class="flujo__caja" x="188" y="14" width="168" height="62" rx="12"/>${lineas(T.personas, 272, 40, 'flujo__texto')}
       <!-- La malla alimenta a Wisfox -->
-      <path class="flujo__guia" d="M88 78V146"/><path class="flujo__punta" d="M80 138l8 10 8-10"/>
+      <path class="flujo__guia" d="M88 78V138"/><path class="flujo__punta" d="M80 138h16l-8 12z"/>
       ${tesela('wisfox', 89, 190, 68)}${lineas(T.wisfox, 89, 242, 'flujo__texto')}
       ${tesela('kinesis', 271, 190, 68)}${lineas(T.kinesis, 271, 242, 'flujo__texto')}
       <!-- Wisfox y Kinesis se tejen entre sí: dos hilos, el del estudiante y el del docente -->
@@ -61,14 +61,15 @@
       ${funda('M180 300V176')}<path class="flujo__hilo flujo__hilo--valeria" d="M180 300V176"/>
       ${funda('M126 198H236')}<path class="flujo__hilo flujo__hilo--kinesis" d="M126 198H236"/>
       <!-- La información sube hacia las personas, en trazo punteado: es la dirección del proyecto -->
-      <path class="flujo__hilo flujo__hilo--valeria flujo__hilo--camino" d="M180 176V130C180 100 272 118 272 90"/><path class="flujo__punta flujo__punta--valeria" d="M264 98l8-10 8 10"/>
+      <path class="flujo__hilo flujo__hilo--valeria flujo__hilo--camino" d="M180 176V130C180 104 272 124 272 102"/><path class="flujo__punta flujo__punta--valeria" d="M264 102h16l-8-14z"/>
       ${tesela('valeria', 180, 334, 68)}${lineas(T.valeria, 180, 388, 'flujo__texto')}
       <!-- Leyenda: el trazo nunca es lo único que dice si algo existe -->
       <path class="flujo__hilo flujo__hilo--leyenda" d="M24 436H84"/>${lineas([T.leyendaHoy], 96, 441, 'flujo__texto flujo__texto--leyenda', 'start')}
       <path class="flujo__hilo flujo__hilo--leyenda flujo__hilo--camino" d="M24 464H84"/>${lineas([T.leyendaCamino], 96, 469, 'flujo__texto flujo__texto--leyenda', 'start')}
     </svg>`;
     const fig = document.createElement('figure');
-    fig.className = ('flujo ' + o.clase).trim();
+    // El nombre de la clase raíz no puede ser "flujo": ol.flujo ya la usa la página Roles y datos.
+    fig.className = ('flujo-portales ' + o.clase).trim();
     const dibujoEl = svg(dibujo);
     const lista = document.createElement('ol'); lista.className = 'solo-lectores';
     T.lista.forEach((t) => { const li = document.createElement('li'); li.textContent = t; lista.append(li); });
