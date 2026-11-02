@@ -30,7 +30,7 @@
 
       c.append(h('nav', { class: 'toc', 'aria-label': 'Contenido del manual' }, h('ul', null,
         [['proposito', 'Propósito'], ['logo', 'Logo'], ['color', 'Color'], ['tipografia', 'Tipografía'], ['formas', 'Formas e íconos'], ['recursos', 'Recursos'], ['componentes', 'Componentes'], ['voz', 'Voz']]
-          .map(([id, t]) => h('li', null, h('a', { href: '#/identidad', onclick: (e) => { e.preventDefault(); const el = document.getElementById(id); if (el) el.scrollIntoView({ behavior: 'smooth' }); } }, t))))));
+          .map(([id, t]) => h('li', null, h('a', { href: '#/identidad', onclick: (e) => { e.preventDefault(); const el = document.getElementById(id); if (el) MT.movimiento.desplazar(el); } }, t))))));
 
       c.append(seccion('proposito', 'Propósito',
         h('div', { class: 'rejilla rejilla--2' },

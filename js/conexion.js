@@ -48,12 +48,17 @@
   if (!enLinea) mostrar(M.aviso, false);
 
   /* ---------------- Sondeo ---------------- */
-  // Una petición "no-cors" no deja leer la respuesta, pero resuelve si el servidor contestó y falla si no hay red: justo lo que se necesita.
+  /* Dos casos. Si la dirección es del mismo origen que la plataforma (Kinesis y Wisfox viven en el mismo dominio de GitHub Pages), la
+     respuesta se puede leer y un 404 o un 5xx cuentan como "no abre". Si es de otro origen, una petición "no-cors" no deja leer el
+     estado, pero resuelve si el servidor contestó y falla si no hay red: con eso solo se detecta la caída, no el error HTTP. */
   async function sondear(url, ms) {
     if (!enLinea) return false;
+    const mismo = location.origin !== 'null' && new URL(url, location.href).origin === location.origin;
     const corte = new AbortController(); const t = setTimeout(() => corte.abort(), ms || 6000);
-    try { await fetch(url, { mode: 'no-cors', cache: 'no-store', referrerPolicy: 'no-referrer', signal: corte.signal }); return true; }
-    catch (e) { return false; } finally { clearTimeout(t); }
+    try {
+      const r = await fetch(url, { mode: mismo ? 'same-origin' : 'no-cors', cache: 'no-store', referrerPolicy: 'no-referrer', signal: corte.signal });
+      return r.type === 'opaque' || r.ok;
+    } catch (e) { return false; } finally { clearTimeout(t); }
   }
 
   /* ---------------- Service worker ---------------- */

@@ -12,14 +12,15 @@
   const { PORTALES, ORDEN } = MT.guias;
   const st = MT.store;
 
-  let raiz; let marcos; let encabezado; const paneles = {};
+  let raiz; let marcos; let encabezado; let rescate; const paneles = {};
   let activo = null; let lado = null;
   const TARDA = 8000;
 
   function iniciar(main) {
     encabezado = h('div', { class: 'vivo-barra' });
     marcos = h('div', { class: 'vivo-marcos' });
-    raiz = h('section', { class: 'vivos', 'data-persistente': '', hidden: true, 'aria-label': 'Portales abiertos' }, encabezado, marcos);
+    rescate = h('p', { class: 'vivo-rescate', hidden: true });
+    raiz = h('section', { class: 'vivos', 'data-persistente': '', hidden: true, 'aria-label': 'Portales abiertos' }, encabezado, rescate, marcos);
     main.prepend(raiz);
   }
 
@@ -170,7 +171,20 @@
     Object.entries(paneles).forEach(([id, el]) => { el.hidden = !visibles.includes(id); });
     marcos.className = 'vivo-marcos' + (visibles.length > 1 ? ' vivo-marcos--2' : '');
     pintarEncabezado();
+    pintarRescate();
     if (MT.barra) MT.barra.actualizar();
+  }
+
+  /* Una línea fija bajo la barra de cada portal externo. Los avisos de "cargando" y de respaldo salen cuando el portal tarda o no responde,
+     pero un portal que contesta con un error (404, 5xx) o que carga en blanco podría no avisar nada: esta línea siempre deja la salida. */
+  function pintarRescate() {
+    const R = MT.mensajes.rescate; const url = (MT.config.portales || {})[activo];
+    rescate.hidden = activo === 'valeria' || !url;
+    if (rescate.hidden) return;
+    rescate.replaceChildren(...[R.pregunta, ' ',
+      h('a', { href: url, target: '_blank', rel: 'noopener' }, R.aparte), R.o,
+      h('button', { class: 'enlace-boton', type: 'button', onclick: () => destinoEnMiEspacio(activo).ir() }, R.miEspacio),
+      R.aprobado ? null : h('span', { class: 'vivo-rescate__borrador' }, ' ' + R.borrador)].filter(Boolean));
   }
 
   function mostrar(id) {

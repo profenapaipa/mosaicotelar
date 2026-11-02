@@ -43,6 +43,11 @@
 .vivo-estado--tarda { background: var(--ambar-suave); color: var(--ambar-texto); border-color: var(--ambar-texto); }
 .vivo-estado .logo-cargador { width: 30px; height: 30px; flex: none; }
 
+/* La línea fija de rescate bajo la barra del portal */
+.vivo-rescate { flex: none; margin: 0; font-size: .85rem; color: var(--tinta-suave); }
+.vivo-rescate .enlace-boton { font-size: inherit; }
+.vivo-rescate__borrador { color: var(--ambar-texto); font-weight: 700; }
+
 /* Respaldo cuando un portal no abre (sin internet o sin respuesta): ocupa el lugar del marco, con la misma altura, y explica qué hacer. */
 .vivo-respaldo { flex: 1; min-height: 0; overflow-y: auto; background: var(--papel); border: 1px solid var(--linea); border-left: 6px solid var(--e-vivo); border-radius: var(--radio); padding: 1.4rem 1.6rem; }
 .vivo-respaldo > * { max-width: 46rem; }

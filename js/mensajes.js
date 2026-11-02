@@ -52,6 +52,16 @@
       comoRol: (rol) => `Se abre como ${rol}; puedes cambiar de rol en la franja de arriba.`,
     },
 
+    // La línea fija bajo la barra de cada portal externo: la salida para cuando el portal no se ve y nada avisó (por ejemplo, un error 404).
+    rescate: {
+      aprobado: false,
+      borrador: '[por aprobar]',
+      pregunta: '¿No ves el portal?',
+      aparte: 'Ábrelo aparte',
+      o: ' o ',
+      miEspacio: 'usa Mi espacio',
+    },
+
     calmado: {
       etiqueta: 'Versión calmada',
       ayuda: 'Quita animaciones, transiciones y revelados, y suaviza el fondo.',
