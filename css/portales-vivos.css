@@ -43,6 +43,24 @@
 .vivo-estado--tarda { background: var(--ambar-suave); color: var(--ambar-texto); border-color: var(--ambar-texto); }
 .vivo-estado .logo-cargador { width: 30px; height: 30px; flex: none; }
 
+/* Respaldo cuando un portal no abre (sin internet o sin respuesta): ocupa el lugar del marco, con la misma altura, y explica qué hacer. */
+.vivo-respaldo { flex: 1; min-height: 0; overflow-y: auto; background: var(--papel); border: 1px solid var(--linea); border-left: 6px solid var(--e-vivo); border-radius: var(--radio); padding: 1.4rem 1.6rem; }
+.vivo-respaldo > * { max-width: 46rem; }
+.vivo-respaldo__cab { display: flex; align-items: center; gap: .8rem; margin-bottom: .6rem; }
+.vivo-respaldo__cab h2 { margin: 0; font-size: clamp(1.4rem, 2.6vw, 1.9rem); }
+.vivo-respaldo__marca { width: 44px; height: 44px; flex: none; color: var(--tinta); }
+.vivo-respaldo ul { margin: 0 0 .4rem; padding-left: 1.2rem; display: grid; gap: .3rem; }
+
+/* Aviso de conexión: dentro de la franja, a todo el ancho, con los colores de aviso (nunca rojo) */
+.aviso-conexion { flex: 1 1 100%; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .4rem 1rem; background: var(--ambar-suave); color: var(--ambar-texto); border-radius: var(--radio-chico); padding: .35rem .8rem; margin: .1rem 0 .25rem; font-weight: 700; }
+.aviso-conexion[hidden] { display: none; }
+.aviso-conexion__texto { flex: 1 1 24rem; }
+.aviso-conexion .acciones { margin: 0; flex-wrap: nowrap; }
+/* La franja pinta sus botones para fondo oscuro; sobre el aviso claro vuelven a la tinta. */
+.franja .aviso-conexion .btn { color: var(--ambar-texto); border-color: var(--ambar-texto); background: transparent; }
+.franja .aviso-conexion .btn:hover { background: var(--ambar-texto); color: var(--ambar-suave); }
+@media print { .aviso-conexion { display: none !important; } }
+
 @media (max-width: 860px) {
   .vivos { height: calc(100dvh - var(--cabeza) - 5.4rem); min-height: 420px; padding: .4rem .5rem .4rem; }
   .vivo-marcos--2 { grid-template-columns: 1fr; }
