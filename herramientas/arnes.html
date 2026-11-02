@@ -540,11 +540,21 @@ async function flujo() {
     lo.irA(3300); lo.el.remove(); delete doc().documentElement.dataset.tema;
     // Movimiento calmado: solo un desvanecido, sin desplazamientos ni giros.
     doc().documentElement.dataset.movimiento = 'calmado';
-    const lc = T.logo({ animar: true }); doc().body.append(lc.el);
+    const lc = T.logo({ animar: true }); doc().body.append(lc.el); await espera(80); // la animación arranca cuando el logo ya está montado
     const anims = lc.animaciones();
     afirmar('movimiento calmado: el logo solo se desvanece (sin desplazar ni girar)', anims.length === 1 && anims[0].effect.getKeyframes().every((k) => !('translate' in k) && !('rotate' in k) && !('transform' in k)), 'animaciones=' + anims.length);
     lc.el.remove(); delete doc().documentElement.dataset.movimiento;
   }
+    // En tiempo real (reloj real, no simulado): el logo se crea antes de montarse en la página, como hace la bienvenida, y a 1,2 s debe
+    // estar animándose o ya mostrar piezas. Antes quedaba en opacidad 0 hasta el relevo: la animación nacía en un documento sin reloj (V-44).
+    {
+      const T2 = ventana().MT.tejido; const lr = T2.logo({ animar: true });
+      await espera(150); doc().body.append(lr.el); await espera(1200);
+      const vivas = lr.animaciones().filter((a) => a.playState === 'running').length;
+      const opac = [...lr.el.querySelectorAll('.pieza')].map((n) => parseFloat(ventana().getComputedStyle(n).opacity));
+      afirmar('el logo recién montado se anima en tiempo real: a 1,2 s hay animación activa y piezas visibles', vivas > 0 && opac.length === 9 && opac.every((o) => o > 0.9), 'activas=' + vivas + ' opacidades=' + opac.join(','));
+      lr.irA(3300); lr.el.remove();
+    }
     // El diagrama de flujo de los portales no desborda en un celular (390 px menos los márgenes) y trae su lista para lectores de pantalla.
     {
       const caja = doc().createElement('div'); caja.style.cssText = 'width:358px;position:relative'; doc().body.append(caja);

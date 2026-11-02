@@ -233,25 +233,39 @@
     const hilos = g.hilos.map((t) => `<rect class="hilo hilo--${t.eje}" data-linea="${t.linea}" data-desde="${t.desde}" data-hasta="${t.hasta}" x="${t.x}" y="${t.y}" width="${t.w}" height="${t.h}" fill="${t.color}"/>`).join('');
     const unica = g.piezas.join('');
     const piezas = g.cuerpos.map((c) => `<g class="pieza" data-i="${c.i}" data-j="${c.j}" style="transform-origin:${c.cx}px ${c.cy}px"><path fill="currentColor" d="${c.cuerpo}"/>${c.lenguetas.map((d) => `<path fill="currentColor" d="${d}"/>`).join('')}</g>`).join('');
-    const el = svg(`<svg class="logo-tejido ${o.clase}" viewBox="0 0 64 64" role="img" aria-label="Mosaico Telar: nueve piezas unidas por cuatro hilos de colores que se cruzan" focusable="false">
+    // svg() arma el logo dentro de un <template>, que pertenece a un documento inerte con su propia línea de tiempo: una animación creada ahí
+    // nunca avanza y las piezas se quedaban en opacidad 0 hasta el relevo. Por eso se adopta en el documento real y la animación arranca
+    // cuando el logo ya está montado en la página.
+    const el = document.adoptNode(svg(`<svg class="logo-tejido ${o.clase}" viewBox="0 0 64 64" role="img" aria-label="Mosaico Telar: nueve piezas unidas por cuatro hilos de colores que se cruzan" focusable="false">
       <g class="lienzo" style="transform-origin:32px 32px">
       <g class="hilos">${tips}${hilos}</g>
       <path class="tela-unica" fill="currentColor" d="${unica}"/>
-      <g class="piezas">${piezas}</g></g></svg>`);
+      <g class="piezas">${piezas}</g></g></svg>`));
     if (o.mono) el.classList.add('mono');
     let animaciones = []; let temporizador = null;
     const limpiar = () => { clearTimeout(temporizador); animaciones.forEach((a) => a.cancel()); animaciones = []; el.classList.remove('tejiendo'); };
     // Con "reducir movimiento" no se anima al cargar; si la persona pide "Ver otra vez", se le muestra el desvanecido calmado.
-    const repetir = () => {
+    const arrancar = () => {
       limpiar(); if (!el.animate) return;
       const suave = reducido() || calmado();
       el.classList.add('tejiendo');
       animaciones = suave ? calma(el) : tejer(el, g, forma);
       temporizador = setTimeout(limpiar, suave ? 800 : DURACION);
     };
+    // Si el logo aún no está en la página (la vista lo crea y luego lo inserta), espera a que se monte; el tiempo cuenta desde ahí.
+    let esperaMontaje = 0;
+    const repetir = () => {
+      cancelAnimationFrame(esperaMontaje);
+      if (el.isConnected) return arrancar();
+      let intentos = 0;
+      const espera = () => { if (el.isConnected) arrancar(); else if (intentos++ < 180) esperaMontaje = requestAnimationFrame(espera); };
+      esperaMontaje = requestAnimationFrame(espera);
+    };
     if (o.animar && !reducido()) repetir();
     // Detiene la animación en un instante (ms) para revisarla cuadro a cuadro: las capturas y las pruebas la usan.
-    const irA = (ms) => { clearTimeout(temporizador); animaciones.forEach((a) => { a.pause(); a.currentTime = ms; }); };
+    const irA = (ms) => {
+      cancelAnimationFrame(esperaMontaje); if (!animaciones.length && el.isConnected) arrancar();
+      clearTimeout(temporizador); animaciones.forEach((a) => { a.pause(); a.currentTime = ms; }); };
     // Pasar de color a blanco y negro (y volver) mostrando las dos versiones de la marca.
     const alternar = () => { el.classList.toggle('mono'); return el.classList.contains('mono'); };
     return { el, repetir, alternar, irA, animaciones: () => animaciones, esMono: () => el.classList.contains('mono') };
