@@ -388,11 +388,12 @@ async function flujo() {
   // ---- identidad: el logo de la pestaña, el botón de inicio y las cuatro versiones coinciden ----
   {
     const fav = await (await fetch('../assets/favicon.svg', { cache: 'no-store' })).text();
-    afirmar('el ícono de la pestaña es de piezas negras con los cuatro hilos de colores en un medallón redondo, sin baldosa cuadrada', /<circle[^>]*fill="#1A1714"[^>]*stroke="#FAF7F2"/.test(fav) && ['#1B7F56', '#2B4FA3', '#E8A13C', '#E0527E'].every((c) => fav.includes(c)) && !/<rect width="64" height="64"/.test(fav) && !/8F887C/i.test(fav));
+    afirmar('el ícono de la pestaña es solo el logo circular: piezas negras e hilos de colores, sin contorno ni fondo', ['#1B7F56', '#2B4FA3', '#E8A13C', '#E0527E'].every((c) => fav.includes(c)) && /fill="#1A1714"/.test(fav) && !/stroke=/.test(fav) && !/<rect width="64" height="64"/.test(fav) && !/FAF7F2|FFFFFF/i.test(fav));
     await ir('#/'); await espera(200);
     const rl = ventana().document.querySelector('#riel-logo');
     const cs = ventana().getComputedStyle(rl);
-    { const v = cs.borderRadius + '|' + cs.backgroundColor + '|' + ventana().getComputedStyle(rl.querySelector('svg')).color; afirmar('el botón de inicio es un medallón redondo (sin baldosa cuadrada) con piezas negras', /^(50%|26px)\|rgb\(250, 247, 242\)\|rgb\(26, 23, 20\)$/.test(v), v); }
+    { const v = cs.borderRadius + '|' + cs.backgroundColor + '|' + cs.borderTopColor + '|' + cs.borderTopWidth; afirmar('el botón de inicio es un círculo con contorno blanco y fondo oscuro', /^(50%|26px)\|rgb\(26, 23, 20\)\|rgb\(255, 255, 255\)\|3px$/.test(v), v); }
+    { const r = rl.getBoundingClientRect(); const s = rl.querySelector('svg').getBoundingClientRect(); const d = Math.hypot((s.left + s.width / 2) - (r.left + r.width / 2), (s.top + s.height / 2) - (r.top + r.height / 2)); afirmar('el logo del botón de inicio está centrado en su círculo', d < 0.6, 'desvío=' + d.toFixed(2) + ' px'); }
     afirmar('el botón de inicio muestra los hilos de colores', rl.querySelectorAll('.hilos rect').length > 0);
     afirmar('el riel nombra la sección Identidad, no Marca', [...ventana().document.querySelectorAll('.riel a')].some((x) => x.textContent.trim() === 'Identidad') && ![...ventana().document.querySelectorAll('.riel a')].some((x) => x.textContent.trim() === 'Marca'));
     await ir('#/identidad'); await espera(250);
@@ -400,7 +401,7 @@ async function flujo() {
     const fondo = (m) => ventana().getComputedStyle(m).backgroundColor;
     afirmar('Identidad muestra el logo a color y en blanco y negro, cada uno sobre blanco y sobre negro', muestras.length >= 4 && muestras.slice(0, 4).map((m) => fondo(m) + (m.querySelector('.logo-mono') ? ' bn' : ' color')).join('|') === 'rgb(255, 255, 255) color|rgb(26, 23, 20) color|rgb(255, 255, 255) bn|rgb(26, 23, 20) bn');
     const bn = [...ventana().document.querySelectorAll('.logo-mono .logo-tejido .hilos')];
-    afirmar('en las versiones en blanco y negro los hilos no se ven y en las de color sí', bn.length === 2 && bn.every((r) => ventana().getComputedStyle(r).opacity === '0') && [...ventana().document.querySelectorAll('.muestra-logo:not(:has(.logo-mono)) .logo-tejido .hilos')].every((r) => ventana().getComputedStyle(r).opacity === '1'));
+    afirmar('en las versiones en blanco y negro los hilos no se ven y en las de color sí', bn.length >= 2 && bn.every((r) => ventana().getComputedStyle(r).opacity === '0') && [...ventana().document.querySelectorAll('.muestra-logo:not(:has(.logo-mono)) .logo-tejido .hilos')].every((r) => ventana().getComputedStyle(r).opacity === '1'));
     afirmar('sobre fondo negro los hilos usan tonos más luminosos que sobre blanco', (() => { const f = (m) => ventana().getComputedStyle(m.querySelector('.hilo')).fill; const a = [...ventana().document.querySelectorAll('.muestra-logo')]; return f(a[1]) !== f(a[0]); })());
     const enlaces = [...ventana().document.querySelectorAll('a[download]')].map((x) => x.getAttribute('href'));
     afirmar('las cuatro versiones se pueden descargar y existen', enlaces.length === 4 && (await Promise.all(enlaces.map(async (u) => (await fetch('../' + u, { method: 'HEAD' })).ok))).every(Boolean));

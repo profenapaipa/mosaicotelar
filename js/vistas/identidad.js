@@ -27,6 +27,13 @@
     { nombre: 'Blanco y negro, sobre fondo negro', clase: 'muestra-logo--oscuro', mono: true, archivo: 'logo-bn-fondo-negro.svg', uso: 'Para fondos oscuros sin color.' },
   ];
 
+  const FONDOS = [
+    { id: 'kinesis', nombre: 'Verde Kinesis', hex: '#1B7F56', tinta: '#FFFFFF' },
+    { id: 'valeria', nombre: 'Azul ValerIA', hex: '#2B4FA3', tinta: '#FFFFFF' },
+    { id: 'wisfox', nombre: 'Ámbar Wisfox', hex: '#E8A13C', tinta: '#1A1714' },
+    { id: 'mosaico', nombre: 'Rosa Mosaico', hex: '#E0527E', tinta: '#1A1714' },
+  ];
+
   const seccion = (id, titulo, ...hijos) => h('section', { class: 'manual-seccion', id, 'aria-labelledby': 'm-' + id }, h('h2', { id: 'm-' + id }, titulo), ...hijos);
 
   MT.router.registrar({
@@ -50,11 +57,30 @@
 
       c.append(seccion('logo', 'Logo',
         h('p', null, 'Una trama de telar vista de cerca: ', h('strong', null, 'nueve teselas negras cruzadas por hilos de cuatro colores'), ', que pasan por encima y por debajo. El mosaico son las piezas; el telar, lo que las une. Cada hilo es el color de uno de los portales: verde (Kinesis), azul (ValerIA), ámbar (Wisfox) y rosa (la plataforma que los une).'),
-        h('div', { class: 'rejilla rejilla--2' }, VERSIONES.map((v) => h('div', { class: 'tarjeta' },
+        // El logo grande, animado, sobre negro: es lo primero que se ve de la identidad.
+        (() => {
+          const grande = MT.tejido.logo({ animar: false, clase: 'logo-heroe__svg' });
+          return h('div', { class: 'logo-heroe' },
+            h('div', { class: 'logo-heroe__logo' }, grande.el),
+            h('div', { class: 'logo-heroe__texto' }, h('p', { class: 'etiqueta' }, 'Mosaico Telar'), h('p', { class: 'manual-grande' }, 'Tejemos caminos para aprender.'),
+              h('p', { class: 'suave' }, 'Las fichas llegan sueltas, se unen y los hilos las tejen: así se arma el mosaico.'),
+              h('button', { class: 'btn btn--chico', type: 'button', onclick: () => grande.repetir() }, 'Ver otra vez')));
+        })(),
+        h('h3', { class: 'manual-subtitulo' }, 'Las cuatro versiones'),
+        h('div', { class: 'logo-versiones' }, VERSIONES.map((v) => h('div', { class: 'logo-version' },
           h('div', { class: 'muestra-logo ' + v.clase }, lockup(v.mono ? 'logo-mono' : '')),
-          h('h3', null, v.nombre), h('p', { class: 'suave' }, v.uso),
-          h('p', null, h('a', { href: 'assets/' + v.archivo, download: v.archivo }, 'Descargar (SVG)'))))),
-        h('p', { class: 'suave', style: 'margin-top:.6rem' }, 'La base es la versión a color: piezas negras con los hilos de colores. De ella salen las otras tres, y también el ícono de la pestaña y el botón de inicio. En el ícono de la pestaña y en el botón de inicio el logo va en un medallón redondo de papel, centrado, para que se lea con cualquier tema del navegador.'),
+          h('div', { class: 'logo-version__pie' }, h('h4', null, v.nombre), h('p', { class: 'suave' }, v.uso),
+            h('a', { class: 'btn btn--chico btn--suave', href: 'assets/' + v.archivo, download: v.archivo }, 'Descargar SVG'))))),
+        h('h3', { class: 'manual-subtitulo' }, 'Sobre los colores de la marca'),
+        h('div', { class: 'logo-colores' }, FONDOS.map((f) => h('div', { class: 'logo-color logo-color--' + f.id, style: `background:${f.hex}; color:${f.tinta}` },
+          lockup('logo-mono'), h('span', { class: 'logo-color__rotulo' }, f.nombre)))),
+        h('h3', { class: 'manual-subtitulo' }, 'Dónde se ve'),
+        h('div', { class: 'logo-usos' },
+          h('div', { class: 'logo-uso' }, h('div', { class: 'uso-pestana' }, h('img', { src: 'assets/favicon.svg', alt: '', width: 16, height: 16 }), h('span', null, 'Mosaico Telar')), h('p', { class: 'suave' }, 'Pestaña del navegador: solo el logo circular, sin contorno.')),
+          h('div', { class: 'logo-uso' }, h('div', { class: 'uso-riel' }, h('span', { class: 'uso-riel__boton' }, h('img', { src: 'assets/favicon.svg', alt: '' }))), h('p', { class: 'suave' }, 'Botón de inicio: el logo dentro de un círculo con contorno blanco, para que resalte.')),
+          h('div', { class: 'logo-uso' }, h('div', { class: 'uso-tamanos' }, [16, 32, 64].map((n) => h('img', { src: 'assets/favicon.svg', alt: '', width: n, height: n }))), h('p', { class: 'suave' }, 'Tamaños de uso: 16, 32 y 64 px.')),
+          h('div', { class: 'logo-uso' }, h('div', { class: 'uso-sticker' }, h('img', { src: 'assets/favicon.svg', alt: '' })), h('p', { class: 'suave' }, 'Sticker o pegatina: el círculo se corta limpio.'))),
+        h('p', { class: 'suave', style: 'margin-top:.6rem' }, 'La base es la versión a color: piezas negras con los hilos de colores. De ella salen las otras tres. En la pestaña del navegador va solo el logo circular, sin contorno; en el botón de inicio va dentro de un círculo con contorno blanco, centrado, para que resalte sobre el riel oscuro.'),
         h('div', { class: 'tarjeta', style: 'margin-top:1rem' }, h('h3', null, 'Por qué se ve como se ve (leyes de la Gestalt)'),
           h('ul', null,
             h('li', null, h('strong', null, 'Cierre: '), 'el círculo completo se lee aunque los hilos lo corten en nueve piezas.'),
