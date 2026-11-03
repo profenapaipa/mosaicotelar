@@ -252,7 +252,7 @@
 
   /* El logo. opciones: { animar: true, mono: false, clase: '', forma: 'curva' (la elegida) | 'escalon', contorno: 'cuadrado' | 'circulo', flojo: false }. 'circulo' recorta el mismo logo con un círculo; flojo: true lo deja con las fichas algo separadas y los hilos curvos (implica círculo). Devuelve { el, repetir, alternar, esMono, irA, animaciones }. */
   function logo(op) {
-    const o = Object.assign({ animar: true, mono: false, clase: '', forma: 'curva', contorno: 'cuadrado', flojo: false }, op);
+    const o = Object.assign({ animar: true, mono: false, clase: '', forma: 'curva', contorno: 'circulo', flojo: false }, op);
     const circular = o.contorno === 'circulo' || o.flojo; const flojo = !!o.flojo; const idr = 'disco-' + (++cuenta); const idg = idr + 'g';
     const forma = FORMAS[o.forma] || FORMAS.curva;
     const g = geometria(forma);

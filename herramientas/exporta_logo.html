@@ -1,0 +1,18 @@
+<!doctype html><meta charset="utf-8"><title>Exporta el logo</title>
+<!-- Herramienta: dibuja el logo circular de js/tejido.js y escribe su SVG final (hilos y forma única), para generar assets/logo*.svg.
+     Se abre con la dirección ?fondo=blanco|negro&bn=0|1 y deja el resultado en el elemento de salida. -->
+<script src="../js/ui.js"></script><script src="../js/tejido.js"></script>
+<pre id="salida"></pre>
+<script>
+const q = new URLSearchParams(location.search); const negro = q.get('fondo') === 'negro'; const bn = q.get('bn') === '1';
+const C = negro ? { k: '#1FA36B', v: '#4A6FE0', w: '#F2A33A', m: '#F0558A' } : { k: '#1B7F56', v: '#2B4FA3', w: '#E8A13C', m: '#E0527E' };
+const tinta = negro ? '#FFFFFF' : '#1A1714';
+const el = window.MT.tejido.logo({ animar: false, contorno: 'circulo' }).el;
+const defs = el.querySelector('defs').outerHTML;
+let hilos = el.querySelector('.hilos').cloneNode(true); hilos.querySelectorAll('.punta').forEach((n) => n.remove());
+let tela = el.querySelector('.tela-unica').cloneNode(true);
+let h = hilos.outerHTML.replace(/var\(--hilo-kinesis\)/g, C.k).replace(/var\(--hilo-valeria\)/g, C.v).replace(/var\(--hilo-wisfox\)/g, C.w).replace(/var\(--hilo-mosaico\)/g, C.m);
+tela.setAttribute('fill', tinta); tela.removeAttribute('class');
+const fondo = q.get('fondo') === 'transparente' ? '' : `<rect width="64" height="64" fill="${negro ? '#1A1714' : '#FFFFFF'}"/>`;
+document.getElementById('salida').textContent = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Mosaico Telar">${fondo}${defs}${bn ? '' : h}${tela.outerHTML}</svg>`;
+</script>

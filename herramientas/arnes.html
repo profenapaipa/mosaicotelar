@@ -399,7 +399,9 @@ async function flujo() {
     const muestras = [...ventana().document.querySelectorAll('.muestra-logo')];
     const fondo = (m) => ventana().getComputedStyle(m).backgroundColor;
     afirmar('Identidad muestra el logo a color y en blanco y negro, cada uno sobre blanco y sobre negro', muestras.length >= 4 && muestras.slice(0, 4).map((m) => fondo(m) + (m.querySelector('.logo-mono') ? ' bn' : ' color')).join('|') === 'rgb(255, 255, 255) color|rgb(26, 23, 20) color|rgb(255, 255, 255) bn|rgb(26, 23, 20) bn');
-    afirmar('en las versiones en blanco y negro los hilos no se ven', [...ventana().document.querySelectorAll('.logo-mono .logo-hilo')].every((r) => ventana().getComputedStyle(r).display === 'none'));
+    const bn = [...ventana().document.querySelectorAll('.logo-mono .logo-tejido .hilos')];
+    afirmar('en las versiones en blanco y negro los hilos no se ven y en las de color sí', bn.length === 2 && bn.every((r) => ventana().getComputedStyle(r).opacity === '0') && [...ventana().document.querySelectorAll('.muestra-logo:not(:has(.logo-mono)) .logo-tejido .hilos')].every((r) => ventana().getComputedStyle(r).opacity === '1'));
+    afirmar('sobre fondo negro los hilos usan tonos más luminosos que sobre blanco', (() => { const f = (m) => ventana().getComputedStyle(m.querySelector('.hilo')).fill; const a = [...ventana().document.querySelectorAll('.muestra-logo')]; return f(a[1]) !== f(a[0]); })());
     const enlaces = [...ventana().document.querySelectorAll('a[download]')].map((x) => x.getAttribute('href'));
     afirmar('las cuatro versiones se pueden descargar y existen', enlaces.length === 4 && (await Promise.all(enlaces.map(async (u) => (await fetch('../' + u, { method: 'HEAD' })).ok))).every(Boolean));
   }

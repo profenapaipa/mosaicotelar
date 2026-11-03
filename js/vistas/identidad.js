@@ -36,7 +36,7 @@
         descripcion: 'Cómo se ve y cómo habla la plataforma. Todo lo que ves aquí está hecho con los mismos componentes que usa el resto del sitio.' });
 
       c.append(h('nav', { class: 'toc', 'aria-label': 'Contenido de la identidad' }, h('ul', null,
-        [['proposito', 'Propósito'], ['logo', 'Logo'], ['propuestas', 'Propuestas en revisión'], ['color', 'Color'], ['tipografia', 'Tipografía'], ['formas', 'Formas e íconos'], ['recursos', 'Recursos'], ['componentes', 'Componentes'], ['voz', 'Voz']]
+        [['proposito', 'Propósito'], ['logo', 'Logo'], ['color', 'Color'], ['tipografia', 'Tipografía'], ['formas', 'Formas e íconos'], ['recursos', 'Recursos'], ['componentes', 'Componentes'], ['voz', 'Voz']]
           .map(([id, t]) => h('li', null, h('a', { href: '#/identidad', onclick: (e) => { e.preventDefault(); const el = document.getElementById(id); if (el) MT.movimiento.desplazar(el); } }, t))))));
 
       c.append(seccion('proposito', 'Propósito',
@@ -57,7 +57,7 @@
         h('p', { class: 'suave', style: 'margin-top:.6rem' }, 'La base es la versión a color: piezas negras con los hilos de colores. De ella salen las otras tres, y también el ícono de la pestaña y el botón de inicio. En el ícono de la pestaña y en el botón de inicio el logo va en un medallón redondo de papel, centrado, para que se lea con cualquier tema del navegador.'),
         h('div', { class: 'tarjeta', style: 'margin-top:1rem' }, h('h3', null, 'Por qué se ve como se ve (leyes de la Gestalt)'),
           h('ul', null,
-            h('li', null, h('strong', null, 'Cierre: '), 'el cuadrado completo se lee aunque los hilos lo corten en nueve piezas.'),
+            h('li', null, h('strong', null, 'Cierre: '), 'el círculo completo se lee aunque los hilos lo corten en nueve piezas.'),
             h('li', null, h('strong', null, 'Semejanza: '), 'todos los hilos tienen el mismo grosor y todas las piezas la misma tinta; por eso se lee como una sola trama.'),
             h('li', null, h('strong', null, 'Continuidad: '), 'cada hilo sigue recto de lado a lado y el ojo lo sigue aunque se oculte bajo otro.'),
             h('li', null, h('strong', null, 'Figura y fondo: '), 'los hilos son el espacio vacío: el logo se dibuja con lo que no está, y por eso funciona en cualquier fondo.'),
@@ -68,24 +68,6 @@
             h('li', null, 'Espacio libre: el ancho de un hilo, por todos los lados.'), h('li', null, 'Tamaño mínimo: 16 px el símbolo; 110 px el logo completo.'), h('li', null, 'Los hilos llevan el color de su portal; en blanco y negro, toman el color del fondo.'))),
           h('div', { class: 'tarjeta' }, h('h3', null, 'Cómo no'), h('ul', null,
             h('li', null, 'No estirarlo ni girarlo.'), h('li', null, 'No cambiar los colores de las piezas ni de los hilos.'), h('li', null, 'No ponerle sombras, degradados ni contornos.'))))));
-
-      // Panel temporal: las dos propuestas de logo circular, animadas, en claro y oscuro. Se quita cuando el dueño elija.
-      const PROPUESTAS = [
-        { titulo: 'Propuesta 1: circular y compacta', texto: 'El mismo logo, con el contorno redondo. Las fichas arrancan abiertas, se cierran uniéndose, los hilos las tejen y queda unido y compacto.', opciones: { contorno: 'circulo' } },
-        { titulo: 'Propuesta 2: circular y suelta', texto: 'Parecida, pero las fichas no terminan tan unidas: los hilos son curvos, como si se tejiera sin apretar, y las fichas quedan algo separadas.', opciones: { flojo: true } },
-      ];
-      const propuesta = (pr) => {
-        const logos = ['claro', 'oscuro'].map((t) => ({ t, l: MT.tejido.logo(Object.assign({ animar: false, clase: 'logo-propuesta' }, pr.opciones)) }));
-        const ver = () => logos.forEach((x) => x.l.repetir());
-        const caja = h('div', { class: 'rejilla rejilla--2' }, logos.map((x) => h('div', { class: 'muestra-logo muestra-logo--' + x.t }, x.l.el)));
-        // La animación arranca cuando la tarjeta llega a la vista, para que se alcance a ver desde el principio.
-        if ('IntersectionObserver' in window) { const io = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) { io.disconnect(); ver(); } }, { threshold: 0.6 }); io.observe(caja); } else ver();
-        return h('div', { class: 'tarjeta' }, h('h3', null, pr.titulo), h('p', { class: 'suave' }, pr.texto), caja,
-          h('p', null, h('button', { class: 'btn btn--chico btn--suave', type: 'button', onclick: ver }, 'Ver otra vez')));
-      };
-      c.append(seccion('propuestas', 'Propuestas en revisión',
-        h('p', { class: 'aviso' }, 'Temporal: dos formas circulares del mismo logo, para que se elija una. Parten de la misma geometría y la misma secuencia del logo actual; solo cambia el contorno.'),
-        h('div', { class: 'rejilla rejilla--2' }, PROPUESTAS.map(propuesta))));
 
       c.append(seccion('color', 'Color',
         h('p', null, h('strong', null, 'Un color principal, dos funcionales y tres neutros.'), ' El principal es el verde bosque, y se eligió por continuidad: los dos proyectos ya eran verdes, así que la plataforma no les cambia el tono, lo comparte. Los funcionales también salen de las aplicaciones.'),

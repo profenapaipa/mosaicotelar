@@ -193,12 +193,16 @@
 .manual-grande { font: 700 clamp(1.5rem, 3vw, 2rem)/1.2 var(--fuente-titulo); margin: 0; }
 .logo-lockup { display: inline-flex; align-items: center; gap: .6rem; color: inherit; }
 .logo-simbolo { width: 40px; height: 40px; flex: none; }
+/* El símbolo estático es el logo circular de js/tejido.js: su regla general (ancho completo, color de tinta) no debe ganarle al tamaño ni al color de cada uso. */
+svg.logo-tejido.logo-simbolo { width: 40px; height: 40px; color: inherit; }
+svg.logo-tejido.plataforma__marca { width: 26px; height: 26px; }
+svg.logo-tejido.simbolo-grande { width: 92px; height: 92px; }
 .logo-nombre { font: 700 1.5rem/1 var(--fuente-titulo); letter-spacing: -.015em; }
 .muestra-logo { display: grid; place-items: center; min-height: 150px; border-radius: var(--radio); border: 1px solid var(--linea); }
-.logo-mono .logo-hilo { display: none; }
+.logo-mono .logo-tejido .hilos { opacity: 0; }   /* la versión en blanco y negro: los hilos se ven como el fondo */
 /* Las cuatro versiones de la identidad: a color y en blanco y negro, cada una sobre blanco y sobre negro. Los hilos usan su tono claro u oscuro según el fondo. */
 .muestra-logo--claro { background: #FFFFFF; color: #1A1714; --logo-fondo: #FFFFFF; --hilo-kinesis: #1B7F56; --hilo-valeria: #2B4FA3; --hilo-wisfox: #E8A13C; --hilo-mosaico: #E0527E; }
-.muestra-logo--oscuro { background: #1A1714; color: #FFFFFF; --logo-fondo: #1A1714; --hilo-kinesis: #5CC08A; --hilo-valeria: #6F8FE8; --hilo-wisfox: #E8A13C; --hilo-mosaico: #E0527E; border-color: #1A1714; }
+.muestra-logo--oscuro { background: #1A1714; color: #FFFFFF; --logo-fondo: #1A1714; --hilo-kinesis: #1FA36B; --hilo-valeria: #4A6FE0; --hilo-wisfox: #F2A33A; --hilo-mosaico: #F0558A; border-color: #1A1714; }
 .muestra-logo--verde { background: #1B7F56; color: #FFFFFF; --logo-fondo: #1B7F56; border-color: transparent; }
 .muestra-logo small { display: block; margin-top: .5rem; font: 700 .8rem/1.2 var(--fuente); }
 .muestra-simbolo { display: grid; place-items: center; min-height: 110px; color: var(--tinta); }
