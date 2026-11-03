@@ -582,6 +582,23 @@ async function flujo() {
       afirmar('el diagrama de flujo trae texto alternativo y una lista ordenada para lectores de pantalla', !!fig.querySelector('svg title') && fig.querySelectorAll('ol.solo-lectores li').length >= 4 && fig.classList.contains('flujo-portales'));
       caja.remove();
     }
+    // Las dos propuestas circulares: el mismo logo recortado por un círculo (compacta) y con fichas algo separadas e hilos curvos (suelta).
+    {
+      const T3 = ventana().MT.tejido; const caja = doc().createElement('div'); caja.style.cssText = 'position:fixed;left:0;top:0;width:640px;background:#fff;z-index:99999'; doc().body.append(caja);
+      const bajo = (el, ux, uy) => { const r = el.getBoundingClientRect(); const e = doc().elementFromPoint(r.left + ux / 64 * r.width, r.top + uy / 64 * r.height); return e && el.contains(e) && e !== el; };
+      for (const [nombre, op] of [['compacta', { contorno: 'circulo' }], ['suelta', { flojo: true }]]) {
+        const lg = T3.logo(Object.assign({ animar: false }, op)); lg.el.style.width = '300px'; caja.append(lg.el); await espera(30);
+        afirmar('la propuesta circular ' + nombre + ' conserva las nueve fichas y los cuatro hilos', lg.el.querySelectorAll('.pieza').length === 9 && new Set([...lg.el.querySelectorAll('.hilo')].map((n) => n.dataset.linea)).size === 4);
+        afirmar('la propuesta circular ' + nombre + ' es redonda: las esquinas del cuadro quedan vacías y el centro lleno', !bajo(lg.el, 3, 3) && !bajo(lg.el, 61, 3) && !bajo(lg.el, 3, 61) && !bajo(lg.el, 61, 61) && bajo(lg.el, 32, 32));
+        lg.el.remove();
+      }
+      const ls = T3.logo({ flojo: true, animar: false }); caja.append(ls.el);
+      afirmar('la propuesta suelta usa hilos curvos y no vuelve a la forma única', ls.el.querySelectorAll('path.hilo').length > 0 && ventana().getComputedStyle(ls.el.querySelector('.tela-unica')).display === 'none'); ls.el.remove();
+      const lp = T3.logo({ flojo: true, animar: true }); caja.append(lp.el); await espera(1300);
+      const vivas = lp.animaciones().filter((a) => a.playState === 'running').length;
+      afirmar('la propuesta suelta se anima al montarse', vivas > 0, 'activas=' + vivas);
+      lp.irA(3300); caja.remove();
+    }
   // ---- fin logo (agente de marca) ----
   const csp = doc().querySelector('meta[http-equiv="Content-Security-Policy"]');
   afirmar('la página trae una política de seguridad de contenido restrictiva', !!csp && /script-src 'self'/.test(csp.content) && /object-src 'none'/.test(csp.content) && /frame-src https:\/\/profenapaipa\.github\.io/.test(csp.content) && !/unsafe-eval/.test(csp.content));

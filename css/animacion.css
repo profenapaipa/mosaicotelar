@@ -8,6 +8,8 @@
 .logo-tejido { display: block; width: 100%; height: auto; color: var(--tinta); overflow: visible; shape-rendering: geometricPrecision; }
 .logo-tejido .piezas, .logo-tejido .punta { display: none; }
 .logo-tejido.tejiendo .piezas, .logo-tejido.tejiendo .punta { display: inline; }
+.logo-tejido.suelto .piezas { display: inline; }   /* la versión suelta no vuelve a la forma única: las fichas se quedan separadas */
+.logo-tejido.suelto .tela-unica { display: none; }
 .logo-tejido .hilos { opacity: 1; transition: opacity .7s ease; }
 .logo-tejido.mono .hilos { opacity: 0; }
 /* Los hilos de los tramos escalan desde su extremo; las piezas giran sobre su propio centro (el origen va en cada pieza, en unidades del dibujo). */

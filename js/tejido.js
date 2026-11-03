@@ -37,6 +37,22 @@
     escalon: { prof: 4, alto: 3, solape: 0.6, radio: 2, separa: 5.5, escala: 0.9 },
     curva: { prof: 5, alto: 6, solape: 0.6, radio: 4, separa: 7.5, escala: 0.84 },
   };
+  // Contorno circular: el mismo logo, recortado por un círculo (no se inventa otra figura). El radio toca los bordes del cuadrado de 2 a 62.
+  // En la versión "suelta" las fichas terminan algo separadas (SEP por paso desde el centro) y los hilos, flojos, se curvan (AMP).
+  const RADIO = 30.5; const RADIO_SUELTO = 32.8; const SEP = 2.2; const AMP = 1.7;
+  const DESPLAZA = [[2, -1], [18, -1], [24, 0], [40, 0], [46, 1], [62, 1]];   // cuánto se corre cada franja de la rejilla (en pasos de SEP)
+  // Una coordenada de la rejilla compacta, pasada a la rejilla con las fichas separadas (sirve a lo largo de un hilo y de través).
+  function suelta(s) {
+    if (s <= DESPLAZA[0][0]) return s + DESPLAZA[0][1] * SEP;
+    for (let k = 1; k < DESPLAZA.length; k++) {
+      const [a, da] = DESPLAZA[k - 1]; const [b, db] = DESPLAZA[k];
+      if (s <= b) return s + (da + (db - da) * (s - a) / (b - a)) * SEP;
+    }
+    return s + DESPLAZA[DESPLAZA.length - 1][1] * SEP;
+  }
+  // Cuánto se curva un tramo del hilo: cero en los extremos (donde se esconde bajo un puente) y AMP en medio.
+  const comba = (t, s) => (t.signo || 1) * AMP * Math.sin(Math.PI * Math.min(1, Math.max(0, (s - t.desde) / (t.hasta - t.desde))));
+  let cuenta = 0;
   const f = (n) => +n.toFixed(2);
   const igual = (a, b) => Math.abs(a - b) < 0.01;
 
@@ -182,7 +198,7 @@
   const SUAVE = 'cubic-bezier(.45, 0, .2, 1)';
   const suave3 = (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
   const INICIOS = [1050, 1250, 1450, 1650]; const TRAVESIA = 1350; const MUESTRAS = 30;
-  function tejer(el, g, forma) {
+  function tejer(el, g, forma, flojo) {
     const A = [];
     // Lo que termina en el estado base (piezas, lienzo, tramos) usa fill "backwards": al acabar, la animación deja de aplicarse. Con "both"
     // el navegador sigue tratando cada pieza como una capa propia y compone sus bordes por separado, lo que dejaba líneas tenues entre
@@ -196,7 +212,8 @@
       const retraso = 60 * ((i === 1 ? 0 : 1) + (j === 1 ? 0 : 1));
       const giro = ((i + j) % 2 ? 1 : -1) * 5;
       an(n, [{ opacity: 0 }, { opacity: 1 }], { duration: 380, delay: retraso, easing: 'ease-out' });
-      an(n, [{ translate: `${(i - 1) * forma.separa}px ${(j - 1) * forma.separa}px` }, { translate: '0px 0px' }], { duration: 820, delay: retraso + 120, easing: SUAVE });
+      const fin = flojo ? `${(i - 1) * SEP}px ${(j - 1) * SEP}px` : '0px 0px';
+      an(n, [{ translate: `${(i - 1) * forma.separa}px ${(j - 1) * forma.separa}px` }, { translate: fin }], { duration: 820, delay: retraso + 120, easing: SUAVE });
       an(n, [{ rotate: `${giro}deg` }, { rotate: '0deg' }], { duration: 560, delay: retraso + 120, easing: 'cubic-bezier(.3, 0, .2, 1)' });
     });
     // 2. Cada hilo avanza de un borde al otro con su aguja. La punta y los tramos usan la misma curva de avance, por eso se ve continuo.
@@ -204,19 +221,28 @@
       const largo = 60; const radio = HILO / 2 + EXTRA; const muestras = Array.from({ length: MUESTRAS + 1 }, (_, n) => 2 + largo * suave3(n / MUESTRAS));
       el.querySelectorAll(`.hilo[data-linea="${k}"]`).forEach((r) => {
         const a = +r.dataset.desde; const b = +r.dataset.hasta; const escala = l.eje === 'v' ? 'scaleY' : 'scaleX';
-        an(r, muestras.map((s) => ({ transform: `${escala}(${f(Math.min(1, Math.max(0, (s - a) / (b - a))))})` })), { duration: TRAVESIA, delay: INICIOS[k] });
+        const avance = (s) => f(Math.min(1, Math.max(0, (s - a) / (b - a))));
+        // Un tramo curvo es un trazo con pathLength 1: se dibuja moviendo el desfase del trazo en vez de escalarlo.
+        if (flojo) an(r, muestras.map((s) => ({ strokeDashoffset: 1 - avance(s) })), { duration: TRAVESIA, delay: INICIOS[k] });
+        else an(r, muestras.map((s) => ({ transform: `${escala}(${avance(s)})` })), { duration: TRAVESIA, delay: INICIOS[k] });
       });
       const punta = el.querySelector(`.punta[data-linea="${k}"]`);
       an(punta, muestras.map((s, n) => {
         // La aguja solo se ve mientras cabe dentro del logo (su radio es lo que sobresale del hilo) y mientras el hilo va a la vista.
         // Antes de llegar a un puente la punta se apaga (su borde redondo dejaría cuñas de fondo contra el negro) y el hilo sigue plano hasta él.
         const visible = s >= 2 + radio && l.tramos.some(([a, b]) => s >= a && s <= (b === 62 ? 62 : b - 2) - radio);
-        return { transform: l.eje === 'v' ? `translate(${l.centro}px, ${f(s)}px)` : `translate(${f(s)}px, ${l.centro}px)`, opacity: visible ? 1 : 0 };
+        // En la versión suelta la aguja sigue la curva del tramo y la rejilla corrida de las fichas.
+        const t = flojo && g.hilos.find((x) => x.linea === k && s >= x.desde && s <= x.hasta);
+        const along = flojo ? suelta(s) : s; const across = flojo ? suelta(l.centro) + (t ? comba(t, s) : 0) : l.centro;
+        return { transform: l.eje === 'v' ? `translate(${f(across)}px, ${f(along)}px)` : `translate(${f(along)}px, ${f(across)}px)`, opacity: visible ? 1 : 0 };
       }), { duration: TRAVESIA, delay: INICIOS[k], fill: 'both' });
     });
     // 3. El relevo a la forma única: las dos formas son idénticas, una se enciende y la otra se apaga.
-    an(el.querySelector('.tela-unica'), [{ opacity: 0 }, { opacity: 1 }], { duration: 1, delay: RELEVO, fill: 'both' });
-    an(el.querySelector('.piezas'), [{ opacity: 1 }, { opacity: 0 }], { duration: 1, delay: RELEVO + 10, fill: 'both' });
+    // En la versión suelta no hay forma única: las fichas se quedan separadas, así que no hay relevo.
+    if (!flojo) {
+      an(el.querySelector('.tela-unica'), [{ opacity: 0 }, { opacity: 1 }], { duration: 1, delay: RELEVO, fill: 'both' });
+      an(el.querySelector('.piezas'), [{ opacity: 1 }, { opacity: 0 }], { duration: 1, delay: RELEVO + 10, fill: 'both' });
+    }
     return A;
   }
   // La versión calmada: sin desplazamientos ni giros, solo aparece suavemente.
@@ -224,23 +250,38 @@
     return [el.querySelector('.lienzo').animate([{ opacity: 0 }, { opacity: 1 }], { duration: 700, easing: 'ease-out', fill: 'both' })];
   }
 
-  /* El logo. opciones: { animar: true, mono: false, clase: '', forma: 'curva' (la elegida) | 'escalon' }. Devuelve { el, repetir, alternar, esMono, irA, animaciones }. */
+  /* El logo. opciones: { animar: true, mono: false, clase: '', forma: 'curva' (la elegida) | 'escalon', contorno: 'cuadrado' | 'circulo', flojo: false }. 'circulo' recorta el mismo logo con un círculo; flojo: true lo deja con las fichas algo separadas y los hilos curvos (implica círculo). Devuelve { el, repetir, alternar, esMono, irA, animaciones }. */
   function logo(op) {
-    const o = Object.assign({ animar: true, mono: false, clase: '', forma: 'curva' }, op);
+    const o = Object.assign({ animar: true, mono: false, clase: '', forma: 'curva', contorno: 'cuadrado', flojo: false }, op);
+    const circular = o.contorno === 'circulo' || o.flojo; const flojo = !!o.flojo; const idr = 'disco-' + (++cuenta); const idg = idr + 'g';
     const forma = FORMAS[o.forma] || FORMAS.curva;
     const g = geometria(forma);
     const tips = g.lineas.map((l, k) => `<circle class="punta" data-linea="${k}" r="${HILO / 2 + EXTRA}" cx="0" cy="0" fill="${l.color}"/>`).join('');
-    const hilos = g.hilos.map((t) => `<rect class="hilo hilo--${t.eje}" data-linea="${t.linea}" data-desde="${t.desde}" data-hasta="${t.hasta}" x="${t.x}" y="${t.y}" width="${t.w}" height="${t.h}" fill="${t.color}"/>`).join('');
+    const cuantos = {};
+    g.hilos.forEach((t) => { cuantos[t.linea] = (cuantos[t.linea] || 0) + 1; t.signo = (t.linea + cuantos[t.linea]) % 2 ? 1 : -1; });
+    const curvo = (t) => {
+      const l = g.lineas[t.linea]; const c = suelta(l.centro); const pts = [];
+      for (let s = t.desde; s < t.hasta; s += 1) pts.push(s);
+      pts.push(t.hasta);
+      return 'M' + pts.map((s) => (t.eje === 'v' ? `${f(c + comba(t, s))} ${f(suelta(s))}` : `${f(suelta(s))} ${f(c + comba(t, s))}`)).join('L');
+    };
+    const hilos = g.hilos.map((t) => flojo
+      ? `<path class="hilo hilo--${t.eje}" data-linea="${t.linea}" data-desde="${t.desde}" data-hasta="${t.hasta}" d="${curvo(t)}" pathLength="1" stroke-dasharray="1 1" fill="none" stroke="${t.color}" stroke-width="${HILO}"/>`
+      : `<rect class="hilo hilo--${t.eje}" data-linea="${t.linea}" data-desde="${t.desde}" data-hasta="${t.hasta}" x="${t.x}" y="${t.y}" width="${t.w}" height="${t.h}" fill="${t.color}"/>`).join('');
     const unica = g.piezas.join('');
-    const piezas = g.cuerpos.map((c) => `<g class="pieza" data-i="${c.i}" data-j="${c.j}" style="transform-origin:${c.cx}px ${c.cy}px"><path fill="currentColor" d="${c.cuerpo}"/>${c.lenguetas.map((d) => `<path fill="currentColor" d="${d}"/>`).join('')}</g>`).join('');
+    const clip = circular ? ` clip-path="url(#${idr})"` : '';
+    const piezas = g.cuerpos.map((c) => `<g class="pieza" data-i="${c.i}" data-j="${c.j}"${clip} style="transform-origin:${c.cx}px ${c.cy}px${flojo ? `;translate:${(c.i - 1) * SEP}px ${(c.j - 1) * SEP}px` : ''}"><path fill="currentColor" d="${c.cuerpo}"/>${c.lenguetas.map((d) => `<path fill="currentColor" d="${d}"/>`).join('')}</g>`).join('');
     // svg() arma el logo dentro de un <template>, que pertenece a un documento inerte con su propia línea de tiempo: una animación creada ahí
     // nunca avanza y las piezas se quedaban en opacidad 0 hasta el relevo. Por eso se adopta en el documento real y la animación arranca
     // cuando el logo ya está montado en la página.
-    const el = document.adoptNode(svg(`<svg class="logo-tejido ${o.clase}" viewBox="0 0 64 64" role="img" aria-label="Mosaico Telar: nueve piezas unidas por cuatro hilos de colores que se cruzan" focusable="false">
+    const defs = circular ? `<defs><clipPath id="${idr}"><circle cx="32" cy="32" r="${RADIO}"/></clipPath><clipPath id="${idg}"><circle cx="32" cy="32" r="${flojo ? RADIO_SUELTO : RADIO}"/></clipPath></defs>` : '';
+    const grupo = circular ? ` clip-path="url(#${idg})"` : '';
+    const el = document.adoptNode(svg(`<svg class="logo-tejido ${o.clase}" viewBox="0 0 64 64" role="img" aria-label="Mosaico Telar: nueve piezas unidas por cuatro hilos de colores que se cruzan" focusable="false">${defs}
       <g class="lienzo" style="transform-origin:32px 32px">
-      <g class="hilos">${tips}${hilos}</g>
-      <path class="tela-unica" fill="currentColor" d="${unica}"/>
-      <g class="piezas">${piezas}</g></g></svg>`));
+      <g class="hilos"${grupo}>${tips}${hilos}</g>
+      <path class="tela-unica" fill="currentColor"${grupo} d="${unica}"/>
+      <g class="piezas"${grupo}>${piezas}</g></g></svg>`));
+    if (flojo) el.classList.add('suelto');
     if (o.mono) el.classList.add('mono');
     let animaciones = []; let temporizador = null;
     const limpiar = () => { clearTimeout(temporizador); animaciones.forEach((a) => a.cancel()); animaciones = []; el.classList.remove('tejiendo'); };
@@ -249,7 +290,7 @@
       limpiar(); if (!el.animate) return;
       const suave = reducido() || calmado();
       el.classList.add('tejiendo');
-      animaciones = suave ? calma(el) : tejer(el, g, forma);
+      animaciones = suave ? calma(el) : tejer(el, g, forma, flojo);
       temporizador = setTimeout(limpiar, suave ? 800 : DURACION);
     };
     // Si el logo aún no está en la página (la vista lo crea y luego lo inserta), espera a que se monte; el tiempo cuenta desde ahí.
