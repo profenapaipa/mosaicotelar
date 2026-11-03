@@ -18,7 +18,7 @@
     { id: 'recorrido', hash: '#/recorrido', etiqueta: 'Roles', cls: 'e-marca', icono: () => icono('docente') },
     { id: 'planes', hash: '#/planes', etiqueta: 'Participar', cls: 'e-marca', icono: () => icono('logros'), abajo: true },
     { id: 'hoja', hash: '#/hoja', etiqueta: 'Hoja de ruta', cls: 'e-marca', icono: () => icono('estado'), abajo: true },
-    { id: 'identidad', hash: '#/identidad', etiqueta: 'Marca', cls: 'e-marca', icono: () => icono('identidad'), abajo: true },
+    { id: 'identidad', hash: '#/identidad', etiqueta: 'Identidad', cls: 'e-marca', icono: () => icono('identidad'), abajo: true },
   ];
 
   function decorativo(svg) { svg.removeAttribute('role'); svg.removeAttribute('aria-label'); svg.setAttribute('aria-hidden', 'true'); return svg; }

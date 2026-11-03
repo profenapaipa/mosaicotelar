@@ -385,6 +385,24 @@ async function flujo() {
   if (doc().querySelector('dialog[open]')) { doc().querySelector('dialog[open]').close(); await espera(150); }
   afirmar('cada portal se presenta como un hilo (estudiante, quien enseña, el que cruza a los otros dos)', /hilo del estudiante/.test(inicioTxt) && /hilo de quien enseña/.test(inicioTxt) && /hilo que cruza a los otros dos/.test(inicioTxt) && /malla curricular de su institución/.test(inicioTxt));
   afirmar('la bienvenida no afirma que los portales originales ya comparten datos', /compartir los datos es lo que viene con el servidor/.test(inicioTxt));
+  // ---- identidad: el logo de la pestaña, el botón de inicio y las cuatro versiones coinciden ----
+  {
+    const fav = await (await fetch('../assets/favicon.svg', { cache: 'no-store' })).text();
+    afirmar('el ícono de la pestaña es de piezas negras con los cuatro hilos de colores sobre baldosa blanca', /fill="#1A1714" d="/.test(fav) && ['#1B7F56', '#2B4FA3', '#E8A13C', '#E0527E'].every((c) => fav.includes(c)) && /<rect width="64" height="64"[^>]*fill="#FFFFFF"/.test(fav) && !/8F887C/i.test(fav));
+    await ir('#/'); await espera(200);
+    const rl = ventana().document.querySelector('#riel-logo');
+    const cs = ventana().getComputedStyle(rl);
+    afirmar('el botón de inicio lleva baldosa blanca con piezas negras', cs.backgroundColor === 'rgb(255, 255, 255)' && ventana().getComputedStyle(rl.querySelector('svg')).color === 'rgb(26, 23, 20)');
+    afirmar('el botón de inicio muestra los hilos de colores', rl.querySelectorAll('.hilos rect').length > 0);
+    afirmar('el riel nombra la sección Identidad, no Marca', [...ventana().document.querySelectorAll('.riel a')].some((x) => x.textContent.trim() === 'Identidad') && ![...ventana().document.querySelectorAll('.riel a')].some((x) => x.textContent.trim() === 'Marca'));
+    await ir('#/identidad'); await espera(250);
+    const muestras = [...ventana().document.querySelectorAll('.muestra-logo')];
+    const fondo = (m) => ventana().getComputedStyle(m).backgroundColor;
+    afirmar('Identidad muestra el logo a color y en blanco y negro, cada uno sobre blanco y sobre negro', muestras.length >= 4 && muestras.slice(0, 4).map((m) => fondo(m) + (m.querySelector('.logo-mono') ? ' bn' : ' color')).join('|') === 'rgb(255, 255, 255) color|rgb(26, 23, 20) color|rgb(255, 255, 255) bn|rgb(26, 23, 20) bn');
+    afirmar('en las versiones en blanco y negro los hilos no se ven', [...ventana().document.querySelectorAll('.logo-mono .logo-hilo')].every((r) => ventana().getComputedStyle(r).display === 'none'));
+    const enlaces = [...ventana().document.querySelectorAll('a[download]')].map((x) => x.getAttribute('href'));
+    afirmar('las cuatro versiones se pueden descargar y existen', enlaces.length === 4 && (await Promise.all(enlaces.map(async (u) => (await fetch('../' + u, { method: 'HEAD' })).ok))).every(Boolean));
+  }
   afirmar('la cuadrícula Cómo lo construimos sigue oculta mientras no se apruebe', !ventana().MT.config.mostrarConstruccion);
   ventana().MT.config.mostrarConstruccion = true;
   await ir('#/hoja/construccion'); await espera(150);

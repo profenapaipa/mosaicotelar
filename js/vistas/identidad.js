@@ -20,15 +20,22 @@
   const razon = (a, b) => { const x = lum(a); const y = lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); };
   const ICONOS = ['docente', 'orientacion', 'familia', 'coordinacion', 'libro', 'chat', 'mapa', 'recorrido', 'estado', 'identidad'];
 
+  const VERSIONES = [
+    { nombre: 'A color, sobre fondo blanco', clase: 'muestra-logo--claro', mono: false, archivo: 'logo-color-fondo-blanco.svg', uso: 'La versión principal: piezas negras e hilos de colores.' },
+    { nombre: 'A color, sobre fondo negro', clase: 'muestra-logo--oscuro', mono: false, archivo: 'logo-color-fondo-negro.svg', uso: 'Las piezas pasan a blanco y los hilos conservan su color.' },
+    { nombre: 'Blanco y negro, sobre fondo blanco', clase: 'muestra-logo--claro', mono: true, archivo: 'logo-bn-fondo-blanco.svg', uso: 'Para impresión en una tinta, fotocopias y sellos.' },
+    { nombre: 'Blanco y negro, sobre fondo negro', clase: 'muestra-logo--oscuro', mono: true, archivo: 'logo-bn-fondo-negro.svg', uso: 'Para fondos oscuros sin color.' },
+  ];
+
   const seccion = (id, titulo, ...hijos) => h('section', { class: 'manual-seccion', id, 'aria-labelledby': 'm-' + id }, h('h2', { id: 'm-' + id }, titulo), ...hijos);
 
   MT.router.registrar({
-    id: 'identidad', titulo: 'Identidad de marca', espacio: '',
+    id: 'identidad', titulo: 'Identidad', espacio: '',
     render(main) {
-      const c = pagina(main, { etiqueta: 'Manual de marca', titulo: 'Mosaico Telar: identidad',
+      const c = pagina(main, { etiqueta: 'Identidad', titulo: 'Mosaico Telar: identidad',
         descripcion: 'Cómo se ve y cómo habla la plataforma. Todo lo que ves aquí está hecho con los mismos componentes que usa el resto del sitio.' });
 
-      c.append(h('nav', { class: 'toc', 'aria-label': 'Contenido del manual' }, h('ul', null,
+      c.append(h('nav', { class: 'toc', 'aria-label': 'Contenido de la identidad' }, h('ul', null,
         [['proposito', 'Propósito'], ['logo', 'Logo'], ['color', 'Color'], ['tipografia', 'Tipografía'], ['formas', 'Formas e íconos'], ['recursos', 'Recursos'], ['componentes', 'Componentes'], ['voz', 'Voz']]
           .map(([id, t]) => h('li', null, h('a', { href: '#/identidad', onclick: (e) => { e.preventDefault(); const el = document.getElementById(id); if (el) MT.movimiento.desplazar(el); } }, t))))));
 
@@ -42,12 +49,12 @@
           .map(([t, p]) => h('div', { class: 'tarjeta' }, h('h3', null, t), h('p', null, p))))));
 
       c.append(seccion('logo', 'Logo',
-        h('p', null, 'Una trama de telar vista de cerca: ', h('strong', null, 'nueve teselas negras cruzadas por hilos blancos de un solo grosor'), ', que pasan por encima y por debajo. El mosaico son las piezas; el telar, lo que las une. ', h('strong', null, 'Es blanco y negro'), ': su identidad está en la forma, no en el color.'),
-        h('div', { class: 'rejilla rejilla--3' },
-          h('div', { class: 'muestra-logo muestra-logo--claro' }, lockup()),
-          h('div', { class: 'muestra-logo muestra-logo--oscuro' }, lockup()),
-          h('div', { class: 'muestra-logo muestra-logo--verde' }, lockup())),
-        h('p', { class: 'suave', style: 'margin-top:.6rem' }, 'En negro sobre claro, en blanco sobre oscuro y en blanco sobre el verde de la marca.'),
+        h('p', null, 'Una trama de telar vista de cerca: ', h('strong', null, 'nueve teselas negras cruzadas por hilos de cuatro colores'), ', que pasan por encima y por debajo. El mosaico son las piezas; el telar, lo que las une. Cada hilo es el color de uno de los portales: verde (Kinesis), azul (ValerIA), ámbar (Wisfox) y rosa (la plataforma que los une).'),
+        h('div', { class: 'rejilla rejilla--2' }, VERSIONES.map((v) => h('div', { class: 'tarjeta' },
+          h('div', { class: 'muestra-logo ' + v.clase }, lockup(v.mono ? 'logo-mono' : '')),
+          h('h3', null, v.nombre), h('p', { class: 'suave' }, v.uso),
+          h('p', null, h('a', { href: 'assets/' + v.archivo, download: v.archivo }, 'Descargar (SVG)'))))),
+        h('p', { class: 'suave', style: 'margin-top:.6rem' }, 'La base es la versión a color: piezas negras con los hilos de colores. De ella salen las otras tres, y también el ícono de la pestaña y el botón de inicio. En el ícono de la pestaña y en el botón de inicio el logo va sobre una baldosa blanca para que se lea con cualquier tema del navegador.'),
         h('div', { class: 'tarjeta', style: 'margin-top:1rem' }, h('h3', null, 'Por qué se ve como se ve (leyes de la Gestalt)'),
           h('ul', null,
             h('li', null, h('strong', null, 'Cierre: '), 'el cuadrado completo se lee aunque los hilos lo corten en nueve piezas.'),
@@ -58,9 +65,9 @@
         h('div', { class: 'rejilla rejilla--3', style: 'margin-top:1rem' },
           h('div', { class: 'tarjeta' }, h('div', { class: 'muestra-simbolo' }, marca('mosaico', 'simbolo-grande')), h('p', { class: 'suave' }, 'Símbolo solo, para íconos y favicon. Se lee desde 16 px.')),
           h('div', { class: 'tarjeta' }, h('h3', null, 'Cómo se usa'), h('ul', null,
-            h('li', null, 'Espacio libre: el ancho de un hilo, por todos los lados.'), h('li', null, 'Tamaño mínimo: 16 px el símbolo; 110 px el logo completo.'), h('li', null, 'Los hilos toman el color del fondo: no se pintan.'))),
+            h('li', null, 'Espacio libre: el ancho de un hilo, por todos los lados.'), h('li', null, 'Tamaño mínimo: 16 px el símbolo; 110 px el logo completo.'), h('li', null, 'Los hilos llevan el color de su portal; en blanco y negro, toman el color del fondo.'))),
           h('div', { class: 'tarjeta' }, h('h3', null, 'Cómo no'), h('ul', null,
-            h('li', null, 'No estirarlo ni girarlo.'), h('li', null, 'No colorear las piezas ni los hilos.'), h('li', null, 'No ponerle sombras, degradados ni contornos.'))))));
+            h('li', null, 'No estirarlo ni girarlo.'), h('li', null, 'No cambiar los colores de las piezas ni de los hilos.'), h('li', null, 'No ponerle sombras, degradados ni contornos.'))))));
 
       c.append(seccion('color', 'Color',
         h('p', null, h('strong', null, 'Un color principal, dos funcionales y tres neutros.'), ' El principal es el verde bosque, y se eligió por continuidad: los dos proyectos ya eran verdes, así que la plataforma no les cambia el tono, lo comparte. Los funcionales también salen de las aplicaciones.'),
