@@ -315,7 +315,7 @@
   // Compatibilidad con la bienvenida: el logo que se teje.
   const logoTejido = () => logo({ animar: true });
   // La versión a color, quieta, para piezas de presentación, planes y la página de marca.
-  const logoColor = (clase) => logo({ animar: false, clase: clase || '' }).el;
+  const logoColor = (clase, op) => logo(Object.assign({ animar: false, clase: clase || '' }, op)).el;
 
   /* Un cargador: el mismo telar, con los hilos subiendo y bajando sin parar. Para esperas reales (un portal que carga). */
   function cargador(clase) {

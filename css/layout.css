@@ -13,10 +13,10 @@
   --logo-fondo: var(--riel-bg);
 }
 .riel-logo { display: grid; place-items: center; width: 52px; height: 52px; border-radius: 50%; margin-bottom: .6rem; }
-/* El riel es oscuro en cualquier tema: el logo (piezas negras, hilos de colores) va en un medallón redondo de papel, como el ovillo de la marca. Es un círculo exacto (sin relleno ni ancho heredados del enlace) para que quede centrado. */
+/* El riel es oscuro en cualquier tema: el logo (piezas negras, hilos de colores) va en un medallón redondo de papel con el logo circular dentro (el mismo logo, recortado por un círculo), como el ovillo de la marca. Es un círculo exacto (sin relleno ni ancho heredados del enlace) para que quede centrado. */
 .riel a.riel-logo { flex: none; box-sizing: border-box; width: 52px; height: 52px; padding: 0; border-radius: 50%; background: #FAF7F2; color: #1A1714; --logo-fondo: #FAF7F2; --hilo-kinesis: #1B7F56; --hilo-valeria: #2B4FA3; --hilo-wisfox: #E8A13C; --hilo-mosaico: #E0527E; }
-.riel a.riel-logo svg { width: 44px; height: 44px; color: #1A1714; --logo-fondo: #FAF7F2; }   /* con "a" para ganarle a la regla de íconos del riel (28 px) */
-.riel a.riel-logo:hover, .riel a.riel-logo[aria-current="page"] { background: #FAF7F2; box-shadow: 0 0 0 3px rgba(250, 247, 242, .3); }
+.riel a.riel-logo svg { width: 46px; height: 46px; color: #1A1714; --logo-fondo: #FAF7F2; }   /* con "a" para ganarle a la regla de íconos del riel (28 px) */
+.riel a.riel-logo:hover, .riel a.riel-logo[aria-current="page"] { background: #FAF7F2; box-shadow: none; }   /* sin aro: el medallón no lleva borde en ningún estado */
 .riel-items { display: flex; flex-direction: column; gap: .2rem; align-items: center; }
 .riel-abajo { margin-top: auto; display: flex; flex-direction: column; gap: .2rem; align-items: center; }
 .riel a {
