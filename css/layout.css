@@ -15,7 +15,7 @@
 .riel-logo { display: grid; place-items: center; width: 56px; height: 56px; border-radius: 14px; margin-bottom: .6rem; }
 /* El riel es oscuro en cualquier tema, así que el logo va sobre su propia baldosa blanca: piezas negras con los hilos de colores, igual que el ícono de la pestaña. */
 .riel a.riel-logo { background: #FFFFFF; color: #1A1714; --logo-fondo: #FFFFFF; --hilo-kinesis: #1B7F56; --hilo-valeria: #2B4FA3; --hilo-wisfox: #E8A13C; --hilo-mosaico: #E0527E; }
-.riel a.riel-logo svg { width: 46px; height: 46px; color: #1A1714; --logo-fondo: #FFFFFF; }   /* con "a" para ganarle a la regla de íconos del riel (28 px) */
+.riel a.riel-logo svg { width: 50px; height: 50px; color: #1A1714; --logo-fondo: #FFFFFF; }   /* con "a" para ganarle a la regla de íconos del riel (28 px) */
 .riel a.riel-logo:hover, .riel a.riel-logo[aria-current="page"] { background: #FFFFFF; }
 .riel-items { display: flex; flex-direction: column; gap: .2rem; align-items: center; }
 .riel-abajo { margin-top: auto; display: flex; flex-direction: column; gap: .2rem; align-items: center; }
