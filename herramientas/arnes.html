@@ -403,6 +403,12 @@ async function flujo() {
     const bn = [...ventana().document.querySelectorAll('.logo-mono .logo-tejido .hilos')];
     afirmar('en las versiones en blanco y negro los hilos no se ven y en las de color sí', bn.length >= 2 && bn.every((r) => ventana().getComputedStyle(r).opacity === '0') && [...ventana().document.querySelectorAll('.muestra-logo:not(:has(.logo-mono)) .logo-tejido .hilos')].every((r) => ventana().getComputedStyle(r).opacity === '1'));
     afirmar('sobre fondo negro los hilos usan tonos más luminosos que sobre blanco', (() => { const f = (m) => ventana().getComputedStyle(m.querySelector('.hilo')).fill; const a = [...ventana().document.querySelectorAll('.muestra-logo')]; return f(a[1]) !== f(a[0]); })());
+    // Propuestas de estilo (demostración): cuatro movimientos y piezas que encajan de verdad.
+    afirmar('Identidad trae la demostración de las propuestas de estilo (divisor, piezas, ovillo y cruce de hilos)', !!ventana().document.querySelector('#estilos .divisor-lana') && ventana().document.querySelectorAll('#estilos .pieza-portal-card').length === 3 && !!ventana().document.querySelector('#estilos .btn-ovillo') && !!ventana().document.querySelector('#estilos .escena-lana'));
+    { const ps = [...ventana().document.querySelectorAll('#estilos .pieza-portal-card')]; const caja = ps[0].parentElement; caja.classList.remove('separadas'); await espera(700);
+      const [r1, r2, r3] = ps.map((x) => x.getBoundingClientRect()); const k = r1.width / 110;
+      afirmar('al encajar, la lengüeta de cada pieza coincide con el hueco de la siguiente', Math.abs((r2.left + 10 * k) - (r1.left + 90 * k)) < 1.5 && Math.abs((r3.left + 10 * k) - (r2.left + 90 * k)) < 1.5 && Math.abs(r1.top - r2.top) < 1.5, 'desvío=' + ((r2.left + 10 * k) - (r1.left + 90 * k)).toFixed(2));
+      caja.classList.add('separadas'); }
     const enlaces = [...ventana().document.querySelectorAll('a[download]')].map((x) => x.getAttribute('href'));
     afirmar('las cuatro versiones se pueden descargar y existen', enlaces.length === 4 && (await Promise.all(enlaces.map(async (u) => (await fetch('../' + u, { method: 'HEAD' })).ok))).every(Boolean));
   }

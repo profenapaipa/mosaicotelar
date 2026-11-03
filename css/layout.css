@@ -17,6 +17,7 @@
 .riel a.riel-logo { flex: none; box-sizing: border-box; display: grid; place-items: center; align-content: center; justify-content: center; gap: 0; width: 52px; height: 52px; padding: 0; border-radius: 50%; background: #1A1714; border: 3px solid #FFFFFF; color: #1A1714; --logo-fondo: #1A1714; --hilo-kinesis: #1FA36B; --hilo-valeria: #4A6FE0; --hilo-wisfox: #F2A33A; --hilo-mosaico: #F0558A; }
 /* El logo llena el círculo por dentro del contorno blanco (46 px de lado interior) y queda centrado: el dibujo se recorta al disco en main.js (viewBox 1.5 1.5 61 61). */
 .riel a.riel-logo svg { display: block; width: 46px; height: 46px; margin: 0; color: #1A1714; }
+.riel a.riel-logo::before { display: none; }   /* el botón de inicio no lleva la barra de «página actual»: el contorno blanco ya lo marca */
 .riel a.riel-logo:hover, .riel a.riel-logo[aria-current="page"] { background: #1A1714; box-shadow: none; }
 .riel-items { display: flex; flex-direction: column; gap: .2rem; align-items: center; }
 .riel-abajo { margin-top: auto; display: flex; flex-direction: column; gap: .2rem; align-items: center; }

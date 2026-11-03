@@ -3,7 +3,7 @@
    en tokens.css, cambia aquí. */
 (function (MT) {
   'use strict';
-  const { h, marca, lockup, icono } = MT.ui;
+  const { h, svg, marca, lockup, icono } = MT.ui;
   const { pagina } = MT.comun;
 
   const COLORES = [
@@ -43,7 +43,7 @@
         descripcion: 'Cómo se ve y cómo habla la plataforma. Todo lo que ves aquí está hecho con los mismos componentes que usa el resto del sitio.' });
 
       c.append(h('nav', { class: 'toc', 'aria-label': 'Contenido de la identidad' }, h('ul', null,
-        [['proposito', 'Propósito'], ['logo', 'Logo'], ['color', 'Color'], ['tipografia', 'Tipografía'], ['formas', 'Formas e íconos'], ['recursos', 'Recursos'], ['componentes', 'Componentes'], ['voz', 'Voz']]
+        [['proposito', 'Propósito'], ['logo', 'Logo'], ['estilos', 'Propuestas de estilo'], ['color', 'Color'], ['tipografia', 'Tipografía'], ['formas', 'Formas e íconos'], ['recursos', 'Recursos'], ['componentes', 'Componentes'], ['voz', 'Voz']]
           .map(([id, t]) => h('li', null, h('a', { href: '#/identidad', onclick: (e) => { e.preventDefault(); const el = document.getElementById(id); if (el) MT.movimiento.desplazar(el); } }, t))))));
 
       c.append(seccion('proposito', 'Propósito',
@@ -94,6 +94,37 @@
             h('li', null, 'Espacio libre: el ancho de un hilo, por todos los lados.'), h('li', null, 'Tamaño mínimo: 16 px el símbolo; 110 px el logo completo.'), h('li', null, 'Los hilos llevan el color de su portal; en blanco y negro, toman el color del fondo.'))),
           h('div', { class: 'tarjeta' }, h('h3', null, 'Cómo no'), h('ul', null,
             h('li', null, 'No estirarlo ni girarlo.'), h('li', null, 'No cambiar los colores de las piezas ni de los hilos.'), h('li', null, 'No ponerle sombras, degradados ni contornos.'))))));
+
+      // Demo temporal: las propuestas de estilo del tejido, vivas, para decidir con ellas a la vista.
+      const hiloLana = (d, c) => `<path class="hilo ${c}" pathLength="1" d="${d}"/>`;
+      const divisor = () => {
+        const el = svg(`<svg class="divisor-lana teje" viewBox="0 0 800 70" preserveAspectRatio="none" aria-hidden="true" focusable="false">${hiloLana('M0 20 C 100 -6, 160 46, 270 20 S 420 -4, 540 22 S 700 44, 780 18', 'p1')}${hiloLana('M0 32 C 100 6, 170 58, 280 32 S 430 8, 550 34 S 710 56, 790 30', 'p2')}${hiloLana('M0 44 C 100 18, 180 70, 290 44 S 440 20, 560 46 S 720 68, 796 42', 'p3')}${hiloLana('M0 56 C 100 30, 190 82, 300 56 S 450 32, 570 58 S 730 80, 800 54', 'p4')}</svg>`);
+        return el;
+      };
+      const pieza = (color, nombre, linea, forma, clase) => h('div', { class: 'pieza-portal-card ' + (clase || ''), style: `--pc:${color}` },
+        svg(`<svg viewBox="0 0 110 100" aria-hidden="true" focusable="false"><path d="${forma}" fill="${color}"/></svg>`),
+        h('div', { class: 'contenido' }, h('b', null, nombre), h('span', null, linea)));
+      const F1 = 'M10 10H90V40a10 10 0 1 1 0 20V90H10Z';                       // lengüeta a la derecha
+      const F2 = 'M10 10H90V40a10 10 0 1 1 0 20V90H10V60a10 10 0 1 0 0-20Z';   // hueco a la izquierda y lengüeta a la derecha
+      const F3 = 'M10 10H90V90H10V60a10 10 0 1 0 0-20Z';                       // solo el hueco a la izquierda
+      const portales = h('div', { class: 'piezas-portales separadas' }, pieza('#1B7F56', 'Kinesis', 'El hilo de quien enseña', F1), pieza('#2B4FA3', 'ValerIA', 'El hilo que cruza a los otros dos', F2), pieza('#E8A13C', 'Wisfox', 'El hilo del estudiante', F3, 'pieza-portal-card--wisfox'));
+      portales.addEventListener('mouseenter', () => portales.classList.remove('separadas'));
+      portales.addEventListener('mouseleave', () => portales.classList.add('separadas'));
+      const ovillo = () => svg('<svg viewBox="0 0 28 28" aria-hidden="true" focusable="false"><defs><clipPath id="ov-demo"><circle cx="13" cy="13" r="10"/></clipPath></defs><circle cx="13" cy="13" r="10" fill="#fff"/><g clip-path="url(#ov-demo)" fill="none" stroke-width="2.4"><path d="M2 8C8 14 16 4 26 10" stroke="#2B4FA3"/><path d="M2 14C8 20 16 10 26 16" stroke="#E8A13C"/><path d="M8 2C12 10 8 18 16 26" stroke="#E0527E"/></g><circle cx="13" cy="13" r="10" fill="none" stroke="#fff" stroke-width="1.5"/></svg>');
+      const escena = h('div', { class: 'escena-lana' }, h('h4', null, 'Mapa'), h('div', { class: 'cortina', 'aria-hidden': 'true' }, h('i'), h('i'), h('i'), h('i')));
+      const nombresEscena = ['Mapa', 'Participar', 'Hoja de ruta', 'Identidad']; let ne = 0;
+      const div1 = divisor();
+      c.append(seccion('estilos', 'Propuestas de estilo',
+        h('p', { class: 'aviso' }, 'Temporal, para decidir con la demostración a la vista. Son cuatro movimientos de la dirección «Hilo conductor» más las piezas que encajan. Con «movimiento calmado» o «reducir movimiento» todo queda quieto y completo.'),
+        h('div', { class: 'estilo-demo' }, h('h3', null, 'A · Divisor de lana'), h('p', { class: 'suave' }, 'Sustituye la línea entre secciones. Se teje al llegar y no cambia de color ni de grosor.'), div1,
+          h('button', { class: 'btn btn--chico btn--suave', type: 'button', onclick: () => { div1.classList.remove('teje'); void div1.getBoundingClientRect(); div1.classList.add('teje'); } }, 'Tejer otra vez')),
+        h('div', { class: 'estilo-demo' }, h('h3', null, 'B · Los tres portales como piezas que encajan'), h('p', { class: 'suave' }, 'Pasa el cursor (o toca el botón): la lengüeta de cada pieza entra exacta en el hueco de la siguiente. En celular se apilan.'), portales,
+          h('p', { style: 'text-align:center' }, h('button', { class: 'btn btn--chico btn--suave', type: 'button', onclick: () => portales.classList.toggle('separadas') }, 'Encajar o separar'))),
+        h('div', { class: 'estilo-demo' }, h('h3', null, 'C · Ovillo en el botón y progreso de cuatro hilos'), h('p', { class: 'suave' }, 'El botón principal lleva un ovillo que gira al pasar el cursor; el avance del camino de un ajuste es un hilo de cuatro colores.'),
+          h('div', { class: 'acciones' }, h('button', { class: 'btn btn-ovillo', type: 'button' }, ovillo(), 'Entrar con mi rol'), h('button', { class: 'btn btn--suave', type: 'button' }, 'Participar')),
+          h('p', { style: 'margin:1rem 0 0' }, h('strong', null, 'El camino de un ajuste: '), '4 de 6 pasos'), h('div', { class: 'hilo-avance', role: 'img', 'aria-label': '4 de 6 pasos hechos' }, h('i'))),
+        h('div', { class: 'estilo-demo' }, h('h3', null, 'D · Cambio de sección: la lana cruza'), h('p', { class: 'suave' }, 'Al pasar de una página a otra, cuatro hilos cruzan en poco más de un segundo, los mismos de la barra superior de hoy.'), escena,
+          h('p', { style: 'margin-top:.8rem' }, h('button', { class: 'btn btn--chico btn--suave', type: 'button', onclick: () => { escena.classList.remove('corre'); void escena.getBoundingClientRect(); escena.classList.add('corre'); setTimeout(() => { ne = (ne + 1) % nombresEscena.length; escena.querySelector('h4').textContent = nombresEscena[ne]; }, 520); } }, 'Cambiar de sección')))));
 
       c.append(seccion('color', 'Color',
         h('p', null, h('strong', null, 'Un color principal, dos funcionales y tres neutros.'), ' El principal es el verde bosque, y se eligió por continuidad: los dos proyectos ya eran verdes, así que la plataforma no les cambia el tono, lo comparte. Los funcionales también salen de las aplicaciones.'),

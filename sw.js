@@ -39,6 +39,7 @@ const CASCARA = [
   'assets/capturas/estudiante.jpg',
   'css/animacion.css',
   'css/simbolos.css',
+  'css/estilo.css',
   'css/base.css',
   'css/calmado.css',
   'css/fuentes.css',
